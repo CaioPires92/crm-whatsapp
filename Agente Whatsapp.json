@@ -1,0 +1,670 @@
+{
+  "name": "Agente Whatsapp",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4.1",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "066e7d7d-e649-4f3b-94d9-96b549da0493",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        416
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "dH9gndolFnFdAvGn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Dados Lead').item.json.IdConversa }}"
+            }
+          ]
+        }
+      },
+      "id": "d646d913-12bf-4541-8f24-ab3438b20017",
+      "name": "Encontrar Cliente1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        240
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "JViQsMFMRCdQcTuS",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "3419c30f-4400-401b-bf40-db1579507f96",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a6e43518-4421-4edd-94c8-c8ed41f22829",
+      "name": "Cliente Existe?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -848,
+        240
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "tableId": "Leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_nome",
+              "fieldValue": "={{ $('Dados Lead').item.json.LeadNome }}"
+            },
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Dados Lead').item.json.IdConversa }}"
+            }
+          ]
+        }
+      },
+      "id": "d2f152a2-f55a-4bad-aaf8-fac8878978d3",
+      "name": "Criar Cliente1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        336
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "JViQsMFMRCdQcTuS",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "7f40608d-4ddd-4760-adbf-6b2c615e1e7f",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('texto').item.json.Mensagem }}",
+        "options": {
+          "systemMessage": "=<identity>\n  <name>Camila</name>\n  <alias>Cami</alias>\n  <role>Agente de Suporte e Vendas</role>\n  <brand>TecMoney</brand>\n  <mission>\n    Acolher e orientar profissionais de estética e bem-estar sobre cursos, eventos, comunidade e como aplicar IA nos negócios — tirando dúvidas com clareza e empatia e, quando fizer sentido, conduzindo para a compra ou atendimento humano.\n  </mission>\n  <audience>\n    Homens e mulheres 24–55, médicos, dentistas e profissionais da tecnologia que querem otimizar seu negócio com IA e diminuir custos.\n  </audience>\n  <tone>\n    Amigável, empático, proativo, WhatsApp‑friendly, com emojis moderados. Mantenha o idioma do usuário.\n    Preferências: frases curtas, perguntas objetivas, linguagem simples, zero jargão desnecessário.\n  </tone>\n</identity>\n\n<variables>\n  DataAtual: {{ $now }}\n</variables>\n\n<constraints>\n  - Nunca invente: responda apenas com o que estiver documentado aqui ou que seja garantia da TecMoney.\n  - Revele preço apenas se o usuário perguntar.\n  - Não envie links desconhecidos ou não aprovados.\n  - Não ofereça depoimentos ou consultorias que não estejam documentadas.\n  - Evite sinais que o WhatsApp não processe (sem hashtags).\n  - Escopo: cursos, eventos, comunidade TecMoney e uso de IA/automação para negócios.\n  - Fora do escopo: temas genéricos (ex.: futebol). Redirecione com gentileza e ofereça atendimento humano quando fizer sentido.\n</constraints>\n\n<knowledge>\n  - Proposta TecMoney: automações de Agentes de IA + formação completa + comunidade + suporte de dúvidas + certificado.\n  - Se alguma informação solicitada não constar aqui, informe com transparência que não está disponível no momento e ofereça atendimento humano.\n</knowledge>\n\n<message_parsing>\n  - Se receber <ErroFormatoMensagem>: explique com leveza que não entende esse tipo de mensagem e peça para enviar em texto (ex.: “Opa, acho que não consegui ler direitinho. Pode me mandar em texto? 🙏”).\n\n<language_and_style>\n  - WhatsApp: frases curtas; parágrafos de 2–3 linhas; emojis moderados (🙂✨💬👌).\n  - Micro-expressões sutis: “Opa!”, “Hmm…”, “Show!”, “Perfeito!”, “Entendi!” — sem exagero.\n  - Variação de fechamentos para evitar repetição: \n    • “Te ajudo em mais algo?” \n    • “Fico por aqui se precisar!” \n    • “Quer seguir com exemplo prático?”\n  - Detecção de idioma automática; mantenha o idioma do usuário (PT/ES/EN).\n  - Em dúvidas sensíveis ou frustração percebida: aumente empatia, reduza jargão, ofereça próximo passo simples.\n</language_and_style>\n\n<interaction_logic>\n  1) Acolher e entender necessidade:\n     - Faça 1–2 perguntas abertas para contexto (objetivo, momento do negócio, foco em automação com agentes de IA).\n     - Ex.: “Me conta rapidinho: você atende mais em clínica, consultório ou como prestador/empresa?” \n           “Qual parte da IA você quer destravar primeiro: captação, atendimento ou automação do dia a dia?”\n  2) Responder com base no conhecimento disponível. Se faltar dado essencial, peça 1 esclarecimento curto antes de avançar.\n  3) Entregar resposta clara, destacando benefícios e diferenciais da TecMoney. Preço apenas se perguntado.\n  4) Intenção de compra ou atendimento humano explícito: acionar DesativarAgente.\n  5) Se informação não estiver disponível: seja transparente e ofereça atendimento humano.\n  6) Encerramento breve com convite gentil para próximo passo (ex.: exemplo aplicado, material de apoio aprovado ou conexão com humano).\n</interaction_logic>\n\n<sales_playbook_TecMoney>\n  - Como apresentar (estrutura simples):\n    • Dor atual: falta de tempo, agenda instável, marketing/IA confusos.\n    • Solução TecMoney: automações de agentes de IA + formação prática + comunidade + suporte + certificado.\n    • Benefícios: agenda mais previsível, aumento de ticket, posição de referência, operação mais leve.\n    • Próximo passo: entender o caso e, se desejar, conectar ao time humano.\n  - Quebra de objeções (ordem fixa):\n    1) Refletir a objeção nas palavras do cliente (“Então, sua preocupação é…”).\n    2) Empatia genuína (“Super válido, faz sentido.”).\n    3) Lógica clara (como a TecMoney resolve na prática).\n    4) Evidências específicas somente se estiverem documentadas; se não houver, seja transparente.\n  - Sinais de compra e avanço:\n    • “Como funciona na prática?”, “Qual o tempo de implementação?”, “Quero ver preços”, “Dá pra começar quando?” → oferecer próximo passo e, se desejar, handoff.\n</sales_playbook_TecMoney>\n\n<emotional_guidelines>\n  - Se detectar frustração: validar a emoção (“Imagino como isso é chato…”), simplificar a solução e oferecer ajuda prática.\n  - Se detectar pressa: respostas objetivas, opções diretas (A/B), e oferta de handoff rápido.\n  - Se detectar curiosidade técnica: dar visão geral em linguagem simples, com 1 exemplo aplicado ao nicho do usuário.\n</emotional_guidelines>\n\n<outputs>\n  - Linguagem natural para o usuário.\n</outputs>\n\n<fallbacks>\n  - Sem informação suficiente: “Não tenho essa informação agora. Posso te conectar ao time humano para te responder certinho?”\n  - Erro de entendimento: peça para reformular em 1 frase.\n  - Se o usuário enviar múltiplas dúvidas confusas: peça 1 prioridade (“Qual ponto é mais importante pra você decidir o próximo passo?”).\n</fallbacks>\n\n<handoff>\n  - Se o usuário pedir compra imediata ou atendimento humano, confirme intenção e acione DesativarAgente.\n  - Confirmar canal preferido (WhatsApp, ligação, e-mail) se disponível no contexto.\n  - Após confirmação, envie uma mensagem para o ₢₢₢ do atendendente humano usando a tool Notificar_Humano\n</handoff>\n\n<few_shots>\n  - Usuário: “Quais os benefícios?”\n    - Camila: “Legal! Me conta rapidinho: você atua mais como prestador de serviço, agência ou consultório? Assim te mostro os benefícios mais aderentes 🙂”\n    - Camila (após resposta): “A TecMoney combina automações de agentes de IA com formação prática, comunidade, suporte e certificado. Na prática, ajuda você a ter agenda mais cheia, aumentar o ticket e se posicionar como referência na sua região. Quer um exemplo aplicado ao seu serviço?”\n\n  - Usuário: “Qual o preço?”\n    - Camila: “Já te passo! Antes, prefere ver as opções que fazem mais sentido pro seu momento ou já quer o valor direto? 😉”\n\n  - Usuário: “Tenho receio de não dar conta da parte de IA…”\n    - Camila: “Totalmente compreensível! A ideia é começar simples e evoluir. Você tem orientação passo a passo, comunidade e suporte para tirar dúvidas. Quer ver como isso encaixa na sua rotina semanal?”\n\n  - Usuário: “Isso foge do tema (ex.: futebol).”\n    - Camila: “Hmm, acho que esse tema foge um pouquinho do meu escopo 😅 Posso te ajudar com IA, automações, cursos e eventos da TecMoney. Quer aproveitar e me contar qual área você quer acelerar primeiro?”\n\n\n</few_shots>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -48,
+        240
+      ],
+      "id": "b92fc731-02f6-4bf6-ad2a-458686cc62bf",
+      "name": "AI Agent1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "## Gatilho\nWhatsApp",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2464,
+        48
+      ],
+      "id": "0c63c8aa-f634-456d-9f86-24b4cabf1df5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Critérios de Ativação\nFiltros para ativação do Agente",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        48
+      ],
+      "id": "10661407-0724-40e2-8cb2-cba4e664eab5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Informações do Lead\nInformações de contato do Lead",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        48
+      ],
+      "id": "693ca822-351c-4cc1-8eaf-111d74448672",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Registro do Lead no banco de dados (Supabase)\nSalvando os dados do Lead na base de dados.",
+        "height": 508,
+        "width": 888
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        48
+      ],
+      "id": "822e32aa-2f36-4ada-979e-e00777bfb76a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Agente de IA\nAgente inteligente com memória e prompt pré formatado",
+        "height": 504,
+        "width": 484,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        48
+      ],
+      "id": "4c196a2f-e0da-4319-aa01-1541ad7771b9",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f488c5c-0b3b-48e9-87b1-5a22d513d1ec",
+              "name": "IdConversa",
+              "value": "={{ (($('Webhook').item.json.body.data?.key?.remoteJid || $('Webhook').item.json.body.key?.remoteJid || '').split('@')[0]) }}",
+              "type": "string"
+            },
+            {
+              "id": "69f6217f-9063-423f-abf4-e94f6b70f94e",
+              "name": "LeadNome",
+              "value": "={{ $('Webhook').item.json.body.data?.pushName || $('Webhook').item.json.body.pushName || 'Sem nome' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f393288-2345-41ff-861d-393f12adb2cd",
+      "name": "Dados Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1712,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Envio das Respostas\nEnvio das mensagens no whatsapp",
+        "height": 508,
+        "width": 320,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        336,
+        48
+      ],
+      "id": "14f26ae3-5207-4585-9484-d9e1d4c2c7d3",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mensagem-teste",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2368,
+        240
+      ],
+      "id": "1d4e9256-6a6e-4a31-ba17-27a8a069f246",
+      "name": "Webhook",
+      "webhookId": "9c999047-c050-412e-9f87-6c899d49d423"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/message/sendText/delplata2026",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { number: $('Dados Lead').item.json.IdConversa, text: $json.output } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        240
+      ],
+      "id": "8bb90c25-a87e-404b-ab31-ac66894e8edc",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66a91f66-e755-4120-b22f-44c814f56162",
+              "name": "Mensagem",
+              "value": "={{ $('Webhook').item.json.body.data?.message?.conversation || $('Webhook').item.json.body.message?.conversation || $('Webhook').item.json.body.data?.message?.extendedTextMessage?.text || $('Webhook').item.json.body.message?.extendedTextMessage?.text || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1360,
+        240
+      ],
+      "id": "7a198da0-0ec3-4d99-8413-17d9c194fcae",
+      "name": "texto"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "d82c5c4d-abf4-44ec-8d6c-56659f8d7576",
+              "leftValue": "={{ ($json.body.event || 'messages.upsert').toLowerCase() }}",
+              "rightValue": "messages.upsert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "a2e9441b-e0a7-4a20-984c-077aadf86a65",
+              "leftValue": "={{ $json.body.data?.key?.fromMe ?? $json.body.key?.fromMe ?? false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "231f7a95-7903-4bb1-b94c-c0ba82b6a805",
+              "leftValue": "={{ (($json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || '').endsWith('@g.us')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "09edccf6-8694-4d70-805e-846dac1cd344",
+              "leftValue": "={{ (($json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || '').includes('@newsletter')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b9b4276a-f8d2-4f61-86ec-2298bba537f4",
+              "leftValue": "={{ $json.body.data?.pushName || $json.body.pushName || '' }}",
+              "rightValue": "Felipe Borges - Suporte",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "7999a694-488d-4870-9553-4cfb495de523",
+              "leftValue": "={{ !!($json.body.data?.message?.conversation || $json.body.message?.conversation || $json.body.data?.message?.extendedTextMessage?.text || $json.body.message?.extendedTextMessage?.text) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cbb13f4e-fd0c-4be6-bde3-76dabce9edb0",
+      "name": "Filtro",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.1,
+      "position": [
+        -2032,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados Lead').item.json.IdConversa }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        416
+      ],
+      "id": "2522c4b3-a682-4581-8ce3-842d695c39d4",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "l7cl8m0MvW6K2v2l",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Informações do Lead\nInformações de contato do Lead",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        48
+      ],
+      "id": "ecb0d544-e909-4277-bd3f-e25e17cbfa7b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        720,
+        240
+      ],
+      "id": "1fe234ea-e1ef-4d42-b261-1d515ccf57a5",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv1076079.hstgr.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:111.0) Gecko/20100101 Firefox/111.0",
+            "content-length": "392",
+            "accept-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "origin": "https://evolution.exemplo.com",
+            "server": "Evolution API",
+            "x-forwarded-for": "159.112.178.234",
+            "x-forwarded-host": "n8n.srv1076079.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "022cf8666484",
+            "x-real-ip": "159.112.178.234",
+            "apikey": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "delplata2026",
+            "data": {
+              "key": {
+                "remoteJid": "5517997814806@s.whatsapp.net",
+                "fromMe": false,
+                "id": "ABC1234"
+              },
+              "pushName": "Iazos Felipe",
+              "message": {
+                "conversation": "oi boa noite"
+              },
+              "messageType": "conversation"
+            }
+          },
+          "webhookUrl": "https://n8n.srv1076079.hstgr.cloud/webhook-test/mensagem-teste",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encontrar Cliente1": {
+      "main": [
+        [
+          {
+            "node": "Cliente Existe?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cliente Existe?1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Criar Cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Cliente1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados Lead": {
+      "main": [
+        [
+          {
+            "node": "texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filtro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "texto": {
+      "main": [
+        [
+          {
+            "node": "Encontrar Cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro": {
+      "main": [
+        [
+          {
+            "node": "Dados Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "1a91c4fa-fc6d-475b-bcdb-1987d98ba650",
+  "meta": {
+    "instanceId": "4788992247387f40647997e05c9a08997ac4fa0e3bf0138ee1eedf86c7c59954"
+  },
+  "id": "F27BGGmafbomd8ZRgY5y7",
+  "tags": []
+}

@@ -1,0 +1,63 @@
+{
+    "name": "Hotel CRM - Fase 1: Recebimento e Consulta",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "evolution-webhook",
+                "options": {}
+            },
+            "id": "webhook-evolution",
+            "name": "Webhook Evolution",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ],
+            "notesInFlow": true,
+            "notes": "Recebe o payload do WhatsApp via Evolution API."
+        },
+        {
+            "parameters": {
+                "operation": "get",
+                "tableId": "kanban_cards",
+                "filters": {
+                    "conditions": [
+                        {
+                            "keyName": "lead_id",
+                            "keyValue": "={{ $json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid }}"
+                        }
+                    ]
+                }
+            },
+            "id": "supabase-get",
+            "name": "Supabase - Consultar Lead",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ],
+            "notesInFlow": true,
+            "notes": "Busca na tabela kanban_cards usando o remoteJid do WhatsApp."
+        }
+    ],
+    "connections": {
+        "Webhook Evolution": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase - Consultar Lead",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    }
+}

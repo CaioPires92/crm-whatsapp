@@ -4,7 +4,8 @@ import {
   Users, 
   Settings as SettingsIcon, 
   LogOut, 
-  MessageSquare
+  MessageSquare,
+  LayoutDashboard
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -50,6 +51,7 @@ export default function SidebarNav() {
   }, [width]);
 
   const navItems = [
+    { to: '/kanban', icon: LayoutDashboard, label: 'Kanban' },
     { to: '/contatos', icon: Users, label: 'Contatos' },
     { to: '/settings', icon: SettingsIcon, label: 'Configurações' },
   ];

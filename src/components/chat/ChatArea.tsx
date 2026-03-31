@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { format, isToday, isYesterday, isSameYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { User, MessageSquare, AlertCircle } from 'lucide-react';
+import { User, MessageSquare, AlertCircle, Radio, RefreshCw, AlertTriangle } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -27,34 +27,106 @@ interface ChatAreaProps {
   };
 }
 
+type SyncState = 'idle' | 'connecting' | 'realtime' | 'polling' | 'error';
+
+function normalizeSessionId(value: string | null | undefined) {
+  return (value || '').split('@')[0];
+}
+
 export default function ChatArea({ lead }: ChatAreaProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [syncState, setSyncState] = useState<SyncState>('idle');
+  const [syncMessage, setSyncMessage] = useState('Selecione uma conversa para sincronizar.');
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!lead) return;
+    if (!lead) {
+      setMessages([]);
+      setLoading(false);
+      setSyncState('idle');
+      setSyncMessage('Selecione uma conversa para acompanhar as mensagens.');
+      setLastUpdatedAt(null);
+      return;
+    }
 
+    let mounted = true;
+    const normalizedLeadId = normalizeSessionId(lead.lead_id);
+
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('n8n_chat_histories')
+        .select('*')
+        .or(`session_id.eq.${lead.lead_id},session_id.eq.${normalizedLeadId}@s.whatsapp.net,session_id.eq.${normalizedLeadId}@c.us`)
+        .order('id', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+        if (mounted) {
+          setSyncState('error');
+          setSyncMessage('Nao foi possivel carregar mensagens novas. Confira sua sessao ou as politicas do Supabase.');
+        }
+      } else if (mounted) {
+        setMessages(data || []);
+        setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        setSyncState((current) => (current === 'error' ? 'polling' : current));
+        setSyncMessage('Historico sincronizado com fallback automatico.');
+      }
+
+      if (mounted) {
+        setLoading(false);
+      }
+    };
+
+    setSyncState('connecting');
+    setSyncMessage(`Conectando com a conversa ${lead.lead_id}...`);
     setLoading(true);
     fetchMessages();
 
     const channel = supabase
-      .channel(`chat-${lead.lead_id}`)
+      .channel(`chat-${normalizedLeadId}`)
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'n8n_chat_histories',
-          filter: `session_id=eq.${lead.lead_id}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const payloadSessionId = normalizeSessionId((payload.new as Message | undefined)?.session_id || (payload.old as Message | undefined)?.session_id);
+          if (payloadSessionId === normalizedLeadId) {
+            fetchMessages();
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          setSyncState('realtime');
+          setSyncMessage('Mensagens chegando em tempo real.');
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          console.error(`Chat realtime channel failed for ${lead.lead_id}. Falling back to polling.`);
+          setSyncState('polling');
+          setSyncMessage('Realtime indisponivel. Consultando novas mensagens periodicamente.');
+        }
+      });
+
+    const intervalId = window.setInterval(fetchMessages, 15000);
+
+    const handleWindowRefresh = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages();
+      }
+    };
+
+    window.addEventListener('focus', handleWindowRefresh);
+    document.addEventListener('visibilitychange', handleWindowRefresh);
 
     return () => {
+      mounted = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleWindowRefresh);
+      document.removeEventListener('visibilitychange', handleWindowRefresh);
       supabase.removeChannel(channel);
     };
   }, [lead]);
@@ -68,22 +140,6 @@ export default function ChatArea({ lead }: ChatAreaProps) {
       }, 120);
     }
   }, [messages]);
-
-  async function fetchMessages() {
-    if (!lead) return;
-    const { data, error } = await supabase
-      .from('n8n_chat_histories')
-      .select('*')
-      .eq('session_id', lead.lead_id)
-      .order('id', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching messages:', error);
-    } else {
-      setMessages(data || []);
-    }
-    setLoading(false);
-  }
 
   const groupMessagesByDate = (msgs: Message[]) => {
     const groups: { [key: string]: Message[] } = {};
@@ -122,6 +178,16 @@ export default function ChatArea({ lead }: ChatAreaProps) {
   }
 
   const messageGroups = groupMessagesByDate(messages);
+  const syncTone =
+    syncState === 'realtime'
+      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
+      : syncState === 'polling'
+        ? 'border-amber-500/20 bg-amber-500/10 text-amber-200'
+        : syncState === 'error'
+          ? 'border-red-500/20 bg-red-500/10 text-red-300'
+          : 'border-white/10 bg-white/5 text-zinc-300';
+  const SyncIcon =
+    syncState === 'realtime' ? Radio : syncState === 'error' ? AlertTriangle : RefreshCw;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#0a0a0a]">
@@ -137,6 +203,15 @@ export default function ChatArea({ lead }: ChatAreaProps) {
               Online
             </p>
           </div>
+        </div>
+        <div className={cn("max-w-[320px] rounded-xl border px-3 py-2 text-[11px]", syncTone)}>
+          <div className="flex items-center gap-2">
+            <SyncIcon className={cn("h-3.5 w-3.5 shrink-0", syncState === 'polling' || syncState === 'connecting' ? 'animate-spin' : '')} />
+            <span className="truncate">{syncMessage}</span>
+          </div>
+          {lastUpdatedAt && (
+            <p className="mt-1 text-[10px] opacity-80">Ultima atualizacao: {lastUpdatedAt}</p>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { differenceInHours, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -29,11 +29,88 @@ const STAGES = [
   'Perdido/Cancelado'
 ];
 
-export default function KanbanBoard() {
+export type KanbanSyncState = 'connecting' | 'realtime' | 'polling' | 'error';
+
+interface KanbanBoardProps {
+  onSyncChange?: (payload: { state: KanbanSyncState; message: string; lastUpdatedAt: string | null }) => void;
+}
+
+function normalizeLeadId(value: string | null | undefined) {
+  return (value || '').split('@')[0];
+}
+
+function getCardPriority(card: KanbanCard) {
+  const hasUsefulName = !!card.hospede_nome && card.hospede_nome !== '.' && card.hospede_nome.toLowerCase() !== 'sem nome';
+  const lastInteraction = card.ultima_interacao ? new Date(card.ultima_interacao).getTime() : 0;
+
+  return {
+    hasUsefulName,
+    lastInteraction,
+    id: card.id,
+  };
+}
+
+function choosePreferredCard(current: KanbanCard, candidate: KanbanCard) {
+  const currentPriority = getCardPriority(current);
+  const candidatePriority = getCardPriority(candidate);
+
+  if (candidatePriority.hasUsefulName && !currentPriority.hasUsefulName) {
+    return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
+  }
+
+  if (candidatePriority.hasUsefulName === currentPriority.hasUsefulName) {
+    if (candidatePriority.lastInteraction > currentPriority.lastInteraction) {
+      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
+    }
+
+    if (candidatePriority.lastInteraction === currentPriority.lastInteraction && candidatePriority.id > currentPriority.id) {
+      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
+    }
+  }
+
+  return current;
+}
+
+export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const syncStateRef = useRef<KanbanSyncState>('connecting');
 
   useEffect(() => {
+    let mounted = true;
+
+    const updateSync = (state: KanbanSyncState, message: string, lastUpdatedAt: string | null = null) => {
+      syncStateRef.current = state;
+      onSyncChange?.({ state, message, lastUpdatedAt });
+    };
+
+    async function fetchCards() {
+      const { data, error } = await supabase
+        .from('kanban_cards')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching kanban cards:', error);
+        if (mounted) {
+          updateSync('error', 'Nao foi possivel atualizar o kanban. Confira a sessao do Supabase.');
+        }
+      } else {
+        if (mounted) {
+          setCards(data || []);
+          updateSync(
+            syncStateRef.current === 'polling' ? 'polling' : 'realtime',
+            'Kanban sincronizado com o banco.',
+            new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+          );
+        }
+      }
+      if (mounted) {
+        setLoading(false);
+      }
+    }
+
+    updateSync('connecting', 'Conectando o kanban ao Supabase...');
     fetchCards();
 
     const channel = supabase
@@ -45,26 +122,33 @@ export default function KanbanBoard() {
           fetchCards();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          updateSync('realtime', 'Kanban ouvindo mudancas em tempo real.');
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          updateSync('polling', 'Realtime do kanban indisponivel. Atualizando por verificacao periodica.');
+        }
+      });
+
+    const intervalId = window.setInterval(fetchCards, 30000);
+
+    const handleWindowRefresh = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCards();
+      }
+    };
+
+    window.addEventListener('focus', handleWindowRefresh);
+    document.addEventListener('visibilitychange', handleWindowRefresh);
 
     return () => {
+      mounted = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleWindowRefresh);
+      document.removeEventListener('visibilitychange', handleWindowRefresh);
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  async function fetchCards() {
-    const { data, error } = await supabase
-      .from('kanban_cards')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching kanban cards:', error);
-    } else {
-      setCards(data || []);
-    }
-    setLoading(false);
-  }
+  }, [onSyncChange]);
 
   const getTemperature = (lastInteraction: string) => {
     const hours = differenceInHours(new Date(), new Date(lastInteraction));
@@ -82,6 +166,27 @@ export default function KanbanBoard() {
     }
   };
 
+  const dedupedCards = Array.from(
+    cards.reduce((acc, card) => {
+      const normalizedLeadId = normalizeLeadId(card.lead_id);
+
+      if (!normalizedLeadId) {
+        return acc;
+      }
+
+      const normalizedCard = { ...card, lead_id: normalizedLeadId };
+      const existingCard = acc.get(normalizedLeadId);
+
+      if (!existingCard) {
+        acc.set(normalizedLeadId, normalizedCard);
+      } else {
+        acc.set(normalizedLeadId, choosePreferredCard(existingCard, normalizedCard));
+      }
+
+      return acc;
+    }, new Map<string, KanbanCard>()).values()
+  );
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#0a0a0a]">
@@ -94,7 +199,7 @@ export default function KanbanBoard() {
     <div className="flex-1 h-full overflow-x-auto bg-[#0a0a0a] scrollbar-thin">
       <div className="flex h-full min-w-max p-6 gap-6">
         {STAGES.map((stage) => {
-          const stageCards = cards.filter(card => card.etapa === stage);
+          const stageCards = dedupedCards.filter(card => card.etapa === stage);
           return (
             <div key={stage} className="w-72 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
               <div className="flex items-center justify-between mb-4 px-2">

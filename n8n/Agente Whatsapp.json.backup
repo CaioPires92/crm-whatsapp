@@ -1,20 +1,20 @@
 {
-  "name": "Agente Whatsapp copy",
+  "name": "Agente Whatsapp",
   "nodes": [
     {
       "parameters": {
         "operation": "get",
-        "tableId": "kanban_cards",
+        "tableId": "Leads",
         "filters": {
           "conditions": [
             {
               "keyName": "lead_id",
-              "keyValue": "={{ $('Dados Lead').item.json.remoteJid }}"
+              "keyValue": "={{ $('Dados Lead').item.json.IdConversa }}"
             }
           ]
         }
       },
-      "id": "cba086cf-c162-41f1-82b0-29fdaa6ebfa8",
+      "id": "a1e17ec1-e309-4eb0-a2cd-79ec37500333",
       "name": "Encontrar Cliente1",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -55,7 +55,7 @@
         },
         "options": {}
       },
-      "id": "f0d822eb-12a3-4c81-938b-cf49846edc13",
+      "id": "438e89e4-06ad-4bce-85ce-e336f0cca05f",
       "name": "Cliente Existe?1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
@@ -64,37 +64,6 @@
         848
       ],
       "alwaysOutputData": false
-    },
-    {
-      "parameters": {
-        "tableId": "kanban_cards",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "hospede_nome",
-              "fieldValue": "={{ $('Dados Lead').item.json.LeadNome }}"
-            },
-            {
-              "fieldId": "lead_id",
-              "fieldValue": "={{ $('Dados Lead').item.json.remoteJid }}"
-            }
-          ]
-        }
-      },
-      "id": "68699c59-75f9-415e-b8be-2c853f11ba62",
-      "name": "Criar Cliente1",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        4080,
-        944
-      ],
-      "credentials": {
-        "supabaseApi": {
-          "id": "kEIfGjkEJRgMsIdQ",
-          "name": "Supabase account"
-        }
-      }
     },
     {
       "parameters": {
@@ -112,12 +81,12 @@
           ]
         }
       },
-      "id": "7b6819d0-09fa-4d6b-9f11-33f032467d4d",
-      "name": "Criar Lead Dashboard",
+      "id": "8963e0c1-daf6-4a2b-9b12-d0018373a3c7",
+      "name": "Criar Cliente1",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        4304,
+        4080,
         944
       ],
       "credentials": {
@@ -129,7 +98,7 @@
     },
     {
       "parameters": {},
-      "id": "d12554bc-b5c0-4106-8af9-1c25e2086f04",
+      "id": "ca02e599-cc7f-48b6-8050-cf3a8baa0a52",
       "name": "Merge1",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
@@ -143,7 +112,7 @@
         "promptType": "define",
         "text": "={{ $('texto').item.json.Mensagem }}",
         "options": {
-          "systemMessage": "=Você é a Aura, recepcionista da Pousada Delplata em Serra Negra. Seu objetivo é converter reservas e tirar dúvidas de forma rápida e humana.\n\n# Regras de Ouro (Parecer Humano)\n- Mensagens Curtas e Diretas: No WhatsApp, responda em no máximo 2 ou 3 frases. \n- Proatividade Obligatória: Se o hóspede perguntar sobre algo (ex: Pets), já dê a resposta completa (onde ficam, limite de peso, distância e ventilador) em uma única mensagem, sem esperar perguntas extras.\n- Uma pergunta por vez: Não encha o hóspede de perguntas. Pergunte apenas as datas e número de pessoas primeiro.\n\n# Informações da Pousada (Conhecimento Seguro)\n- Café da Manhã: Das 08:30h às 10:30h, servido na Ala Principal. 🥐\n- Pets: Apenas Pequeno Porte (até 12kg) e SOMENTE nos Chalés/Anexos. 🐾\n- Localização e Estrutura:\n  - Ala Principal (Conforto): Apto Superior (tem Ar Condicionado) e Apto Térreo (sem janela).\n  - Chalés e Anexos (Econômico/Pet): Ficam a 70m da Ala Principal. Têm ventilador de teto (não têm ar condicionado).\n  - Atenção: Quem fica nos Chalés/Anexos precisa se deslocar (cerca de 70m) até a Ala Principal para tomar o café.\n\n# Protocolo Aura\n1. Recepcione com empatia (\"Oi! Que bom que você nos procurou!\").\n2. Tire a dúvida com proatividade (já avise sobre ar condicionado vs ventilador e o deslocamento).\n3. Puxe o gancho para cotação: \"Quantas pessoas seriam e em qual data você gostaria de vir?\"\n\n# Kanban\n- Sempre que houver mudança de etapa comercial, use a ferramenta update_kanban_stage.\n- Use exatamente uma destas etapas: Novo Lead, Cotação Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/Pós-venda, Perdido/Cancelado.\n- Se você informar preço, diária, pacote, valor total ou enviar uma proposta comercial, chame update_kanban_stage com new_stage = \"Cotação Enviada\".\n- No campo summary, resuma em uma frase objetiva o contexto do lead.\n\n# Check-in: 14h | Check-out: 12h.\n# Não invente preços ou disponibilidade sem autorização."
+          "systemMessage": "=<identity>\n  <name>Larissa</name>\n  <alias>Lari</alias>\n  <role>Atendente de Reservas</role>\n  <brand>Pousada Delplata</brand>\n  <mission>\n    Atender hóspedes, tirar dúvidas e converter reservas diretas com clareza,\n    evitando promessas incorretas e garantindo uma boa experiência.\n  </mission>\n  <audience>\n    Casais, famílias e viajantes interessados em se hospedar em Serra Negra.\n  </audience>\n  <tone>\n    Profissional, direto, amigável, estilo WhatsApp.\n    Frases curtas, perguntas objetivas, linguagem simples.\n  </tone>\n</identity>\n\n<variables>\n  DataAtual: {{ $now }}\n</variables>\n\n<constraints>\n  - Nunca invente disponibilidade ou valores.\n  - Nunca confirme reserva sem validação.\n  - Nunca prometa early check-in ou late check-out.\n  - Nunca garanta upgrade.\n  - Não prometa desconto automático.\n  - Sempre deixe claro quando algo depende de disponibilidade.\n</constraints>\n\n<knowledge>\n  - Café da manhã incluso em todas as reservas.\n\n  Acomodações:\n\n  Apto Superior:\n  - Mais completo\n  - Possui ar condicionado\n  - Fica na ala principal\n\n  Apto Térreo:\n  - Fica na ala principal\n  - Não possui janelas\n\n  Chalés:\n  - Ficam a cerca de 70 metros da ala principal\n  - Possuem ventilador de teto (não têm ar condicionado)\n  - Aceitam pets de pequeno porte\n\n  Anexos:\n  - Mesma lógica dos chalés\n  - Fora da ala principal\n  - Sem ar condicionado\n\n  Deslocamento:\n  - Chalés e anexos precisam ir até a ala principal para o café da manhã\n\n  Check-in: a partir das 14h\n  Check-out: até 12h\n</knowledge>\n\n<interaction_logic>\n  1) Sempre entender a necessidade do cliente\n\n  2) Coletar obrigatoriamente:\n  - Data de entrada\n  - Data de saída\n  - Número de pessoas\n\n  3) Responder com base nessas informações\n\n  4) Oferecer opções de forma clara\n\n  5) Conduzir para reserva\n</interaction_logic>\n\n<selling_logic>\n  - Conforto → sugerir apto superior\n  - Economia → sugerir chalé/anexo\n  - Pet → oferecer somente chalé\n\n  Sempre explicar:\n  - Ar condicionado vs ventilador\n  - Localização (ala principal vs afastado)\n</selling_logic>\n\n<upsell_rules>\n  - Só oferecer melhoria se houver disponibilidade\n  - Nunca prometer\n\n  Usar sempre:\n  \"posso verificar disponibilidade\"\n</upsell_rules>\n\n<examples>\n  Cliente:\n  \"Quero reservar\"\n\n  Resposta:\n  \"Perfeito! Me passa só:\n  - Data de entrada\n  - Data de saída\n  - Quantas pessoas 😊\"\n\n  ----\n\n  Cliente:\n  \"Tem ar condicionado?\"\n\n  Resposta:\n  \"O apto superior possui ar condicionado e fica na ala principal.\n\n  Já os chalés e anexos têm ventilador de teto e ficam a cerca de 70 metros.\n\n  Você prefere mais conforto ou algo mais econômico?\"\n</examples>"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -152,143 +121,9 @@
         4656,
         848
       ],
-      "id": "f8463da8-8ade-473c-93f2-053b9d85efac",
+      "id": "a293a3d6-2767-4454-af10-bcc554d3a2c4",
       "name": "AI Agent1",
       "retryOnFail": true
-    },
-    {
-      "parameters": {
-        "description": "Atualiza a etapa do hóspede no Kanban e salva o resumo da solicitação. Use esta ferramenta sempre que houver mudança de etapa no funil.",
-        "specifyInputSchema": true,
-        "jsonSchemaExample": "{\n  \"new_stage\": \"Cotação Enviada\",\n  \"summary\": \"Casal com pet, 10 a 12 de abril, pediu cotação\"\n}",
-        "jsCode": "const input = typeof $input.item.json === 'object' && $input.item.json !== null ? $input.item.json : {};\nconst new_stage = input.new_stage || 'Novo Lead';\nconst summary = input.summary || 'Lead sem resumo informado';\n\nreturn [{\n  json: {\n    new_stage,\n    summary,\n    lead_id: $('Dados Lead').first().json.remoteJid,\n    ultima_interacao: new Date().toISOString()\n  }\n}];"
-      },
-      "id": "6c3fb9a0-7df6-4f6e-9be2-afe83a31b775",
-      "name": "update_kanban_stage",
-      "type": "@n8n/n8n-nodes-langchain.toolCode",
-      "typeVersion": 1.3,
-      "position": [
-        4624,
-        592
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "tableId": "kanban_cards",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "lead_id",
-              "keyValue": "={{ $json.lead_id }}"
-            }
-          ]
-        },
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "hospede_nome",
-              "fieldValue": "={{ $('Dados Lead').item.json.LeadNome }}"
-            },
-            {
-              "fieldId": "etapa",
-              "fieldValue": "={{ $json.new_stage }}"
-            },
-            {
-              "fieldId": "resumo_solicitacao",
-              "fieldValue": "={{ $json.summary }}"
-            },
-            {
-              "fieldId": "ultima_interacao",
-              "fieldValue": "={{ $json.ultima_interacao }}"
-            }
-          ]
-        }
-      },
-      "id": "1a8d1dfe-f4a2-4117-a65a-247910b7c3d5",
-      "name": "Supabase - Update Kanban",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        4880,
-        592
-      ],
-      "credentials": {
-        "supabaseApi": {
-          "id": "kEIfGjkEJRgMsIdQ",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "tableId": "n8n_chat_histories",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "session_id",
-              "fieldValue": "={{ $('Dados Lead').item.json.IdConversa }}"
-            },
-            {
-              "fieldId": "message",
-              "fieldValue": "={{ { type: 'human', content: $('texto').item.json.Mensagem, pushName: $('Dados Lead').item.json.LeadNome } }}"
-            },
-            {
-              "fieldId": "hora_data_mensagem",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        }
-      },
-      "id": "3989c469-a7f6-4a6e-8820-5c7b7fa95a5e",
-      "name": "Salvar Historico Usuario",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        3648,
-        1040
-      ],
-      "credentials": {
-        "supabaseApi": {
-          "id": "kEIfGjkEJRgMsIdQ",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "tableId": "n8n_chat_histories",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "session_id",
-              "fieldValue": "={{ $('Dados Lead').item.json.IdConversa }}"
-            },
-            {
-              "fieldId": "message",
-              "fieldValue": "={{ { type: 'ai', content: $json.output } }}"
-            },
-            {
-              "fieldId": "hora_data_mensagem",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        }
-      },
-      "id": "eb8e5a5a-ec3e-4d4c-b481-00a4d967268b",
-      "name": "Salvar Historico IA",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        4896,
-        848
-      ],
-      "credentials": {
-        "supabaseApi": {
-          "id": "kEIfGjkEJRgMsIdQ",
-          "name": "Supabase account"
-        }
-      }
     },
     {
       "parameters": {
@@ -303,7 +138,7 @@
         2240,
         656
       ],
-      "id": "37d1fa72-4888-4dbe-a924-bb420b9ef2c7",
+      "id": "6f968557-57d6-4ac5-8b64-3409601e3921",
       "name": "Sticky Note2"
     },
     {
@@ -319,7 +154,7 @@
         2576,
         656
       ],
-      "id": "6f3b364e-8d31-43bb-a7ae-73e4f32d2194",
+      "id": "ee4c70e3-b3c1-4464-ae68-de7d071d7c15",
       "name": "Sticky Note4"
     },
     {
@@ -335,7 +170,7 @@
         2912,
         656
       ],
-      "id": "14183672-dfc3-44fb-b6d0-73c916863f8f",
+      "id": "1edc9cd2-6059-4f86-b631-84f132db8585",
       "name": "Sticky Note5"
     },
     {
@@ -350,7 +185,7 @@
         3584,
         656
       ],
-      "id": "3bbedd19-73c9-483b-8e0d-311ed8e72214",
+      "id": "e770797b-5cb5-4867-8d1f-b4a462c7abcc",
       "name": "Sticky Note7"
     },
     {
@@ -366,7 +201,7 @@
         4512,
         656
       ],
-      "id": "875081e6-1733-47e5-873a-af29d1cf0341",
+      "id": "b49a54d1-97a6-4385-990c-61dea2d33e2d",
       "name": "Sticky Note11"
     },
     {
@@ -384,18 +219,12 @@
               "name": "LeadNome",
               "value": "={{ $('Webhook').item.json.body.data?.pushName || $('Webhook').item.json.body.pushName || 'Sem nome' }}",
               "type": "string"
-            },
-            {
-              "id": "e00a17c7-7b97-44cc-ba3e-984ae92a750b",
-              "name": "=remoteJid",
-              "value": "={{$json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || \"\"}}",
-              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "518953f9-74d1-4c17-8891-b4e17403dde2",
+      "id": "d4ab3bf6-31f9-47f1-83ba-09ffc043aa1e",
       "name": "Dados Lead",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -417,7 +246,7 @@
         5040,
         656
       ],
-      "id": "6f7108ef-95b5-47fe-838c-8dfc67c21faf",
+      "id": "b8824247-40f8-4794-ae18-e954fc9a62de",
       "name": "Sticky Note12"
     },
     {
@@ -432,9 +261,9 @@
         2336,
         848
       ],
-      "id": "e8b997f9-739f-435d-9498-c49d14c0fd9f",
+      "id": "20268b14-07ae-4d2b-b2db-8e098ede5ce9",
       "name": "Webhook",
-      "webhookId": "b5a0b596-713d-4492-93dd-d2607f2d1537"
+      "webhookId": "9c999047-c050-412e-9f87-6c899d49d423"
     },
     {
       "parameters": {
@@ -460,7 +289,7 @@
         5136,
         848
       ],
-      "id": "4c4af415-0ca7-46de-a689-b109a770abf4",
+      "id": "319794cc-2bc1-47d9-94fc-f72072d8247d",
       "name": "HTTP Request"
     },
     {
@@ -483,7 +312,7 @@
         3344,
         848
       ],
-      "id": "3755a499-2c2d-4550-9b44-ca7089f9c188",
+      "id": "10038285-2f3d-446c-9edc-3717c2e0cf8e",
       "name": "texto"
     },
     {
@@ -511,7 +340,7 @@
               "rightValue": "",
               "operator": {
                 "type": "boolean",
-                "operation": "exists",
+                "operation": "false",
                 "singleValue": true
               }
             },
@@ -559,7 +388,7 @@
         },
         "options": {}
       },
-      "id": "d6a71ddb-e575-49dc-9ba3-c5fee730fb3f",
+      "id": "3b5b7fe5-a982-4a1f-b94e-4e0fee9e184f",
       "name": "Filtro",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.1,
@@ -571,7 +400,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Dados Lead').item.json.remoteJid }}",
+        "sessionKey": "={{ $('Dados Lead').item.json.IdConversa }}",
         "contextWindowLength": 20
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
@@ -580,7 +409,7 @@
         4752,
         1024
       ],
-      "id": "8b16133b-c949-431f-a658-103d2641d5e4",
+      "id": "17622b2d-f838-4b54-ac72-655ed6af3e88",
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
@@ -602,7 +431,7 @@
         3248,
         656
       ],
-      "id": "29d14b24-3b3c-477a-b2fe-c68ccfd51890",
+      "id": "474e3688-1257-4bad-9d61-cbd26fda62dc",
       "name": "Sticky Note"
     },
     {
@@ -613,7 +442,7 @@
         5424,
         848
       ],
-      "id": "03653bb7-538d-46cf-882f-e1a2491343a3",
+      "id": "0b7ebd5b-aa09-4ee1-a6bb-b3f0885f9820",
       "name": "No Operation, do nothing"
     },
     {
@@ -626,7 +455,7 @@
         4608,
         1024
       ],
-      "id": "6c9c8c7f-f6f1-496d-8e75-b4acfc637efe",
+      "id": "48f97f62-c74e-4954-914e-eb2267cbc8b0",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -636,7 +465,74 @@
       }
     }
   ],
-  "pinData": {},
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json",
+            "user-agent": "axios/1.7.9",
+            "content-length": "1086",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "host.docker.internal:5678",
+            "connection": "keep-alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "delplata2026",
+            "data": {
+              "key": {
+                "remoteJid": "5519998701203@s.whatsapp.net",
+                "fromMe": false,
+                "id": "3EB0503A68FDF50CED5DE7"
+              },
+              "pushName": ".",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "messageContextInfo": {
+                  "deviceListMetadata": {
+                    "senderKeyHash": "F+l2t9FG8RETWA==",
+                    "senderTimestamp": "1774609026",
+                    "senderAccountType": "E2EE",
+                    "receiverAccountType": "E2EE",
+                    "recipientKeyHash": "0MJEwaQg0f1luQ==",
+                    "recipientTimestamp": "1774648413"
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": "gz5cAvE0YZpWY67lTTOW72k65F1RTIaVfYAGh/UqwW8="
+                },
+                "conversation": "teste"
+              },
+              "contextInfo": {
+                "ephemeralSettingTimestamp": "1774377535",
+                "disappearingMode": {
+                  "initiator": "CHANGED_IN_CHAT",
+                  "trigger": "CHAT_SETTING",
+                  "initiatedByMe": false
+                }
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1774738180,
+              "instanceId": "508c6dcc-2794-44aa-836a-688b6f9de7ff",
+              "source": "web"
+            },
+            "destination": "http://host.docker.internal:5678/webhook-test/mensagem-teste",
+            "date_time": "2026-03-28T19:49:41.475Z",
+            "sender": "5519999654866@s.whatsapp.net",
+            "server_url": "http://localhost:8080",
+            "apikey": "AB1033CD5E46-474F-9537-6D1C247494E9"
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/mensagem-teste",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
   "connections": {
     "Encontrar Cliente1": {
       "main": [
@@ -671,17 +567,6 @@
       "main": [
         [
           {
-            "node": "Criar Lead Dashboard",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Criar Lead Dashboard": {
-      "main": [
-        [
-          {
             "node": "Merge1",
             "type": "main",
             "index": 1
@@ -704,7 +589,7 @@
       "main": [
         [
           {
-            "node": "Salvar Historico IA",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -748,7 +633,7 @@
       "main": [
         [
           {
-            "node": "Salvar Historico Usuario",
+            "node": "Encontrar Cliente1",
             "type": "main",
             "index": 0
           }
@@ -777,48 +662,6 @@
         ]
       ]
     },
-    "Salvar Historico Usuario": {
-      "main": [
-        [
-          {
-            "node": "Encontrar Cliente1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Salvar Historico IA": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "update_kanban_stage": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent1",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ],
-      "main": [
-        [
-          {
-            "node": "Supabase - Update Kanban",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
@@ -834,14 +677,13 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "de86d167-7558-4ad6-81c9-13e521a381cb",
+  "versionId": "5fb8fbf4-2e65-41a6-a562-63fff8dfe7a3",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "5899da75ae67d1ebd3667589ddb09f27975a5ddcea12c7dcc5226e44d13e5aaf"
   },
-  "id": "OQNovYmqufz7rQ6A",
+  "id": "dIGZql5baei2kc4P",
   "tags": []
 }

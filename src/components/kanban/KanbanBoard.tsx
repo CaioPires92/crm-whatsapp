@@ -74,7 +74,11 @@ function choosePreferredCard(current: KanbanCard, candidate: KanbanCard) {
 export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDraggingBoard, setIsDraggingBoard] = useState(false);
   const syncStateRef = useRef<KanbanSyncState>('connecting');
+  const boardScrollRef = useRef<HTMLDivElement | null>(null);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollLeftRef = useRef(0);
 
   useEffect(() => {
     let mounted = true;
@@ -150,6 +154,35 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     };
   }, [onSyncChange]);
 
+  useEffect(() => {
+    if (!isDraggingBoard) {
+      return;
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const board = boardScrollRef.current;
+      if (!board) {
+        return;
+      }
+
+      const walk = event.pageX - dragStartXRef.current;
+      board.scrollLeft = dragStartScrollLeftRef.current - walk;
+      event.preventDefault();
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingBoard(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingBoard]);
+
   const getTemperature = (lastInteraction: string) => {
     const hours = differenceInHours(new Date(), new Date(lastInteraction));
     if (hours < 4) return 'green';
@@ -196,12 +229,27 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   }
 
   return (
-    <div className="flex-1 h-full overflow-x-auto bg-[#0a0a0a] scrollbar-thin">
+    <div
+      ref={boardScrollRef}
+      onMouseDown={(event) => {
+        if (event.button !== 0) return;
+        const board = boardScrollRef.current;
+        if (!board) return;
+
+        setIsDraggingBoard(true);
+        dragStartXRef.current = event.pageX;
+        dragStartScrollLeftRef.current = board.scrollLeft;
+      }}
+      className={cn(
+        "flex-1 h-full overflow-x-auto overflow-y-hidden bg-[#0a0a0a] scrollbar-thin",
+        isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab"
+      )}
+    >
       <div className="flex h-full min-w-max p-6 gap-6">
         {STAGES.map((stage) => {
           const stageCards = dedupedCards.filter(card => card.etapa === stage);
           return (
-            <div key={stage} className="w-72 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
+            <div key={stage} className="w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
               <div className="flex items-center justify-between mb-4 px-2">
                 <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-white/20" />

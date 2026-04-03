@@ -47,6 +47,11 @@ interface KanbanCard {
 }
 
 type KanbanCardsByStage = Record<KanbanStage, KanbanCard[]>;
+interface KanbanMetrics {
+  totalAtivos: number;
+  totalUrgentes: number;
+  taxaConversao: number;
+}
 
 export type KanbanSyncState = 'connecting' | 'realtime' | 'polling' | 'error';
 
@@ -217,6 +222,26 @@ function KanbanLeadCard({ card }: { card: KanbanCard }) {
   );
 }
 
+function calcularMetricas(cards: KanbanCard[]): KanbanMetrics {
+  const totalLeads = cards.length;
+  const totalAtivos = cards.filter(
+    (card) => card.etapa !== 'Perdido/Cancelado' && card.etapa !== 'Check-out/Pós-venda'
+  ).length;
+
+  const totalUrgentes = cards.filter(
+    (card) => calcularUrgencia(card.ultima_interacao, card.etapa) === 'Vermelho'
+  ).length;
+
+  const totalConfirmados = cards.filter((card) => card.etapa === 'Reserva Confirmada').length;
+  const taxaConversao = totalLeads > 0 ? (totalConfirmados / totalLeads) * 100 : 0;
+
+  return {
+    totalAtivos,
+    totalUrgentes,
+    taxaConversao,
+  };
+}
+
 export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -363,6 +388,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     }, new Map<string, KanbanCard>()).values()
   );
   const cardsByStage = groupCardsByStage(dedupedCards);
+  const metricas = calcularMetricas(dedupedCards);
 
   if (loading) {
     return (
@@ -373,51 +399,70 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   }
 
   return (
-    <div
-      ref={boardScrollRef}
-      onMouseDown={(event) => {
-        if (event.button !== 0) return;
-        const board = boardScrollRef.current;
-        if (!board) return;
+    <div className="flex-1 min-h-0 flex flex-col bg-[#0a0a0a]">
+      <div className="px-6 pt-4 pb-2 shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <p className="text-[11px] text-zinc-400 uppercase tracking-wider">Leads Ativos</p>
+            <p className="text-2xl font-bold text-white">{metricas.totalAtivos}</p>
+          </div>
+          <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3">
+            <p className="text-[11px] text-red-200 uppercase tracking-wider">Leads com Urgência</p>
+            <p className="text-2xl font-bold text-red-300">{metricas.totalUrgentes}</p>
+          </div>
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+            <p className="text-[11px] text-emerald-200 uppercase tracking-wider">Taxa de Conversão</p>
+            <p className="text-2xl font-bold text-emerald-300">{metricas.taxaConversao.toFixed(1)}%</p>
+          </div>
+        </div>
+      </div>
 
-        setIsDraggingBoard(true);
-        dragStartXRef.current = event.pageX;
-        dragStartScrollLeftRef.current = board.scrollLeft;
-      }}
-      className={cn(
-        "flex-1 h-full overflow-x-auto overflow-y-hidden bg-[#0a0a0a] scrollbar-thin",
-        isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab"
-      )}
-    >
-      <div className="flex h-full min-w-max p-6 gap-6">
-        {STAGES.map((stage) => {
-          const stageCards = cardsByStage[stage];
-          return (
-            <div key={stage} className="w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
-              <div className="flex items-center justify-between mb-4 px-2">
-                <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-white/20" />
-                  {stage}
-                </h3>
-                <span className="text-[10px] font-bold bg-white/5 text-zinc-500 px-2.5 py-1 rounded-full border border-white/5 shadow-inner">
-                  {stageCards.length}
-                </span>
+      <div
+        ref={boardScrollRef}
+        onMouseDown={(event) => {
+          if (event.button !== 0) return;
+          const board = boardScrollRef.current;
+          if (!board) return;
+
+          setIsDraggingBoard(true);
+          dragStartXRef.current = event.pageX;
+          dragStartScrollLeftRef.current = board.scrollLeft;
+        }}
+        className={cn(
+          "flex-1 overflow-x-auto overflow-y-hidden bg-[#0a0a0a] scrollbar-thin",
+          isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab"
+        )}
+      >
+        <div className="flex h-full min-w-max p-6 gap-6">
+          {STAGES.map((stage) => {
+            const stageCards = cardsByStage[stage];
+            return (
+              <div key={stage} className="w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-white/20" />
+                    {stage}
+                  </h3>
+                  <span className="text-[10px] font-bold bg-white/5 text-zinc-500 px-2.5 py-1 rounded-full border border-white/5 shadow-inner">
+                    {stageCards.length}
+                  </span>
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin">
+                  {stageCards.map((card) => {
+                    return <KanbanLeadCard key={card.id} card={card} />;
+                  })}
+
+                  {stageCards.length === 0 && (
+                    <div className="h-24 border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center group/empty">
+                      <p className="text-[10px] text-zinc-700 font-medium group-hover/empty:text-zinc-600 transition-colors">Sem cards nesta etapa</p>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin">
-                {stageCards.map((card) => {
-                  return <KanbanLeadCard key={card.id} card={card} />;
-                })}
-
-                {stageCards.length === 0 && (
-                  <div className="h-24 border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center group/empty">
-                    <p className="text-[10px] text-zinc-700 font-medium group-hover/empty:text-zinc-600 transition-colors">Sem cards nesta etapa</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

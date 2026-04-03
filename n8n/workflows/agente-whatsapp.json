@@ -651,10 +651,10 @@
             {
               "id": "bot-active-condition",
               "leftValue": "={{ $json.chatbot_ativo }}",
-              "rightValue": "false",
+              "rightValue": "true",
               "operator": {
                 "type": "boolean",
-                "operation": "notEquals",
+                "operation": "equals",
                 "singleValue": true
               }
             }

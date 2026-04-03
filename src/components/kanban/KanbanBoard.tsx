@@ -22,6 +22,7 @@ const STAGES = [
 
 type KanbanStage = (typeof STAGES)[number];
 type KanbanPriority = 'alta' | 'media' | 'baixa';
+type UrgenciaCor = 'Verde' | 'Amarelo' | 'Vermelho';
 
 interface KanbanCardRow {
   id: number;
@@ -77,6 +78,19 @@ function groupCardsByStage(cards: KanbanCard[]): KanbanCardsByStage {
     acc[card.etapa].push(card);
     return acc;
   }, createEmptyStageGroups());
+}
+
+export function calcularUrgencia(ultima_interacao: string, etapa: KanbanStage): UrgenciaCor {
+  // SLA comercial se aplica nas etapas de topo de funil.
+  if (etapa !== 'Novo Lead' && etapa !== 'Cotação Enviada') {
+    return 'Verde';
+  }
+
+  const hours = differenceInHours(new Date(), new Date(ultima_interacao));
+
+  if (hours > 24) return 'Vermelho';
+  if (hours >= 12) return 'Amarelo';
+  return 'Verde';
 }
 
 function getCardPriority(card: KanbanCard) {
@@ -236,18 +250,11 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     };
   }, [isDraggingBoard]);
 
-  const getTemperature = (lastInteraction: string) => {
-    const hours = differenceInHours(new Date(), new Date(lastInteraction));
-    if (hours < 4) return 'green';
-    if (hours < 12) return 'yellow';
-    return 'red';
-  };
-
-  const getTemperatureColor = (temp: string) => {
-    switch (temp) {
-      case 'green': return 'bg-green-500/20 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]';
-      case 'yellow': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/20 shadow-[0_0_10px_rgba(234,179,8,0.1)]';
-      case 'red': return 'bg-red-500/20 text-red-400 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] animate-pulse';
+  const getTemperatureColor = (urgencia: UrgenciaCor) => {
+    switch (urgencia) {
+      case 'Verde': return 'bg-green-500/20 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]';
+      case 'Amarelo': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/20 shadow-[0_0_10px_rgba(234,179,8,0.1)]';
+      case 'Vermelho': return 'bg-red-500/20 text-red-400 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] animate-pulse';
       default: return 'bg-zinc-500/20 text-zinc-400';
     }
   };
@@ -316,12 +323,12 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin">
                 {stageCards.map((card) => {
-                  const temp = getTemperature(card.ultima_interacao);
+                  const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
                   return (
                     <div 
                       key={card.id}
                       className="group bg-[#161616] border border-[#1f1f1f] rounded-xl p-3 shadow-sm hover:shadow-xl hover:border-zinc-700/50 hover:bg-[#1c1c1c] transition-all duration-300 cursor-pointer active:scale-[0.98] border-l-4"
-                      style={{ borderLeftColor: temp === 'green' ? '#22c55e' : temp === 'yellow' ? '#eab308' : '#ef4444' }}
+                      style={{ borderLeftColor: urgencia === 'Verde' ? '#22c55e' : urgencia === 'Amarelo' ? '#eab308' : '#ef4444' }}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-2">
@@ -334,7 +341,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                         </div>
                         <div className={cn(
                           "px-2 py-0.5 rounded-full text-[9px] font-bold border flex items-center gap-1",
-                          getTemperatureColor(temp)
+                          getTemperatureColor(urgencia)
                         )}>
                           <Clock className="w-2.5 h-2.5" />
                           {formatDistanceToNow(new Date(card.ultima_interacao), { addSuffix: true, locale: ptBR })}
@@ -355,7 +362,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                           <span className="text-[10px] tabular-nums">@{card.lead_id.split('@')[0]}</span>
                         </div>
                         
-                        {temp === 'red' && (
+                        {urgencia === 'Vermelho' && (
                           <div className="animate-bounce">
                             <AlertCircle className="w-3.5 h-3.5 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
                           </div>

@@ -1,0 +1,886 @@
+{
+  "name": "Agente Whatsapp copy",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "kanban_cards",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Dados Lead').item.json.remoteJid }}"
+            }
+          ]
+        }
+      },
+      "id": "cba086cf-c162-41f1-82b0-29fdaa6ebfa8",
+      "name": "Encontrar Cliente1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3648,
+        848
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "3419c30f-4400-401b-bf40-db1579507f96",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f0d822eb-12a3-4c81-938b-cf49846edc13",
+      "name": "Cliente Existe?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        3856,
+        848
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "tableId": "kanban_cards",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "hospede_nome",
+              "fieldValue": "={{ $('Dados Lead').item.json.LeadNome }}"
+            },
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Dados Lead').item.json.remoteJid }}"
+            }
+          ]
+        }
+      },
+      "id": "68699c59-75f9-415e-b8be-2c853f11ba62",
+      "name": "Criar Cliente1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4080,
+        944
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "d12554bc-b5c0-4106-8af9-1c25e2086f04",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        4320,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('texto').item.json.Mensagem }}",
+        "options": {
+          "systemMessage": "=Você é a Aura, a recepcionista proativa da Pousada Delplata em Serra Negra. Seu objetivo é fechar reservas e manter o CRM impecável.\n\n# PERSONALIDADE AURA 😊\n- Use emojis, seja humana e empática. Responda em no máximo 3 frases curtas. \n- PROATIVIDADE: Se falarem de pets, já explique sobre chalés e deslocamento. Se houver datas, já dê o valor total calculado.\n\n# TABELA DE PREÇOS (ABRIL 2026) 🌿\n- Domingo a Sexta: Chalé/Anexo R$ 349 | Apto Térreo R$ 359 | Apto Superior R$ 369.\n- Sábado: Chalé/Anexo R$ 379 | Apto Térreo R$ 389 | Apto Superior R$ 399.\n- Adicionais: Criança (0-5 anos) Grátis | Criança (6-11 anos) R$ 80 | Adulto Extra R$ 100.\n# FERIADOS (PÁSCOA/CORPUS): Chalé R$ 599 | Térreo R$ 699 | Superior R$ 799 (Mín. diárias obrigatório).\n\n# REGRAS DA POUSADA\n- Café: 08:30 às 10:30. Check-in: 14h | Check-out: 12h.\n- Pets: Até 12kg apenas em Chalés/Anexos (70m da Ala Principal). \n\n# FLUXO DE RESERVA & KANBAN (OBRIGATÓRIO) 🚀\n1. COTAÇÃO ENVIADA: Use 'atualizar_etapa_kanban' ao passar valores/datas pela primeira vez.\n2. INTENÇÃO DE RESERVA (\"Quero reservar\", \"Pode confirmar\"): \n   - Chame 'atualizar_etapa_kanban' para a etapa 'Dados Solicitados'.\n   - Responda APENAS confirmando a disponibilidade e solicitando o Nome Completo e CPF. \n   - NUNCA envie os dados bancários antes de ter o Nome e CPF.\n3. DADOS RECEBIDOS (Nome e CPF anotados):\n   - Chame 'atualizar_etapa_kanban' para a etapa 'Aguardando Pagamento'.\n   - Forneça o modelo de pagamento completo calculando os valores [50%].\n4. COMPROVANTE RECEBIDO (Imagem ou confirmação):\n   - Chame 'atualizar_etapa_kanban' para a etapa 'Reserva Confirmada'.\n   - Confirme a recepção e deseje uma estadia maravilhosa! ✨\n\n# MODELO DE PAGAMENTO (Preencha os campos [ ])\n\"Muito obrigada pelos dados! Seguem os dados para reserva de [ACOMODAÇÃO] do dia [INÍCIO] a [FIM]. O valor total é R$ [VALOR TOTAL] e o depósito de 50% é de R$ [50% DO TOTAL]. \n\nBanco Sicoob | AG: 3122 | C/C: 878.506-6\nCNPJ: 11.336.243/0001-11 | FAV: HOTEL POUSADA DELPLATA\nChave PIX: (19)99965-4866\"\n\n# REGRA DE OURO\n- NUNCA responda com texto vazio. \n- Sempre dê um retorno amigável ao hóspede ao usar qualquer ferramenta.\n",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        4656,
+        848
+      ],
+      "id": "f8463da8-8ade-473c-93f2-053b9d85efac",
+      "name": "AI Agent1",
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "content": "## Gatilho\nWhatsApp",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        656
+      ],
+      "id": "37d1fa72-4888-4dbe-a924-bb420b9ef2c7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Critérios de Ativação\nFiltros para ativação do Agente",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        656
+      ],
+      "id": "6f3b364e-8d31-43bb-a7ae-73e4f32d2194",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Informações do Lead\nInformações de contato do Lead",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        656
+      ],
+      "id": "14183672-dfc3-44fb-b6d0-73c916863f8f",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Registro do Lead no banco de dados (Supabase)\nSalvando os dados do Lead na base de dados.",
+        "height": 508,
+        "width": 888
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3584,
+        656
+      ],
+      "id": "3bbedd19-73c9-483b-8e0d-311ed8e72214",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Agente de IA\nAgente inteligente com memória e prompt pré formatado",
+        "height": 504,
+        "width": 484,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4512,
+        656
+      ],
+      "id": "875081e6-1733-47e5-873a-af29d1cf0341",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f488c5c-0b3b-48e9-87b1-5a22d513d1ec",
+              "name": "IdConversa",
+              "value": "={{ (($('Webhook').item.json.body.data?.key?.remoteJid || $('Webhook').item.json.body.key?.remoteJid || '').split('@')[0]) }}",
+              "type": "string"
+            },
+            {
+              "id": "69f6217f-9063-423f-abf4-e94f6b70f94e",
+              "name": "LeadNome",
+              "value": "={{ $('Webhook').item.json.body.data?.pushName || $('Webhook').item.json.body.pushName || 'Sem nome' }}",
+              "type": "string"
+            },
+            {
+              "id": "e00a17c7-7b97-44cc-ba3e-984ae92a750b",
+              "name": "=remoteJid",
+              "value": "={{$json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || \"\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "518953f9-74d1-4c17-8891-b4e17403dde2",
+      "name": "Dados Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2992,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Envio das Respostas\nEnvio das mensagens no whatsapp",
+        "height": 508,
+        "width": 596,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5040,
+        656
+      ],
+      "id": "6f7108ef-95b5-47fe-838c-8dfc67c21faf",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mensagem-teste",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        848
+      ],
+      "id": "e8b997f9-739f-435d-9498-c49d14c0fd9f",
+      "name": "Webhook",
+      "webhookId": "b5a0b596-713d-4492-93dd-d2607f2d1537"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/message/sendText/delplata2026",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.number }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5456,
+        848
+      ],
+      "id": "4c4af415-0ca7-46de-a689-b109a770abf4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66a91f66-e755-4120-b22f-44c814f56162",
+              "name": "Mensagem",
+              "value": "={{ $('Webhook').item.json.body.data?.message?.conversation || $('Webhook').item.json.body.message?.conversation || $('Webhook').item.json.body.data?.message?.imageMessage?.caption || $('Webhook').item.json.body.message?.imageMessage?.caption || $('Webhook').item.json.body.data?.message?.extendedTextMessage?.text || $('Webhook').item.json.body.message?.extendedTextMessage?.text || \"\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3344,
+        848
+      ],
+      "id": "3755a499-2c2d-4550-9b44-ca7089f9c188",
+      "name": "texto"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "d82c5c4d-abf4-44ec-8d6c-56659f8d7576",
+              "leftValue": "={{ ($json.body.event || 'messages.upsert').toLowerCase() }}",
+              "rightValue": "messages.upsert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "a2e9441b-e0a7-4a20-984c-077aadf86a65",
+              "leftValue": "={{ $json.body.data?.key?.fromMe ?? $json.body.key?.fromMe ?? false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "231f7a95-7903-4bb1-b94c-c0ba82b6a805",
+              "leftValue": "={{ (($json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || '').endsWith('@g.us')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "09edccf6-8694-4d70-805e-846dac1cd344",
+              "leftValue": "={{ (($json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || '').includes('@newsletter')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b9b4276a-f8d2-4f61-86ec-2298bba537f4",
+              "leftValue": "={{ $json.body.data?.pushName || $json.body.pushName || '' }}",
+              "rightValue": "Felipe Borges - Suporte",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "7999a694-488d-4870-9553-4cfb495de523",
+              "leftValue": "={{ !!($json.body.data?.message?.conversation || $json.body.message?.conversation || $json.body.data?.message?.extendedTextMessage?.text || $json.body.message?.extendedTextMessage?.text || $json.body.data?.message?.imageMessage || $json.body.message?.imageMessage) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d6a71ddb-e575-49dc-9ba3-c5fee730fb3f",
+      "name": "Filtro",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.1,
+      "position": [
+        2672,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados Lead').item.json.remoteJid }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        4704,
+        1024
+      ],
+      "id": "8b16133b-c949-431f-a658-103d2641d5e4",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "31pB58OQNGC0I2Fb",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Informações do Lead\nInformações de contato do Lead",
+        "height": 508,
+        "width": 292,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3248,
+        656
+      ],
+      "id": "29d14b24-3b3c-477a-b2fe-c68ccfd51890",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        5744,
+        848
+      ],
+      "id": "03653bb7-538d-46cf-882f-e1a2491343a3",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        4560,
+        1024
+      ],
+      "id": "6c9c8c7f-f6f1-496d-8e75-b4acfc637efe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "diFMALZF6UJa35nv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "\"Use esta ferramenta IMEDIATAMENTE quando o hóspede fornecer informações de datas ou pessoas, mesmo que você ainda não tenha o preço final. Mova para a etapa 'Cotação Enviada' e coloque as datas no resumo.\"",
+        "workflowId": {
+          "__rl": true,
+          "value": "MDB2GSW429YiggOO",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MDB2GSW429YiggOO",
+          "cachedResultName": "Aura - Ajudante Kanban"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "remoteJid": "={{ $('Dados Lead').item.json.remoteJid }}",
+            "nova_etapa": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nova_etapa', `\"A etapa do funil. Ex: Nova Lead, Cotação Enviada, Negociação, Reserva Confirmada, Perdido.\"`, 'string') }}",
+            "resumo_solicitacao": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('resumo_solicitacao', `\"Resumo do que o hóspede pediu. Ex: Quarto casal, datas X a Y.\"`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "remoteJid",
+              "displayName": "remoteJid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nova_etapa",
+              "displayName": "nova_etapa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "resumo_solicitacao",
+              "displayName": "resumo_solicitacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        4848,
+        1024
+      ],
+      "id": "7a720916-6e7e-4b45-9e18-5f295abc87b6",
+      "name": "atualizar_etapa_kanban",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21aadedf-27cd-4d73-8eee-83746ba47b69",
+              "name": "number",
+              "value": "={{ $('Dados Lead').item.json.remoteJid.replace('@lid', '@s.whatsapp.net') }}",
+              "type": "string"
+            },
+            {
+              "id": "a6486ed6-de10-43c3-9649-7f1a42341c6c",
+              "name": "text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5280,
+        848
+      ],
+      "id": "64ed1f99-3c62-4613-bb52-616206d4d21d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "851f1fb8-cd90-4717-aa0f-1ef26fb88e70",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        5104,
+        848
+      ],
+      "id": "189aa22f-9a4c-4d95-9ae2-066a6ffb3a45",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Leads",
+        "returnFirst": true,
+        "where": [
+          {
+            "column": "lead_id",
+            "condition": "equal",
+            "value": "={{ $('Dados Lead').item.json.remoteJid.split('@')[0] }}"
+          }
+        ]
+      },
+      "id": "check-chatbot-status",
+      "name": "Check Chatbot Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        848
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "bot-active-condition",
+              "leftValue": "={{ $json.chatbot_ativo }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-chatbot-active",
+      "name": "Is Chatbot Active?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3230,
+        848
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Encontrar Cliente1": {
+      "main": [
+        [
+          {
+            "node": "Cliente Existe?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cliente Existe?1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Criar Cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Cliente1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados Lead": {
+      "main": [
+        [
+          {
+            "node": "Check Chatbot Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Chatbot Status": {
+      "main": [
+        [
+          {
+            "node": "Is Chatbot Active?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Chatbot Active?": {
+      "main": [
+        [
+          {
+            "node": "texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filtro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "texto": {
+      "main": [
+        [
+          {
+            "node": "Encontrar Cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro": {
+      "main": [
+        [
+          {
+            "node": "Dados Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizar_etapa_kanban": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2f3643ff-2e90-4b3d-b842-5b75654f0a60",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5899da75ae67d1ebd3667589ddb09f27975a5ddcea12c7dcc5226e44d13e5aaf"
+  },
+  "id": "OQNovYmqufz7rQ6A",
+  "tags": []
+}

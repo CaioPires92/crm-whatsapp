@@ -1,0 +1,715 @@
+{
+  "name": "Hotel CRM - Kanban Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-webhook",
+        "options": {}
+      },
+      "id": "webhook-1",
+      "name": "Webhook Evolution",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        320
+      ],
+      "webhookId": "hotel-crm-evolution-webhook",
+      "notesInFlow": true,
+      "notes": "Recebe os eventos da Evolution API."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "filter-event",
+              "leftValue": "={{ ($json.body?.event || $json.event || 'messages.upsert').toLowerCase() }}",
+              "rightValue": "messages.upsert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "filter-fromme",
+              "leftValue": "={{ $json.body?.data?.key?.fromMe ?? $json.data?.key?.fromMe ?? false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "filter-group",
+              "leftValue": "={{ (($json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid || '').endsWith('@g.us')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "filter-newsletter",
+              "leftValue": "={{ (($json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid || '').includes('@newsletter')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "filter-status",
+              "leftValue": "={{ ($json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid || '') }}",
+              "rightValue": "status@broadcast",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "filter-text",
+              "leftValue": "={{ !!($json.body?.data?.message?.conversation || $json.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || $json.data?.message?.extendedTextMessage?.text || $json.body?.data?.message?.imageMessage?.caption || $json.data?.message?.imageMessage?.caption) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "message-filter",
+      "name": "Filtro Entrada WhatsApp",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: ignora grupos, newsletter, status e mensagens enviadas pela propria instância."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lead-remotejid",
+              "name": "remoteJid",
+              "value": "={{ $json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "lead-number",
+              "name": "waNumber",
+              "value": "={{ (($json.body?.data?.key?.remoteJid || $json.data?.key?.remoteJid || '').split('@')[0]) }}",
+              "type": "string"
+            },
+            {
+              "id": "lead-name",
+              "name": "pushName",
+              "value": "={{ $json.body?.data?.pushName || $json.data?.pushName || 'Sem nome' }}",
+              "type": "string"
+            },
+            {
+              "id": "lead-instance",
+              "name": "instanceName",
+              "value": "={{ $json.body?.instance || $json.instance || 'SUA_INSTANCIA' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "normalize-lead",
+      "name": "Normalizar Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: padroniza remoteJid, numero sem sufixo e nome do lead para o restante do fluxo."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message-text",
+              "name": "messageText",
+              "value": "={{ $json.body?.data?.message?.conversation || $json.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || $json.data?.message?.extendedTextMessage?.text || $json.body?.data?.message?.imageMessage?.caption || $json.data?.message?.imageMessage?.caption || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "normalize-message",
+      "name": "Normalizar Mensagem",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: extrai o texto da mensagem para o agente ler sempre do mesmo campo."
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "kanban_cards",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-get",
+      "name": "Supabase - Get Lead Stage",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        320
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "AJUSTADO: usa o formato atual do node Supabase (tableId, keyName, keyValue)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "lead-exists",
+              "leftValue": "={{ $json.id || $json.lead_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-lead-exists",
+      "name": "Lead Existe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        1540,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: se o card nao existir, cria um registro inicial no Kanban antes de conversar."
+    },
+    {
+      "parameters": {
+        "tableId": "kanban_cards",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+            },
+            {
+              "fieldId": "hospede_nome",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+            },
+            {
+              "fieldId": "etapa",
+              "fieldValue": "Novo Lead"
+            },
+            {
+              "fieldId": "resumo_solicitacao",
+              "fieldValue": "Primeiro contato recebido via WhatsApp."
+            },
+            {
+              "fieldId": "ultima_interacao",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-create",
+      "name": "Supabase - Create Lead",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "AJUSTADO AO BANCO REAL: cria o card inicial em kanban_cards com lead_id, hospede_nome, etapa, resumo_solicitacao e ultima_interacao."
+    },
+    {
+      "parameters": {},
+      "id": "merge-lead",
+      "name": "Merge Lead",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2200,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: junta o caminho do lead existente com o caminho do lead-criado e segue para a IA."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Normalizar Mensagem').item.json.messageText }}",
+        "options": {
+          "systemMessage": "Você é a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua missão é atender hóspedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. Não dê preços genéricos; peça datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudança de estágio comercial, use a ferramenta update_kanban_stage.\n\nETAPAS DISPONÍVEIS:\n- Novo Lead\n- Cotação Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/Pós-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forneça um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cotação Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/Pós-venda, Perdido/Cancelado."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent Aura",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2420,
+        340
+      ],
+      "notesInFlow": true,
+      "notes": "AJUSTADO: agora le o texto normalizado da Evolution e segue para resposta no WhatsApp."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "openai-chat-model",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2260,
+        540
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: modelo de chat do agente."
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Normalizar Lead').item.json.remoteJid }}",
+        "contextWindowLength": 10
+      },
+      "id": "memory-window",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2560,
+        540
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: memoria por remoteJid para manter contexto por hospede."
+    },
+    {
+      "parameters": {
+        "description": "Atualiza a etapa do hóspede no Kanban e salva o resumo da solicitação. Use esta ferramenta sempre que houver mudança de etapa no funil.",
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"new_stage\": \"Cotação Enviada\",\n  \"summary\": \"Casal, 3 diarias, quarto luxo, 12 a 15 de julho\"\n}",
+        "jsCode": "const input = typeof $input.item.json === 'object' && $input.item.json !== null ? $input.item.json : {};\nconst new_stage = input.new_stage || 'Novo Lead';\nconst summary = input.summary || 'Lead sem resumo informado';\n\nreturn [{\n  json: {\n    new_stage,\n    summary,\n    lead_id: $('Normalizar Lead').first().json.remoteJid,\n    ultima_interacao: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "tool-update",
+      "name": "update_kanban_stage",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        2420,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "AJUSTADO: tool do agente com etapas compativeis com o enum do kanban e saida main para atualizar o card."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "kanban_cards",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $json.lead_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "hospede_nome",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+            },
+            {
+              "fieldId": "etapa",
+              "fieldValue": "={{ $json.new_stage }}"
+            },
+            {
+              "fieldId": "resumo_solicitacao",
+              "fieldValue": "={{ $json.summary }}"
+            },
+            {
+              "fieldId": "ultima_interacao",
+              "fieldValue": "={{ $json.ultima_interacao }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-update",
+      "name": "Supabase - Update Kanban",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2620,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "AJUSTADO AO BANCO REAL: atualiza hospede_nome, etapa, resumo_solicitacao e ultima_interacao em kanban_cards filtrando por lead_id."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.EVOLUTION_API_BASE_URL || 'http://host.docker.internal:8080') + '/message/sendText/' + $('Normalizar Lead').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY || 'SUA_API_KEY_DA_EVOLUTION' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { number: $('Normalizar Lead').item.json.waNumber, text: $json.output } }}",
+        "options": {}
+      },
+      "id": "http-reply",
+      "name": "HTTP Request - Send WhatsApp Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2820,
+        340
+      ],
+      "notesInFlow": true,
+      "notes": "AJUSTADO: envia para a Evolution o numero sem o sufixo @s.whatsapp.net, que e o formato mais seguro para sendText."
+    },
+    {
+      "parameters": {
+        "tableId": "n8n_chat_histories",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ { role: 'user', content: $('Normalizar Mensagem').item.json.messageText, pushName: $('Normalizar Lead').item.json.pushName } }}"
+            },
+            {
+              "fieldId": "hora_data_mensagem",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-save-user-history",
+      "name": "Supabase - Save User History",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        500
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: salva a mensagem recebida na tabela n8n_chat_histories."
+    },
+    {
+      "parameters": {
+        "tableId": "Leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_nome",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+            },
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.numeroSemSufixo }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-create-lead-master",
+      "name": "Supabase - Create Lead Master",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        320
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: sincroniza a tabela Leads quando um novo contato entra no funil."
+    },
+    {
+      "parameters": {
+        "tableId": "n8n_chat_histories",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ { role: 'assistant', content: $json.output } }}"
+            },
+            {
+              "fieldId": "hora_data_mensagem",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-save-assistant-history",
+      "name": "Supabase - Save Assistant History",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2620,
+        500
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: salva a resposta da Aura em n8n_chat_histories antes do envio ao WhatsApp."
+    }
+  ],
+  "connections": {
+    "Webhook Evolution": {
+      "main": [
+        [
+          {
+            "node": "Filtro Entrada WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro Entrada WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Lead": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save User History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Lead Stage": {
+      "main": [
+        [
+          {
+            "node": "Lead Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Existe?": {
+      "main": [
+        [
+          {
+            "node": "Merge Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase - Create Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Create Lead": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Create Lead Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Lead": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_kanban_stage": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Supabase - Update Kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Aura": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save Assistant History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Save User History": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Lead Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Create Lead Master": {
+      "main": [
+        [
+          {
+            "node": "Merge Lead",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Supabase - Save Assistant History": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "hotel-crm-kanban-v6",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

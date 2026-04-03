@@ -1,0 +1,94 @@
+{
+  "mode": "apply",
+  "existingLeads": 451,
+  "existingHistories": 0,
+  "rawChatsConsidered": 455,
+  "canonicalConversations": 50,
+  "importedMessages": 748,
+  "duplicateLeadGroups": [],
+  "historySyncWarning": null,
+  "sample": [
+    {
+      "lead_id": "8744637333562",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "8744637333562@lid"
+      ],
+      "updatedAt": "2026-04-03T20:14:48.000Z"
+    },
+    {
+      "lead_id": "252866233168059",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "252866233168059@lid"
+      ],
+      "updatedAt": "2026-04-03T20:03:39.000Z"
+    },
+    {
+      "lead_id": "5519998701203",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "5519998701203@s.whatsapp.net"
+      ],
+      "updatedAt": "2026-04-03T20:02:38.000Z"
+    },
+    {
+      "lead_id": "254017418567883",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "254017418567883@lid"
+      ],
+      "updatedAt": "2026-04-03T19:21:11.000Z"
+    },
+    {
+      "lead_id": "160219543933111",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "160219543933111@lid"
+      ],
+      "updatedAt": "2026-04-03T18:31:57.000Z"
+    },
+    {
+      "lead_id": "5511981384640",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "210427795480821@lid",
+        "5511981384640@s.whatsapp.net"
+      ],
+      "updatedAt": "2026-04-03T18:28:19.000Z"
+    },
+    {
+      "lead_id": "221680458854643",
+      "lead_nome": "Marcelo Soufia",
+      "sourceRemoteJids": [
+        "221680458854643@lid"
+      ],
+      "updatedAt": "2026-04-03T17:41:42.000Z"
+    },
+    {
+      "lead_id": "153390478827669",
+      "lead_nome": "Ivanei Pinheiro",
+      "sourceRemoteJids": [
+        "153390478827669@lid"
+      ],
+      "updatedAt": "2026-04-03T17:31:44.000Z"
+    },
+    {
+      "lead_id": "5519998816069",
+      "lead_nome": "Victor Disk Gás Consigaz",
+      "sourceRemoteJids": [
+        "171270729638034@lid",
+        "5519998816069@s.whatsapp.net"
+      ],
+      "updatedAt": "2026-04-03T17:28:59.000Z"
+    },
+    {
+      "lead_id": "137228567203888",
+      "lead_nome": "Sem nome",
+      "sourceRemoteJids": [
+        "137228567203888@lid"
+      ],
+      "updatedAt": "2026-04-03T17:18:59.000Z"
+    }
+  ]
+}

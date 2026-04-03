@@ -1,0 +1,42 @@
+{
+  "name": "Sincronizar Labels Salvas pela Evolution",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const evolutionBaseUrl = 'http://host.docker.internal:8080';\nconst evolutionInstance = 'delplata2026';\nconst evolutionApiKey = '8129ABA9826B-420A-88E0-6B2DDE20482B';\nconst supabaseUrl = 'https://yqqbgevlqzfmtkbjzits.supabase.co';\nconst supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxcWJnZXZscXpmbXRrYmp6aXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Njg2ODgsImV4cCI6MjA5MDE0NDY4OH0.BB66YqTMA2VJzWg9FiFjCcna-TaGYL6hvz5ROVecoto';\n\nconst normalizeLeadId = (value) => String(value || '').split('@')[0].trim();\nconst isIgnorableChat = (remoteJid) => !remoteJid || remoteJid.endsWith('@g.us') || remoteJid.includes('@newsletter') || remoteJid === 'status@broadcast';\nconst mergeLabels = (existingLabels = [], incomingLabels = []) => {\n  const merged = new Map();\n  for (const label of [...existingLabels, ...incomingLabels]) {\n    if (!label?.id) continue;\n    merged.set(String(label.id), {\n      id: String(label.id),\n      name: String(label.name || ''),\n      color: String(label.color || '0'),\n    });\n  }\n  return Array.from(merged.values()).sort((a, b) => a.name.localeCompare(b.name));\n};\nconst requestJson = async (url, options = {}) => {\n  const response = await fetch(url, options);\n  const text = await response.text();\n  if (!response.ok) {\n    throw new Error(`Request failed ${response.status}: ${text.slice(0, 500)}`);\n  }\n  return text ? JSON.parse(text) : null;\n};\n\nconst chats = await requestJson(`${evolutionBaseUrl}/chat/findChats/${evolutionInstance}`, {\n  method: 'POST',\n  headers: {\n    apikey: evolutionApiKey,\n    'Content-Type': 'application/json',\n  },\n  body: JSON.stringify({\n    take: 500,\n    include: { labels: true },\n  }),\n});\n\nconst labeledChats = (chats || []).filter((chat) => !isIgnorableChat(chat.remoteJid) && Array.isArray(chat.labels) && chat.labels.length > 0);\nconst existingLeads = await requestJson(`${supabaseUrl}/rest/v1/Leads?select=id,lead_id,lead_nome,labels,chatbot_ativo&limit=5000`, {\n  headers: {\n    apikey: supabaseKey,\n    Authorization: `Bearer ${supabaseKey}`,\n  },\n});\nconst existingLeadMap = new Map((existingLeads || []).map((lead) => [normalizeLeadId(lead.lead_id), lead]));\n\nlet syncedLeads = 0;\nfor (const chat of labeledChats) {\n  const leadId = normalizeLeadId(chat.remoteJid);\n  const existingLead = existingLeadMap.get(leadId);\n  const payload = {\n    lead_id: leadId,\n    lead_nome: existingLead?.lead_nome && existingLead.lead_nome !== 'Sem nome' ? existingLead.lead_nome : ((chat.pushName || '').trim() || 'Sem nome'),\n    labels: mergeLabels(existingLead?.labels, chat.labels),\n    chatbot_ativo: existingLead?.chatbot_ativo ?? true,\n  };\n\n  await requestJson(`${supabaseUrl}/rest/v1/Leads`, {\n    method: 'POST',\n    headers: {\n      apikey: supabaseKey,\n      Authorization: `Bearer ${supabaseKey}`,\n      'Content-Type': 'application/json',\n      Prefer: 'resolution=merge-duplicates,return=minimal',\n    },\n    body: JSON.stringify(payload),\n  });\n\n  syncedLeads += 1;\n}\n\nreturn [{\n  json: {\n    chatsScanned: (chats || []).length,\n    labeledChats: labeledChats.length,\n    syncedLeads,\n    note: labeledChats.length === 0 ? 'A Evolution nao retornou labels associadas nos chats. Sem dados para backfill.' : 'Labels sincronizadas com sucesso.',\n  },\n}];"
+      },
+      "id": "sync-saved-labels",
+      "name": "Sincronizar Labels Salvas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sincronizar Labels Salvas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

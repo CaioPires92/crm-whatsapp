@@ -471,7 +471,7 @@
             },
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+              "fieldValue": "={{ $('Normalizar Lead').item.json.numeroSemSufixo }}"
             }
           ]
         }

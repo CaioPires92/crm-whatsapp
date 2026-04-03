@@ -1,0 +1,85 @@
+{
+    "name": "Sync Inteligente de Contatos",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "manual-sync-trigger",
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [100, 300]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://host.docker.internal:8080/chat/findChats/delplata2026",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{ \"take\": 100, \"include\": { \"labels\": true } }",
+                "options": {}
+            },
+            "id": "fetch-recent-chats",
+            "name": "Buscar Chats Recentes",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [350, 300]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://yqqbgevlqzfmtkbjzits.supabase.co/rest/v1/Leads",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxcWJnZXZscXpmbXRrYmp6aXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Njg2ODgsImV4cCI6MjA5MDE0NDY4OH0.BB66YqTMA2VJzWg9FiFjCcna-TaGYL6hvz5ROVecoto"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxcWJnZXZscXpmbXRrYmp6aXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Njg2ODgsImV4cCI6MjA5MDE0NDY4OH0.BB66YqTMA2VJzWg9FiFjCcna-TaGYL6hvz5ROVecoto"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "resolution=merge-duplicates"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ \"lead_id\": ($json.remoteJid || '').split('@')[0], \"lead_nome\": $json.pushName || 'Sem nome', \"labels\": $json.labels || [], \"chatbot_ativo\": true }) }}",
+                "options": {}
+            },
+            "id": "upsert-leads-sync",
+            "name": "Atualizar Leads",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [600, 300]
+        }
+    ],
+    "connections": {
+        "Manual Trigger": {
+            "main": [[{"node": "Buscar Chats Recentes", "type": "main", "index": 0}]]
+        },
+        "Buscar Chats Recentes": {
+            "main": [[{"node": "Atualizar Leads", "type": "main", "index": 0}]]
+        }
+    }
+}

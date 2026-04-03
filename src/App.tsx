@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Contatos from './pages/Contatos';
 import Settings from './pages/Settings';
 import Kanban from './pages/Kanban';
+import Campanhas from './pages/Campanhas';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
                 <Route index element={<Navigate to="/kanban" replace />} />
                 <Route path="kanban" element={<Kanban />} />
                 <Route path="contatos" element={<Contatos />} />
+                <Route path="campanhas" element={<Campanhas />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>

@@ -1,0 +1,3616 @@
+[
+  {
+    "id": 2973,
+    "created_at": "2026-04-03T20:14:00.451323+00:00",
+    "lead_nome": "Erick Silva",
+    "lead_id": "8744637333562",
+    "labels": [],
+    "chatbot_ativo": true
+  },
+  {
+    "id": 1,
+    "created_at": "2026-03-28T01:05:42.12974+00:00",
+    "lead_nome": "Iazos Felipe",
+    "lead_id": "5517997814806",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2962,
+    "created_at": "2026-04-03T03:51:29.087521+00:00",
+    "lead_nome": "Cryslaine Matos",
+    "lead_id": "252866233168059",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 9,
+    "created_at": "2026-03-29T18:21:37.662684+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": null,
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2639,
+    "created_at": "2026-04-03T00:41:53.03654+00:00",
+    "lead_nome": "Mauricio Cohen",
+    "lead_id": "5511996222227",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2899,
+    "created_at": "2026-04-03T00:41:56.089125+00:00",
+    "lead_nome": "Renan",
+    "lead_id": "5519998014004",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2789,
+    "created_at": "2026-04-03T00:41:53.877186+00:00",
+    "lead_nome": "001 Pamela",
+    "lead_id": "5511995930320",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2799,
+    "created_at": "2026-04-03T00:41:53.980383+00:00",
+    "lead_nome": "Alan-alimentos",
+    "lead_id": "5519996479381",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2808,
+    "created_at": "2026-04-03T00:41:54.58396+00:00",
+    "lead_nome": "Barbosa",
+    "lead_id": "5524999762236",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2908,
+    "created_at": "2026-04-03T00:41:56.158829+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519996926225",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2599,
+    "created_at": "2026-04-03T00:41:52.844122+00:00",
+    "lead_nome": "Rosana Mara Bueno",
+    "lead_id": "5519993513555",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2766,
+    "created_at": "2026-04-03T00:41:53.735186+00:00",
+    "lead_nome": "Adriano Oliveira Financeiro Ecila",
+    "lead_id": "553591165512",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2867,
+    "created_at": "2026-04-03T00:41:55.544121+00:00",
+    "lead_nome": "Addas Nascimento Oliveira",
+    "lead_id": "5511969164152",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2566,
+    "created_at": "2026-04-03T00:41:52.226954+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519999339554",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2545,
+    "created_at": "2026-04-03T00:41:51.917885+00:00",
+    "lead_nome": "alilson refrigeração 🧢🥶🥶",
+    "lead_id": "190645343903819",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2629,
+    "created_at": "2026-04-03T00:41:52.968114+00:00",
+    "lead_nome": "Marcus Meneghetti",
+    "lead_id": "5519971063993",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2694,
+    "created_at": "2026-04-03T00:41:53.513545+00:00",
+    "lead_nome": "Patrícia 2",
+    "lead_id": "5519994005000",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2818,
+    "created_at": "2026-04-03T00:41:54.751664+00:00",
+    "lead_nome": "Cami - Pousada Mariangela",
+    "lead_id": "5511998424167",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2828,
+    "created_at": "2026-04-03T00:41:54.936803+00:00",
+    "lead_nome": "Sergio VIVO",
+    "lead_id": "5519997337730",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2838,
+    "created_at": "2026-04-03T00:41:55.116525+00:00",
+    "lead_nome": "130423 Fernanda Rubia",
+    "lead_id": "5511978466563",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2701,
+    "created_at": "2026-04-03T00:41:53.563434+00:00",
+    "lead_nome": "Raquel",
+    "lead_id": "5519996600016",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2742,
+    "created_at": "2026-04-03T00:41:53.715822+00:00",
+    "lead_nome": "Rafael Pereira",
+    "lead_id": "5511963091364",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2943,
+    "created_at": "2026-04-03T00:41:56.618597+00:00",
+    "lead_nome": "Priscila Teodoro",
+    "lead_id": "5519993207133",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2656,
+    "created_at": "2026-04-03T00:41:53.096003+00:00",
+    "lead_nome": "Pedro Paulo",
+    "lead_id": "5519997898322",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2689,
+    "created_at": "2026-04-03T00:41:53.489999+00:00",
+    "lead_nome": "Alexandre de Freitas Filho",
+    "lead_id": "5519993088395",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2734,
+    "created_at": "2026-04-03T00:41:53.663354+00:00",
+    "lead_nome": "Wagner",
+    "lead_id": "5511999035432",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2929,
+    "created_at": "2026-04-03T00:41:56.490015+00:00",
+    "lead_nome": "Rafael Loiza",
+    "lead_id": "5511989394620",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2719,
+    "created_at": "2026-04-03T00:41:53.588418+00:00",
+    "lead_nome": "Oswaldo Pariazotto",
+    "lead_id": "5514997097846",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2574,
+    "created_at": "2026-04-03T00:41:52.446663+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "105815176442056",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2593,
+    "created_at": "2026-04-03T00:41:52.827419+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "280590280577238",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2776,
+    "created_at": "2026-04-03T00:41:53.818729+00:00",
+    "lead_nome": "001 Jose Martins",
+    "lead_id": "5519982889505",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2859,
+    "created_at": "2026-04-03T00:41:55.448671+00:00",
+    "lead_nome": "130423 Regiane Mara",
+    "lead_id": "5513996261569",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2537,
+    "created_at": "2026-04-03T00:41:50.94661+00:00",
+    "lead_nome": "Rennã",
+    "lead_id": "127019648041006",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2754,
+    "created_at": "2026-04-03T00:41:53.72546+00:00",
+    "lead_nome": "Luiz",
+    "lead_id": "5519998848362",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2654,
+    "created_at": "2026-04-03T00:41:53.116875+00:00",
+    "lead_nome": "Otavio Augusto Sechin",
+    "lead_id": "5519996035389",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2746,
+    "created_at": "2026-04-03T00:41:53.719007+00:00",
+    "lead_nome": "Adilson",
+    "lead_id": "5512981982525",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2916,
+    "created_at": "2026-04-03T00:41:56.34337+00:00",
+    "lead_nome": "Eletromarchi",
+    "lead_id": "5519998988545",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2849,
+    "created_at": "2026-04-03T00:41:55.247788+00:00",
+    "lead_nome": "Val",
+    "lead_id": "5519993590887",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2767,
+    "created_at": "2026-04-03T00:41:53.740636+00:00",
+    "lead_nome": "Rafael2",
+    "lead_id": "5511982137880",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2907,
+    "created_at": "2026-04-03T00:41:56.154482+00:00",
+    "lead_nome": "Silvio Jr",
+    "lead_id": "5519971644673",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2729,
+    "created_at": "2026-04-03T00:41:53.665251+00:00",
+    "lead_nome": "Paulo A Ferreira Lopes",
+    "lead_id": "5511981815031",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2829,
+    "created_at": "2026-04-03T00:41:54.968741+00:00",
+    "lead_nome": "Meliane Bonfante",
+    "lead_id": "5519992034314",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2708,
+    "created_at": "2026-04-03T00:41:53.512499+00:00",
+    "lead_nome": "Alexsandro Silva",
+    "lead_id": "5511965929932",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2582,
+    "created_at": "2026-04-03T00:41:52.534101+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "68522109587700",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2897,
+    "created_at": "2026-04-03T00:41:56.083099+00:00",
+    "lead_nome": "Marcio Cedran",
+    "lead_id": "5519984008534",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2547,
+    "created_at": "2026-04-03T00:41:52.015989+00:00",
+    "lead_nome": "Iara",
+    "lead_id": "149069792059433",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2527,
+    "created_at": "2026-04-03T00:41:50.632884+00:00",
+    "lead_nome": "Alan Silva",
+    "lead_id": "120363425024827000",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2598,
+    "created_at": "2026-04-03T00:41:52.840524+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "259274374705343",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2716,
+    "created_at": "2026-04-03T00:41:53.592457+00:00",
+    "lead_nome": "Alex Lincoln",
+    "lead_id": "5513996725141",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2740,
+    "created_at": "2026-04-03T00:41:53.70409+00:00",
+    "lead_nome": "Osvaldo Lourenço Da Silva Junior",
+    "lead_id": "5517992597259",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2869,
+    "created_at": "2026-04-03T00:41:55.554788+00:00",
+    "lead_nome": "Adeus Almeida Silva",
+    "lead_id": "5511984053298",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2659,
+    "created_at": "2026-04-03T00:41:53.172013+00:00",
+    "lead_nome": "001 Janete",
+    "lead_id": "5511937145829",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2887,
+    "created_at": "2026-04-03T00:41:55.782765+00:00",
+    "lead_nome": "Regina Nardi Marangi",
+    "lead_id": "5519996078686",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2935,
+    "created_at": "2026-04-03T00:41:56.558494+00:00",
+    "lead_nome": "Paulo Cesar Magro",
+    "lead_id": "5519982581513",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2678,
+    "created_at": "2026-04-03T00:41:53.451107+00:00",
+    "lead_nome": "Alexandre José Lopes",
+    "lead_id": "5519999184121",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2667,
+    "created_at": "2026-04-03T00:41:53.209005+00:00",
+    "lead_nome": "Albanir",
+    "lead_id": "5513996603577",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2624,
+    "created_at": "2026-04-03T00:41:52.898794+00:00",
+    "lead_nome": "Rosimeire Pinto",
+    "lead_id": "5519988330501",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2604,
+    "created_at": "2026-04-03T00:41:52.843108+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "229471529500905",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2938,
+    "created_at": "2026-04-03T00:41:56.574117+00:00",
+    "lead_nome": "Premium Limp",
+    "lead_id": "5519992030453",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2761,
+    "created_at": "2026-04-03T00:41:53.735533+00:00",
+    "lead_nome": "Alexsandro",
+    "lead_id": "5521976741662",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2822,
+    "created_at": "2026-04-03T00:41:54.793486+00:00",
+    "lead_nome": "Katy Camargo",
+    "lead_id": "5515997271120",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2549,
+    "created_at": "2026-04-03T00:41:52.040913+00:00",
+    "lead_nome": "Fernanda",
+    "lead_id": "123776696066126",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2619,
+    "created_at": "2026-04-03T00:41:52.875776+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "104127724040193",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2841,
+    "created_at": "2026-04-03T00:41:55.172512+00:00",
+    "lead_nome": "130423 Nathalia",
+    "lead_id": "5511982823959",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2677,
+    "created_at": "2026-04-03T00:41:53.448202+00:00",
+    "lead_nome": "Aline Gomes",
+    "lead_id": "5511986335114",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2583,
+    "created_at": "2026-04-03T00:41:52.540415+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "1357327155204",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2559,
+    "created_at": "2026-04-03T00:41:52.202536+00:00",
+    "lead_nome": "JPCar Transporte Por Aplicativo",
+    "lead_id": "278301079818298",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2591,
+    "created_at": "2026-04-03T00:41:52.823787+00:00",
+    "lead_nome": "Camila Peixinho",
+    "lead_id": "150418579550265",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2628,
+    "created_at": "2026-04-03T00:41:52.966166+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519993458084",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2900,
+    "created_at": "2026-04-03T00:41:56.089251+00:00",
+    "lead_nome": "Renan Monteiro",
+    "lead_id": "5511966655381",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2775,
+    "created_at": "2026-04-03T00:41:53.742953+00:00",
+    "lead_nome": "Rafinha Arts",
+    "lead_id": "5519993839604",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2947,
+    "created_at": "2026-04-03T00:41:56.900993+00:00",
+    "lead_nome": "Paulo De Melo",
+    "lead_id": "5513997904719",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2753,
+    "created_at": "2026-04-03T00:41:53.72373+00:00",
+    "lead_nome": "Odeildo",
+    "lead_id": "5519996944393",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2812,
+    "created_at": "2026-04-03T00:41:54.646959+00:00",
+    "lead_nome": "Selma Chalé",
+    "lead_id": "5511998795871",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2661,
+    "created_at": "2026-04-03T00:41:53.177453+00:00",
+    "lead_nome": "001k",
+    "lead_id": "5519996201213",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2539,
+    "created_at": "2026-04-03T00:41:51.829903+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "168341377404967",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2918,
+    "created_at": "2026-04-03T00:41:56.349343+00:00",
+    "lead_nome": "Renata Delmiglio",
+    "lead_id": "5519989923993",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2636,
+    "created_at": "2026-04-03T00:41:53.037271+00:00",
+    "lead_nome": "Orlando",
+    "lead_id": "5511995033337",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2890,
+    "created_at": "2026-04-03T00:41:55.829646+00:00",
+    "lead_nome": "Rayana",
+    "lead_id": "5511959647153",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2573,
+    "created_at": "2026-04-03T00:41:52.44608+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "194239929524433",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2803,
+    "created_at": "2026-04-03T00:41:54.526044+00:00",
+    "lead_nome": "01 Ariane",
+    "lead_id": "5511974657226",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2723,
+    "created_at": "2026-04-03T00:41:53.658469+00:00",
+    "lead_nome": "Advaldo Antonio",
+    "lead_id": "5516981007017",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2784,
+    "created_at": "2026-04-03T00:41:53.82298+00:00",
+    "lead_nome": "Alessandra",
+    "lead_id": "5511947265805",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2702,
+    "created_at": "2026-04-03T00:41:53.448314+00:00",
+    "lead_nome": "Amor ❤️",
+    "lead_id": "5519997164959",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2530,
+    "created_at": "2026-04-03T00:41:50.658074+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "57969291047004",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2660,
+    "created_at": "2026-04-03T00:41:53.172113+00:00",
+    "lead_nome": "002 Marina",
+    "lead_id": "5511973697726",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2588,
+    "created_at": "2026-04-03T00:41:52.778372+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "84516433608926",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2551,
+    "created_at": "2026-04-03T00:41:52.117652+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519995722712",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2718,
+    "created_at": "2026-04-03T00:41:53.593427+00:00",
+    "lead_nome": "Paola",
+    "lead_id": "5511954795986",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2724,
+    "created_at": "2026-04-03T00:41:53.659099+00:00",
+    "lead_nome": "Sergio Castelão",
+    "lead_id": "5513981282139",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2565,
+    "created_at": "2026-04-03T00:41:52.259368+00:00",
+    "lead_nome": "Maria Fernanda",
+    "lead_id": "85671712665702",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2540,
+    "created_at": "2026-04-03T00:41:51.830809+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "214933081960650",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2622,
+    "created_at": "2026-04-03T00:41:52.894083+00:00",
+    "lead_nome": "Sérgio",
+    "lead_id": "5513997737829",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2610,
+    "created_at": "2026-04-03T00:41:52.838442+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "248180524482600",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2872,
+    "created_at": "2026-04-03T00:41:55.594954+00:00",
+    "lead_nome": "Denise Benatto",
+    "lead_id": "5519982096757",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2813,
+    "created_at": "2026-04-03T00:41:54.675956+00:00",
+    "lead_nome": "Erica",
+    "lead_id": "5519971285076",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2963,
+    "created_at": "2026-04-03T12:53:22.275607+00:00",
+    "lead_nome": "Nani",
+    "lead_id": "141940230213661",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2744,
+    "created_at": "2026-04-03T00:41:53.717378+00:00",
+    "lead_nome": "Tempo Bombas e Aquecedores",
+    "lead_id": "5519993455809",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2630,
+    "created_at": "2026-04-03T00:41:53.018426+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "106610114478113",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2674,
+    "created_at": "2026-04-03T00:41:53.284867+00:00",
+    "lead_nome": "Otávio rocha",
+    "lead_id": "5511998936261",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2862,
+    "created_at": "2026-04-03T00:41:55.476867+00:00",
+    "lead_nome": "Adalberto Calmon",
+    "lead_id": "556199141884",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2560,
+    "created_at": "2026-04-03T00:41:52.206354+00:00",
+    "lead_nome": "Eliane",
+    "lead_id": "163540191191185",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2795,
+    "created_at": "2026-04-03T00:41:53.946613+00:00",
+    "lead_nome": "Adriano Vaz",
+    "lead_id": "5511948713550",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2949,
+    "created_at": "2026-04-03T00:41:56.900802+00:00",
+    "lead_nome": "Rangel Luis Vaz Trindade",
+    "lead_id": "5516993857249",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2669,
+    "created_at": "2026-04-03T00:41:53.228443+00:00",
+    "lead_nome": "Patricia Lepore",
+    "lead_id": "5511956518772",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2901,
+    "created_at": "2026-04-03T00:41:56.091547+00:00",
+    "lead_nome": "Robson Araujo Novo",
+    "lead_id": "5519971715103",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2823,
+    "created_at": "2026-04-03T00:41:54.813985+00:00",
+    "lead_nome": "Renata",
+    "lead_id": "5513991679523",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2852,
+    "created_at": "2026-04-03T00:41:55.331642+00:00",
+    "lead_nome": "Adilson Aaa",
+    "lead_id": "5511985355707",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2555,
+    "created_at": "2026-04-03T00:41:52.140369+00:00",
+    "lead_nome": "Lucas",
+    "lead_id": "32208513433752",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2585,
+    "created_at": "2026-04-03T00:41:52.731977+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519999553977",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2601,
+    "created_at": "2026-04-03T00:41:52.844189+00:00",
+    "lead_nome": "Vania Sa",
+    "lead_id": "5511940545889",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2814,
+    "created_at": "2026-04-03T00:41:54.680361+00:00",
+    "lead_nome": "Cristiane De Fatima Leonini",
+    "lead_id": "5511982426351",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2543,
+    "created_at": "2026-04-03T00:41:51.867809+00:00",
+    "lead_nome": "Paulinha Franzese😘",
+    "lead_id": "104101467672585",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2617,
+    "created_at": "2026-04-03T00:41:52.89504+00:00",
+    "lead_nome": "Reinaldo Macedo",
+    "lead_id": "5511968817559",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2728,
+    "created_at": "2026-04-03T00:41:53.65999+00:00",
+    "lead_nome": "Patricia Magiolo",
+    "lead_id": "5519999300540",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2864,
+    "created_at": "2026-04-03T00:41:55.491091+00:00",
+    "lead_nome": "Marcelo Atibaia",
+    "lead_id": "5511973011175",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2748,
+    "created_at": "2026-04-03T00:41:53.718417+00:00",
+    "lead_nome": "Nilton Cotação Ano Novo",
+    "lead_id": "5511986044444",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2782,
+    "created_at": "2026-04-03T00:41:53.824022+00:00",
+    "lead_nome": "Adoroaldo Nogueira",
+    "lead_id": "5516992221060",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2834,
+    "created_at": "2026-04-03T00:41:55.037622+00:00",
+    "lead_nome": "Vivi Furtado 🐝",
+    "lead_id": "5519989018416",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2892,
+    "created_at": "2026-04-03T00:41:55.904396+00:00",
+    "lead_nome": "Rayla marinos",
+    "lead_id": "5519999129194",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2873,
+    "created_at": "2026-04-03T00:41:55.633632+00:00",
+    "lead_nome": "130423 Rosimeire Pinheiro",
+    "lead_id": "5513991175351",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2805,
+    "created_at": "2026-04-03T00:41:54.56855+00:00",
+    "lead_nome": "Fernando Mairipora",
+    "lead_id": "5511941744608",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2964,
+    "created_at": "2026-04-03T13:51:01.695176+00:00",
+    "lead_nome": "Alex Zanata",
+    "lead_id": "211600321548384",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2961,
+    "created_at": "2026-04-03T02:09:38.403923+00:00",
+    "lead_nome": "Gustavo Coelho Cintra",
+    "lead_id": "5511967598844",
+    "labels": [
+      {
+        "id": "26",
+        "name": "SIM",
+        "color": "3"
+      }
+    ],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2965,
+    "created_at": "2026-04-03T17:18:05.31515+00:00",
+    "lead_nome": "Treinando",
+    "lead_id": "70201374695579",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2968,
+    "created_at": "2026-04-03T17:18:17.756295+00:00",
+    "lead_nome": "Dario Aquilano",
+    "lead_id": "210427795480821",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2969,
+    "created_at": "2026-04-03T17:18:21.497508+00:00",
+    "lead_nome": "Marcelo Soufia",
+    "lead_id": "221680458854643",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2966,
+    "created_at": "2026-04-03T17:18:13.183081+00:00",
+    "lead_nome": "Supermercado Ciamdrighi",
+    "lead_id": "20955313254479",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2967,
+    "created_at": "2026-04-03T17:18:16.299856+00:00",
+    "lead_nome": "Denis",
+    "lead_id": "137228567203888",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2970,
+    "created_at": "2026-04-03T17:31:28.083874+00:00",
+    "lead_nome": "Ivanei Pinheiro",
+    "lead_id": "153390478827669",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2971,
+    "created_at": "2026-04-03T18:30:40.734984+00:00",
+    "lead_nome": "Fernanda H",
+    "lead_id": "160219543933111",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2972,
+    "created_at": "2026-04-03T19:16:41.274208+00:00",
+    "lead_nome": "RF",
+    "lead_id": "254017418567883",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2798,
+    "created_at": "2026-04-03T00:41:53.980027+00:00",
+    "lead_nome": "Adriano Oliveira",
+    "lead_id": "5519988292988",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2685,
+    "created_at": "2026-04-03T00:41:53.461264+00:00",
+    "lead_nome": "Alfredo Saraseni",
+    "lead_id": "5511976668953",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2645,
+    "created_at": "2026-04-03T00:41:53.090014+00:00",
+    "lead_nome": "Alan",
+    "lead_id": "5519997963112",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2768,
+    "created_at": "2026-04-03T00:41:53.742598+00:00",
+    "lead_nome": "Nilson Pinheiro",
+    "lead_id": "5511951369443",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2917,
+    "created_at": "2026-04-03T00:41:56.291341+00:00",
+    "lead_nome": "Raimundo",
+    "lead_id": "5513997439113",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2515,
+    "created_at": "2026-04-03T00:41:49.321707+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "254764642230471",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2951,
+    "created_at": "2026-04-03T00:41:56.934662+00:00",
+    "lead_nome": "Paulo Henrique",
+    "lead_id": "5517996016720",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2876,
+    "created_at": "2026-04-03T00:41:55.648416+00:00",
+    "lead_nome": "Jessica",
+    "lead_id": "5511941241587",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2533,
+    "created_at": "2026-04-03T00:41:50.914458+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5516991216951",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2836,
+    "created_at": "2026-04-03T00:41:55.098898+00:00",
+    "lead_nome": "008 Alex",
+    "lead_id": "5511968272200",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2945,
+    "created_at": "2026-04-03T00:41:56.740366+00:00",
+    "lead_nome": "Paulo Alves Dos Santos",
+    "lead_id": "5511985604112",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2781,
+    "created_at": "2026-04-03T00:41:53.820459+00:00",
+    "lead_nome": "0000 Thiago",
+    "lead_id": "5511970166938",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2927,
+    "created_at": "2026-04-03T00:41:56.487194+00:00",
+    "lead_nome": "Rafael Conselho",
+    "lead_id": "5511985851766",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2634,
+    "created_at": "2026-04-03T00:41:53.018542+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "200261523996687",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2856,
+    "created_at": "2026-04-03T00:41:55.36011+00:00",
+    "lead_nome": "Taiani Faria",
+    "lead_id": "5519994862845",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2519,
+    "created_at": "2026-04-03T00:41:49.899456+00:00",
+    "lead_nome": "Ivan Tavares",
+    "lead_id": "15698256494704",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2609,
+    "created_at": "2026-04-03T00:41:52.845035+00:00",
+    "lead_nome": "Thalita Bulk",
+    "lead_id": "5519999011314",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2542,
+    "created_at": "2026-04-03T00:41:51.869012+00:00",
+    "lead_nome": "Senedata Informática",
+    "lead_id": "73714590851146",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2715,
+    "created_at": "2026-04-03T00:41:53.55484+00:00",
+    "lead_nome": "Edinaldo Óleo",
+    "lead_id": "5519997200599",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2745,
+    "created_at": "2026-04-03T00:41:53.71864+00:00",
+    "lead_nome": "Paulo Jefesen",
+    "lead_id": "5511965772563",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2815,
+    "created_at": "2026-04-03T00:41:54.705524+00:00",
+    "lead_nome": "Recepção Delplata",
+    "lead_id": "120363373746712909",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2722,
+    "created_at": "2026-04-03T00:41:53.658023+00:00",
+    "lead_nome": "Geraldo Escritório",
+    "lead_id": "5519999006416",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2552,
+    "created_at": "2026-04-03T00:41:52.122546+00:00",
+    "lead_nome": "Maryana",
+    "lead_id": "59713400082536",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2826,
+    "created_at": "2026-04-03T00:41:54.926569+00:00",
+    "lead_nome": "Adriane",
+    "lead_id": "5511940354366",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2523,
+    "created_at": "2026-04-03T00:41:50.579122+00:00",
+    "lead_nome": "Casa de Hóspedes",
+    "lead_id": "5519998953777-1591215863",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2676,
+    "created_at": "2026-04-03T00:41:53.437558+00:00",
+    "lead_nome": "Paula Ferreira",
+    "lead_id": "5519994363010",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2516,
+    "created_at": "2026-04-03T00:41:49.709343+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "71047449735230",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2657,
+    "created_at": "2026-04-03T00:41:53.136093+00:00",
+    "lead_nome": "Rodigo Coca",
+    "lead_id": "5519992347271",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2845,
+    "created_at": "2026-04-03T00:41:55.195763+00:00",
+    "lead_nome": "Adriano Ferreira",
+    "lead_id": "5511997134012",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2595,
+    "created_at": "2026-04-03T00:41:52.827142+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "168435900244030",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2936,
+    "created_at": "2026-04-03T00:41:56.563935+00:00",
+    "lead_nome": "Reinaldo",
+    "lead_id": "5511940342667",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2788,
+    "created_at": "2026-04-03T00:41:53.870553+00:00",
+    "lead_nome": "Antônia  Leide",
+    "lead_id": "5513981166237",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2904,
+    "created_at": "2026-04-03T00:41:56.145022+00:00",
+    "lead_nome": "Rafael Souza",
+    "lead_id": "5519984524760",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2517,
+    "created_at": "2026-04-03T00:41:49.818924+00:00",
+    "lead_nome": "Rafael",
+    "lead_id": "42004897620208",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2884,
+    "created_at": "2026-04-03T00:41:55.751301+00:00",
+    "lead_nome": "Rodrigo Heineken",
+    "lead_id": "5519997641472",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2695,
+    "created_at": "2026-04-03T00:41:53.512252+00:00",
+    "lead_nome": "Alfredo 14",
+    "lead_id": "5514996022228",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2561,
+    "created_at": "2026-04-03T00:41:52.206464+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "75733259038873",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2732,
+    "created_at": "2026-04-03T00:41:53.667957+00:00",
+    "lead_nome": "Pousada das Águas",
+    "lead_id": "5519999205281",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2759,
+    "created_at": "2026-04-03T00:41:53.730827+00:00",
+    "lead_nome": "Pedro Teodoro Carlstron",
+    "lead_id": "5519982861866",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2895,
+    "created_at": "2026-04-03T00:41:55.922452+00:00",
+    "lead_nome": "Nessa",
+    "lead_id": "5519994031742",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2649,
+    "created_at": "2026-04-03T00:41:53.109024+00:00",
+    "lead_nome": "Othavio",
+    "lead_id": "5519994663553",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2640,
+    "created_at": "2026-04-03T00:41:53.041216+00:00",
+    "lead_nome": "Paulo Mazzei",
+    "lead_id": "5511994389438",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2665,
+    "created_at": "2026-04-03T00:41:53.189558+00:00",
+    "lead_nome": "Patricia Conceição",
+    "lead_id": "5511995097939",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2807,
+    "created_at": "2026-04-03T00:41:54.581247+00:00",
+    "lead_nome": "Helio",
+    "lead_id": "5513997299667",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2866,
+    "created_at": "2026-04-03T00:41:55.513404+00:00",
+    "lead_nome": "tatianaribeiro2030",
+    "lead_id": "5511985459056",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2520,
+    "created_at": "2026-04-03T00:41:50.015656+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519998701203",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2621,
+    "created_at": "2026-04-03T00:41:52.896812+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519981511716",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2806,
+    "created_at": "2026-04-03T00:41:54.571894+00:00",
+    "lead_nome": "Aline",
+    "lead_id": "5515997726799",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2577,
+    "created_at": "2026-04-03T00:41:52.448141+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "188072994066440",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2613,
+    "created_at": "2026-04-03T00:41:52.867505+00:00",
+    "lead_nome": "Hélio Gonçalves",
+    "lead_id": "219296768745578",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2764,
+    "created_at": "2026-04-03T00:41:53.741291+00:00",
+    "lead_nome": "001 William",
+    "lead_id": "5512996764995",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2749,
+    "created_at": "2026-04-03T00:41:53.7219+00:00",
+    "lead_nome": "Pamela 001",
+    "lead_id": "5511975969437",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2623,
+    "created_at": "2026-04-03T00:41:52.899533+00:00",
+    "lead_nome": "Elisangela",
+    "lead_id": "5513991664159",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2875,
+    "created_at": "2026-04-03T00:41:55.63843+00:00",
+    "lead_nome": "130423 Adenilson",
+    "lead_id": "5519992269954",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2787,
+    "created_at": "2026-04-03T00:41:53.829867+00:00",
+    "lead_nome": "Aline 000",
+    "lead_id": "5511948441149",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2956,
+    "created_at": "2026-04-03T00:41:56.944986+00:00",
+    "lead_nome": "Portão e Camera Ederson",
+    "lead_id": "5519992072533",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2692,
+    "created_at": "2026-04-03T00:41:53.509133+00:00",
+    "lead_nome": "Patricia Extra",
+    "lead_id": "5519971663419",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2651,
+    "created_at": "2026-04-03T00:41:53.119136+00:00",
+    "lead_nome": "Marcella | Aplicari",
+    "lead_id": "145209153302637",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2528,
+    "created_at": "2026-04-03T00:41:50.679995+00:00",
+    "lead_nome": "Mário Pecette",
+    "lead_id": "155714056151291",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2844,
+    "created_at": "2026-04-03T00:41:55.193265+00:00",
+    "lead_nome": "Adriana Pesseti",
+    "lead_id": "5511953119311",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2816,
+    "created_at": "2026-04-03T00:41:54.705524+00:00",
+    "lead_nome": "Marcelo",
+    "lead_id": "5519998390969",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2668,
+    "created_at": "2026-04-03T00:41:53.18979+00:00",
+    "lead_nome": "Sandra Ch 22",
+    "lead_id": "5519994095158",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2934,
+    "created_at": "2026-04-03T00:41:56.550956+00:00",
+    "lead_nome": "Pereira Joice",
+    "lead_id": "5514996436477",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2777,
+    "created_at": "2026-04-03T00:41:53.823466+00:00",
+    "lead_nome": "Mario SchumahérRepresenta",
+    "lead_id": "5511947243615",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2631,
+    "created_at": "2026-04-03T00:41:53.021316+00:00",
+    "lead_nome": "Atacadão do Hoteleiro",
+    "lead_id": "105570732392649",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2597,
+    "created_at": "2026-04-03T00:41:52.838591+00:00",
+    "lead_nome": "Angelica Bueno Ramos",
+    "lead_id": "186792422686759",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2825,
+    "created_at": "2026-04-03T00:41:54.925592+00:00",
+    "lead_nome": "Adilson Rodrigues",
+    "lead_id": "5511966037440",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2865,
+    "created_at": "2026-04-03T00:41:55.5124+00:00",
+    "lead_nome": "Abel Santos",
+    "lead_id": "5513997218386",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2522,
+    "created_at": "2026-04-03T00:41:50.579136+00:00",
+    "lead_nome": "Adrielli Aparecida",
+    "lead_id": "280332968448221",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2699,
+    "created_at": "2026-04-03T00:41:53.564995+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "165975051755524",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2797,
+    "created_at": "2026-04-03T00:41:53.975759+00:00",
+    "lead_nome": "Alberto Vasques",
+    "lead_id": "5511977236532",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2915,
+    "created_at": "2026-04-03T00:41:56.307106+00:00",
+    "lead_nome": "Paulo Roberto Silva",
+    "lead_id": "5511953973832",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2944,
+    "created_at": "2026-04-03T00:41:56.739224+00:00",
+    "lead_nome": "Rafael Ferreira",
+    "lead_id": "5511933340814",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2683,
+    "created_at": "2026-04-03T00:41:53.43711+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "32697770623184",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2739,
+    "created_at": "2026-04-03T00:41:53.701107+00:00",
+    "lead_nome": "Luis Fabiano",
+    "lead_id": "5519992280690",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2646,
+    "created_at": "2026-04-03T00:41:53.096814+00:00",
+    "lead_nome": "Whats Pousada",
+    "lead_id": "5519999654866",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2705,
+    "created_at": "2026-04-03T00:41:53.570905+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "130717363208239",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2587,
+    "created_at": "2026-04-03T00:41:52.773812+00:00",
+    "lead_nome": "Victor Disk Gás Consigaz",
+    "lead_id": "171270729638034",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2727,
+    "created_at": "2026-04-03T00:41:53.657755+00:00",
+    "lead_nome": "Alexandre Monte Alegre",
+    "lead_id": "5511976161289",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2906,
+    "created_at": "2026-04-03T00:41:56.149825+00:00",
+    "lead_nome": "Rafael Torre",
+    "lead_id": "5511993537665",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2605,
+    "created_at": "2026-04-03T00:41:52.858027+00:00",
+    "lead_nome": "Eletropiu",
+    "lead_id": "5519999623718",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2896,
+    "created_at": "2026-04-03T00:41:56.08305+00:00",
+    "lead_nome": "Raquel Casa Do Box",
+    "lead_id": "5519996984081",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2774,
+    "created_at": "2026-04-03T00:41:53.746954+00:00",
+    "lead_nome": "Pedro Navarro @nv2r.draw Classic And Beer",
+    "lead_id": "5511980953642",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2854,
+    "created_at": "2026-04-03T00:41:55.355781+00:00",
+    "lead_nome": "Luis Alberto",
+    "lead_id": "5511996518384",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2924,
+    "created_at": "2026-04-03T00:41:56.399625+00:00",
+    "lead_nome": "Pollyana Lima",
+    "lead_id": "5511989349090",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2756,
+    "created_at": "2026-04-03T00:41:53.729937+00:00",
+    "lead_nome": "Jamile Castelão",
+    "lead_id": "5513991522885",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2885,
+    "created_at": "2026-04-03T00:41:55.750905+00:00",
+    "lead_nome": "Glau Pao De Queijo",
+    "lead_id": "5516997429778",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2638,
+    "created_at": "2026-04-03T00:41:53.037621+00:00",
+    "lead_nome": "PagSeguro Karen",
+    "lead_id": "5519997415075",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2713,
+    "created_at": "2026-04-03T00:41:53.588662+00:00",
+    "lead_nome": "Osvaldo Galego",
+    "lead_id": "5519993813082",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2571,
+    "created_at": "2026-04-03T00:41:52.223989+00:00",
+    "lead_nome": "Ione Vasconcelos",
+    "lead_id": "85740616716385",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2835,
+    "created_at": "2026-04-03T00:41:55.079051+00:00",
+    "lead_nome": "130423 Diogo Marcondes",
+    "lead_id": "5511991823978",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2778,
+    "created_at": "2026-04-03T00:41:53.823721+00:00",
+    "lead_nome": "Rita Kalil",
+    "lead_id": "5511980453240",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2894,
+    "created_at": "2026-04-03T00:41:55.921673+00:00",
+    "lead_nome": "Luiz Carlos Zacarias",
+    "lead_id": "5511996196923",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2771,
+    "created_at": "2026-04-03T00:41:53.746228+00:00",
+    "lead_nome": "Paulo M",
+    "lead_id": "5511997325965",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2858,
+    "created_at": "2026-04-03T00:41:55.423359+00:00",
+    "lead_nome": "Admildo Teófilo L",
+    "lead_id": "5519981843107",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2933,
+    "created_at": "2026-04-03T00:41:56.541042+00:00",
+    "lead_nome": "Rayssa Oliveira",
+    "lead_id": "5511999072954",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2950,
+    "created_at": "2026-04-03T00:41:56.93246+00:00",
+    "lead_nome": "Priscila Aparecida",
+    "lead_id": "5511991277098",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2868,
+    "created_at": "2026-04-03T00:41:55.553241+00:00",
+    "lead_nome": "Ademir Pinheiro",
+    "lead_id": "5519988487082",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2886,
+    "created_at": "2026-04-03T00:41:55.754625+00:00",
+    "lead_nome": "Priscila Borges",
+    "lead_id": "5519996116122",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2642,
+    "created_at": "2026-04-03T00:41:53.038757+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "38745084543209",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2800,
+    "created_at": "2026-04-03T00:41:54.323076+00:00",
+    "lead_nome": "Adriano Pinto",
+    "lead_id": "5519997186484",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2664,
+    "created_at": "2026-04-03T00:41:53.178858+00:00",
+    "lead_nome": "Patricia Literio",
+    "lead_id": "5511945189583",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2848,
+    "created_at": "2026-04-03T00:41:55.241304+00:00",
+    "lead_nome": "130423 Ana Paula Barros",
+    "lead_id": "5512991621233",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2614,
+    "created_at": "2026-04-03T00:41:52.868974+00:00",
+    "lead_nome": "Reinaldo Frederich",
+    "lead_id": "5511992888718",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2600,
+    "created_at": "2026-04-03T00:41:52.843562+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5511988921313",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2679,
+    "created_at": "2026-04-03T00:41:53.450691+00:00",
+    "lead_nome": "Paty Melo Extra",
+    "lead_id": "5519996943677",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2652,
+    "created_at": "2026-04-03T00:41:53.108535+00:00",
+    "lead_nome": "Alexandra Leme Extra",
+    "lead_id": "5519999006484",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2877,
+    "created_at": "2026-04-03T00:41:55.669691+00:00",
+    "lead_nome": "130423 Carolina Pescorolli",
+    "lead_id": "5511959681288",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2762,
+    "created_at": "2026-04-03T00:41:53.735074+00:00",
+    "lead_nome": "Aida Santos",
+    "lead_id": "5513997019699",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2731,
+    "created_at": "2026-04-03T00:41:53.665854+00:00",
+    "lead_nome": "Alania Dias",
+    "lead_id": "5519991002924",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2534,
+    "created_at": "2026-04-03T00:41:50.924199+00:00",
+    "lead_nome": "Daia Souza",
+    "lead_id": "120363047674164284",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2914,
+    "created_at": "2026-04-03T00:41:56.305292+00:00",
+    "lead_nome": "Rafael Tadashi",
+    "lead_id": "5511955205126",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2721,
+    "created_at": "2026-04-03T00:41:53.596944+00:00",
+    "lead_nome": "Nilson",
+    "lead_id": "5511991583503",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2544,
+    "created_at": "2026-04-03T00:41:51.871086+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "553598704832",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2942,
+    "created_at": "2026-04-03T00:41:56.693925+00:00",
+    "lead_nome": "Permuta",
+    "lead_id": "5511969785543",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2751,
+    "created_at": "2026-04-03T00:41:53.725236+00:00",
+    "lead_nome": "Paulo Bruck",
+    "lead_id": "5511981409184",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2524,
+    "created_at": "2026-04-03T00:41:50.577816+00:00",
+    "lead_nome": "Camila Melo",
+    "lead_id": "223085299032086",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2572,
+    "created_at": "2026-04-03T00:41:52.443784+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "3251894255750",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2673,
+    "created_at": "2026-04-03T00:41:53.251402+00:00",
+    "lead_nome": "Norma Salgados",
+    "lead_id": "5519992695697",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2693,
+    "created_at": "2026-04-03T00:41:53.514963+00:00",
+    "lead_nome": "Agnaldo De Freitas Viana",
+    "lead_id": "5511988836152",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2830,
+    "created_at": "2026-04-03T00:41:54.973618+00:00",
+    "lead_nome": "Márcia",
+    "lead_id": "5511967694439",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2741,
+    "created_at": "2026-04-03T00:41:53.712943+00:00",
+    "lead_nome": "Andreza Extra",
+    "lead_id": "5519996588990",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2556,
+    "created_at": "2026-04-03T00:41:52.166104+00:00",
+    "lead_nome": "Jorge Laranjeiras",
+    "lead_id": "184619320266811",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2704,
+    "created_at": "2026-04-03T00:41:53.569952+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "70549216719062",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2905,
+    "created_at": "2026-04-03T00:41:56.144873+00:00",
+    "lead_nome": "Raquel Munhai",
+    "lead_id": "5511969327493",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2810,
+    "created_at": "2026-04-03T00:41:54.609361+00:00",
+    "lead_nome": "Vagner Lourenco",
+    "lead_id": "5519991224419",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2592,
+    "created_at": "2026-04-03T00:41:52.823952+00:00",
+    "lead_nome": "Joao Paulo",
+    "lead_id": "271807223492687",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2923,
+    "created_at": "2026-04-03T00:41:56.39485+00:00",
+    "lead_nome": "Priscila Araujo",
+    "lead_id": "5513981233099",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2712,
+    "created_at": "2026-04-03T00:41:53.586667+00:00",
+    "lead_nome": "Oscar Lins",
+    "lead_id": "5511943873713",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2790,
+    "created_at": "2026-04-03T00:41:53.878874+00:00",
+    "lead_nome": "Alex123",
+    "lead_id": "5511971887776",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2839,
+    "created_at": "2026-04-03T00:41:55.127847+00:00",
+    "lead_nome": "130423 Erick Santos",
+    "lead_id": "5511952072223",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2687,
+    "created_at": "2026-04-03T00:41:53.490169+00:00",
+    "lead_nome": "Otavia Natallia",
+    "lead_id": "5519989011923",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2562,
+    "created_at": "2026-04-03T00:41:52.225341+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "23961740038256",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2581,
+    "created_at": "2026-04-03T00:41:52.53569+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5513955380385",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2698,
+    "created_at": "2026-04-03T00:41:53.54571+00:00",
+    "lead_nome": "Anderson Box",
+    "lead_id": "5519998362090",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2663,
+    "created_at": "2026-04-03T00:41:53.178962+00:00",
+    "lead_nome": "Gediel Lira",
+    "lead_id": "5511960419851",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2954,
+    "created_at": "2026-04-03T00:41:56.936433+00:00",
+    "lead_nome": "Raquel Vasco",
+    "lead_id": "5511992010145",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2680,
+    "created_at": "2026-04-03T00:41:53.449585+00:00",
+    "lead_nome": "Zezinho Do Fogão",
+    "lead_id": "5519997319672",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2607,
+    "created_at": "2026-04-03T00:41:52.859362+00:00",
+    "lead_nome": "Regina Bronzato",
+    "lead_id": "5519997513296",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2641,
+    "created_at": "2026-04-03T00:41:53.075664+00:00",
+    "lead_nome": "Marisa Escritorio",
+    "lead_id": "5519997756042",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2671,
+    "created_at": "2026-04-03T00:41:53.251495+00:00",
+    "lead_nome": "Felipe Fernandes De Araujo",
+    "lead_id": "5519993537286",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2752,
+    "created_at": "2026-04-03T00:41:53.723819+00:00",
+    "lead_nome": "Paulo Luciano",
+    "lead_id": "5519991641715",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2847,
+    "created_at": "2026-04-03T00:41:55.23499+00:00",
+    "lead_nome": "130423 Michele silva",
+    "lead_id": "5511992313910",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2889,
+    "created_at": "2026-04-03T00:41:55.788503+00:00",
+    "lead_nome": "Laine",
+    "lead_id": "5511956083844",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2620,
+    "created_at": "2026-04-03T00:41:52.923201+00:00",
+    "lead_nome": "Jose 1",
+    "lead_id": "5511949394142",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2857,
+    "created_at": "2026-04-03T00:41:55.411034+00:00",
+    "lead_nome": "Valéria Tannure",
+    "lead_id": "5524992809495",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2710,
+    "created_at": "2026-04-03T00:41:53.579746+00:00",
+    "lead_nome": "Rafael Furlan",
+    "lead_id": "5519991418036",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2525,
+    "created_at": "2026-04-03T00:41:50.554099+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "20409718145206",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2553,
+    "created_at": "2026-04-03T00:41:52.167514+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5511998532848",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1727,
+    "created_at": "2026-03-31T20:23:10.796594+00:00",
+    "lead_nome": "alilson refrigeração Frigobar🧢🥶🥶",
+    "lead_id": "5511934038707",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1698,
+    "created_at": "2026-03-31T20:23:10.662815+00:00",
+    "lead_nome": "Mauricio Miguel",
+    "lead_id": "5519997787309",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1733,
+    "created_at": "2026-03-31T20:23:10.833104+00:00",
+    "lead_nome": "Hamilton Cesar",
+    "lead_id": "5519996018773",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1865,
+    "created_at": "2026-03-31T20:23:11.295579+00:00",
+    "lead_nome": "Rapaz Das 10 Diárias",
+    "lead_id": "5513991256632",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1941,
+    "created_at": "2026-03-31T20:23:11.497036+00:00",
+    "lead_nome": "Paulinha Escritorio da Marisa",
+    "lead_id": "5519999205899",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2002,
+    "created_at": "2026-03-31T20:23:11.880414+00:00",
+    "lead_nome": "Senedata",
+    "lead_id": "551938925390",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1823,
+    "created_at": "2026-03-31T20:23:11.186677+00:00",
+    "lead_nome": "Aquarella Erika",
+    "lead_id": "5519998385794",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2690,
+    "created_at": "2026-04-03T00:41:53.509266+00:00",
+    "lead_nome": "Deza",
+    "lead_id": "5519996178846",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2606,
+    "created_at": "2026-04-03T00:41:52.861417+00:00",
+    "lead_nome": "Isabel",
+    "lead_id": "5521998222257",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2696,
+    "created_at": "2026-04-03T00:41:53.516535+00:00",
+    "lead_nome": "PAT SN",
+    "lead_id": "5519993068751",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2662,
+    "created_at": "2026-04-03T00:41:53.17776+00:00",
+    "lead_nome": "Alexandre Carvalho",
+    "lead_id": "5519971700202",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2558,
+    "created_at": "2026-04-03T00:41:52.200091+00:00",
+    "lead_nome": "Carinne",
+    "lead_id": "109393521688745",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2612,
+    "created_at": "2026-04-03T00:41:52.868452+00:00",
+    "lead_nome": "Daniel Elétricas",
+    "lead_id": "5519997151253",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2526,
+    "created_at": "2026-04-03T00:41:50.582682+00:00",
+    "lead_nome": "Supermercado Ciamdrighi",
+    "lead_id": "5519998801082",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2626,
+    "created_at": "2026-04-03T00:41:52.954181+00:00",
+    "lead_nome": "Ashores",
+    "lead_id": "5519999202241",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2635,
+    "created_at": "2026-04-03T00:41:53.031287+00:00",
+    "lead_nome": "Ana 😜",
+    "lead_id": "5515997455922",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2586,
+    "created_at": "2026-04-03T00:41:52.731381+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519996442324",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2596,
+    "created_at": "2026-04-03T00:41:52.830442+00:00",
+    "lead_nome": "Danilo Mendes ",
+    "lead_id": "222638286831741",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2615,
+    "created_at": "2026-04-03T00:41:52.878232+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "120363399338471576",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2707,
+    "created_at": "2026-04-03T00:41:53.568863+00:00",
+    "lead_nome": "Rafael 0000",
+    "lead_id": "5513996696583",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2643,
+    "created_at": "2026-04-03T00:41:53.064229+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "148279518064677",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2538,
+    "created_at": "2026-04-03T00:41:50.936089+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "269496413589512",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2603,
+    "created_at": "2026-04-03T00:41:52.846487+00:00",
+    "lead_nome": "Alessandra A.",
+    "lead_id": "5513997178472",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2684,
+    "created_at": "2026-04-03T00:41:53.488752+00:00",
+    "lead_nome": "Nilza Madureira",
+    "lead_id": "5511981916492",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2618,
+    "created_at": "2026-04-03T00:41:52.904551+00:00",
+    "lead_nome": "Água Fria",
+    "lead_id": "5519998008529",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2564,
+    "created_at": "2026-04-03T00:41:52.258096+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519998985005",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2548,
+    "created_at": "2026-04-03T00:41:52.016669+00:00",
+    "lead_nome": "Hotel Moinho De Pedra",
+    "lead_id": "5519997799645-1566936631",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2672,
+    "created_at": "2026-04-03T00:41:53.22899+00:00",
+    "lead_nome": "Luiz Funcionário",
+    "lead_id": "5519971712078",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2650,
+    "created_at": "2026-04-03T00:41:53.1093+00:00",
+    "lead_nome": "Reinaldo Teixeira",
+    "lead_id": "5519988065672",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2714,
+    "created_at": "2026-04-03T00:41:53.589364+00:00",
+    "lead_nome": "Pedro Araujo",
+    "lead_id": "5511993468495",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2575,
+    "created_at": "2026-04-03T00:41:52.447515+00:00",
+    "lead_nome": "Aplicari",
+    "lead_id": "215822156959854",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2779,
+    "created_at": "2026-04-03T00:41:53.819563+00:00",
+    "lead_nome": "Adriano Souza",
+    "lead_id": "5513981153636",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2632,
+    "created_at": "2026-04-03T00:41:53.023231+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519984521479",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2801,
+    "created_at": "2026-04-03T00:41:54.325092+00:00",
+    "lead_nome": "Ailton Leriano",
+    "lead_id": "5511947956484",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2675,
+    "created_at": "2026-04-03T00:41:53.436802+00:00",
+    "lead_nome": "Paulo Romero",
+    "lead_id": "5511988741102",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2686,
+    "created_at": "2026-04-03T00:41:53.490441+00:00",
+    "lead_nome": "Alexandra Brindes",
+    "lead_id": "5519993158303",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2819,
+    "created_at": "2026-04-03T00:41:54.773088+00:00",
+    "lead_nome": "Vanessa StefaniTonon",
+    "lead_id": "5511965740287",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2946,
+    "created_at": "2026-04-03T00:41:56.740456+00:00",
+    "lead_nome": "Paulo Brun",
+    "lead_id": "5512997700850",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2955,
+    "created_at": "2026-04-03T00:41:56.940356+00:00",
+    "lead_nome": "Puxe&Ferr",
+    "lead_id": "5519996353676",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2648,
+    "created_at": "2026-04-03T00:41:53.038635+00:00",
+    "lead_nome": "⚖️ Alessandro - Advogado",
+    "lead_id": "5511997188919",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2809,
+    "created_at": "2026-04-03T00:41:54.609361+00:00",
+    "lead_nome": "Daniel",
+    "lead_id": "5513988390088",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2878,
+    "created_at": "2026-04-03T00:41:55.672917+00:00",
+    "lead_nome": "130423 Ana Amelia",
+    "lead_id": "5511977489463",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2725,
+    "created_at": "2026-04-03T00:41:53.65857+00:00",
+    "lead_nome": "Cordeiro",
+    "lead_id": "5519997722688",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2590,
+    "created_at": "2026-04-03T00:41:52.789044+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "158621816082515",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2791,
+    "created_at": "2026-04-03T00:41:53.890871+00:00",
+    "lead_nome": "0000",
+    "lead_id": "5511940068754",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2925,
+    "created_at": "2026-04-03T00:41:56.417968+00:00",
+    "lead_nome": "Rafael Alves Feitosa",
+    "lead_id": "5519986046814",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2910,
+    "created_at": "2026-04-03T00:41:56.206531+00:00",
+    "lead_nome": "Rcardo Menezes",
+    "lead_id": "5511993270392",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2563,
+    "created_at": "2026-04-03T00:41:52.235801+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519999663242",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2926,
+    "created_at": "2026-04-03T00:41:56.458923+00:00",
+    "lead_nome": "Reginaldo 2",
+    "lead_id": "5511964029744",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2655,
+    "created_at": "2026-04-03T00:41:53.064317+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "143074051256572",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2783,
+    "created_at": "2026-04-03T00:41:53.829739+00:00",
+    "lead_nome": "Alessandra Prado",
+    "lead_id": "5511968529459",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2861,
+    "created_at": "2026-04-03T00:41:55.47462+00:00",
+    "lead_nome": "Admir Brunello",
+    "lead_id": "5511999157542",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2666,
+    "created_at": "2026-04-03T00:41:53.209079+00:00",
+    "lead_nome": "Alcides",
+    "lead_id": "5511996031252",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2733,
+    "created_at": "2026-04-03T00:41:53.666867+00:00",
+    "lead_nome": "Paulo Henrique Velasco",
+    "lead_id": "5511959113779",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2871,
+    "created_at": "2026-04-03T00:41:55.591825+00:00",
+    "lead_nome": "Fabio 5 Casais Janeiro",
+    "lead_id": "5516991614306",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2743,
+    "created_at": "2026-04-03T00:41:53.714127+00:00",
+    "lead_nome": "Aline Fernanda 2",
+    "lead_id": "5519995569783",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2832,
+    "created_at": "2026-04-03T00:41:55.008562+00:00",
+    "lead_nome": "Luciano Alves 🚀",
+    "lead_id": "5519999077876",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2880,
+    "created_at": "2026-04-03T00:41:55.690519+00:00",
+    "lead_nome": "Alex Nogueira",
+    "lead_id": "5511953952869",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2793,
+    "created_at": "2026-04-03T00:41:53.925643+00:00",
+    "lead_nome": "00 Juninho",
+    "lead_id": "5519971540520",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2709,
+    "created_at": "2026-04-03T00:41:53.530488+00:00",
+    "lead_nome": "Paulinha Alves",
+    "lead_id": "5511963107467",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2688,
+    "created_at": "2026-04-03T00:41:53.497088+00:00",
+    "lead_nome": "Alexandro",
+    "lead_id": "5511997056540",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2851,
+    "created_at": "2026-04-03T00:41:55.321803+00:00",
+    "lead_nome": "Maria Lucia Brunrelli",
+    "lead_id": "5519971502806",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2931,
+    "created_at": "2026-04-03T00:41:56.51532+00:00",
+    "lead_nome": "Pedro Barroti",
+    "lead_id": "5511975417384",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2920,
+    "created_at": "2026-04-03T00:41:56.383122+00:00",
+    "lead_nome": "Rafael Guedes",
+    "lead_id": "5519981770831",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2833,
+    "created_at": "2026-04-03T00:41:55.031141+00:00",
+    "lead_nome": "130423 Ana Paula",
+    "lead_id": "5519999779171",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2647,
+    "created_at": "2026-04-03T00:41:53.075994+00:00",
+    "lead_nome": "Odair Marcineiro",
+    "lead_id": "5519999642776",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2911,
+    "created_at": "2026-04-03T00:41:56.210616+00:00",
+    "lead_nome": "Reis Amanda",
+    "lead_id": "5511969724737",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2578,
+    "created_at": "2026-04-03T00:41:52.448965+00:00",
+    "lead_nome": "Daiana",
+    "lead_id": "148803604726005",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2658,
+    "created_at": "2026-04-03T00:41:53.116713+00:00",
+    "lead_nome": "Studio Darling Daiane Silva",
+    "lead_id": "27908814942234",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2637,
+    "created_at": "2026-04-03T00:41:53.038073+00:00",
+    "lead_nome": "Otavio Sartori",
+    "lead_id": "5511997178309",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2770,
+    "created_at": "2026-04-03T00:41:53.746184+00:00",
+    "lead_nome": "Paulo Junior",
+    "lead_id": "5519997468959",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2891,
+    "created_at": "2026-04-03T00:41:55.85719+00:00",
+    "lead_nome": "Regene",
+    "lead_id": "5511943445677",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2804,
+    "created_at": "2026-04-03T00:41:54.550279+00:00",
+    "lead_nome": "001 Bruno",
+    "lead_id": "5516997111497",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2939,
+    "created_at": "2026-04-03T00:41:56.628268+00:00",
+    "lead_nome": "Daia Souza",
+    "lead_id": "272975622369426",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2737,
+    "created_at": "2026-04-03T00:41:53.699356+00:00",
+    "lead_nome": "Patricio Vilela",
+    "lead_id": "5519981783878",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2881,
+    "created_at": "2026-04-03T00:41:55.710105+00:00",
+    "lead_nome": "Reginaldo 8",
+    "lead_id": "5519981815515",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2842,
+    "created_at": "2026-04-03T00:41:55.175013+00:00",
+    "lead_nome": "130423 Pedro Halk",
+    "lead_id": "5511941628574",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2757,
+    "created_at": "2026-04-03T00:41:53.730929+00:00",
+    "lead_nome": "Aline Fernanda",
+    "lead_id": "5519997130070",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2681,
+    "created_at": "2026-04-03T00:41:53.334074+00:00",
+    "lead_nome": "Pedro Booking 001",
+    "lead_id": "5511967900090",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2921,
+    "created_at": "2026-04-03T00:41:56.394111+00:00",
+    "lead_nome": "Telesson",
+    "lead_id": "551938087500",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2760,
+    "created_at": "2026-04-03T00:41:53.730676+00:00",
+    "lead_nome": "Marleni 1",
+    "lead_id": "5511995012389",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2700,
+    "created_at": "2026-04-03T00:41:53.502606+00:00",
+    "lead_nome": "Gyovana Oliveira",
+    "lead_id": "5519992552020",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2941,
+    "created_at": "2026-04-03T00:41:56.628241+00:00",
+    "lead_nome": "Rc Aguas",
+    "lead_id": "5519997339105",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2930,
+    "created_at": "2026-04-03T00:41:56.519+00:00",
+    "lead_nome": "Priscila Silva",
+    "lead_id": "5513991661128",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2824,
+    "created_at": "2026-04-03T00:41:54.907598+00:00",
+    "lead_nome": "2",
+    "lead_id": "5516997411424",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2570,
+    "created_at": "2026-04-03T00:41:52.227136+00:00",
+    "lead_nome": "Danilo Cavani",
+    "lead_id": "116372726136877",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2594,
+    "created_at": "2026-04-03T00:41:52.827633+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519998816069",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2717,
+    "created_at": "2026-04-03T00:41:53.593892+00:00",
+    "lead_nome": "Aline",
+    "lead_id": "5511981081929",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2611,
+    "created_at": "2026-04-03T00:41:52.862339+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "136807660413055",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2902,
+    "created_at": "2026-04-03T00:41:56.098882+00:00",
+    "lead_nome": "Esposa Do Seu Antonio",
+    "lead_id": "5511995672918",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2706,
+    "created_at": "2026-04-03T00:41:53.579505+00:00",
+    "lead_nome": "Rafaela Cotação",
+    "lead_id": "5511962043676",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2531,
+    "created_at": "2026-04-03T00:41:50.670657+00:00",
+    "lead_nome": "Thais",
+    "lead_id": "5519997339492",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2882,
+    "created_at": "2026-04-03T00:41:55.720117+00:00",
+    "lead_nome": "Vivo Carlos",
+    "lead_id": "5519996201215",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2843,
+    "created_at": "2026-04-03T00:41:55.176282+00:00",
+    "lead_nome": "130423 Noemi Silveira",
+    "lead_id": "553598888634",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2738,
+    "created_at": "2026-04-03T00:41:53.701849+00:00",
+    "lead_nome": "0 Wagner",
+    "lead_id": "5511963357003",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2576,
+    "created_at": "2026-04-03T00:41:52.448019+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519999296365",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2796,
+    "created_at": "2026-04-03T00:41:53.952319+00:00",
+    "lead_nome": "000 Cliente",
+    "lead_id": "5511970705936",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2772,
+    "created_at": "2026-04-03T00:41:53.744822+00:00",
+    "lead_nome": "Alexandre De Almeida",
+    "lead_id": "5511939089510",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2912,
+    "created_at": "2026-04-03T00:41:56.238929+00:00",
+    "lead_nome": "Rafael Nunes",
+    "lead_id": "5511940191994",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2853,
+    "created_at": "2026-04-03T00:41:55.354704+00:00",
+    "lead_nome": "130423 Adriana Marques Castro",
+    "lead_id": "5512997598655",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2953,
+    "created_at": "2026-04-03T00:41:56.933853+00:00",
+    "lead_nome": "Priscila",
+    "lead_id": "5511987883930",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2780,
+    "created_at": "2026-04-03T00:41:53.82329+00:00",
+    "lead_nome": "CPFL",
+    "lead_id": "5519999088888",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2879,
+    "created_at": "2026-04-03T00:41:55.674094+00:00",
+    "lead_nome": "130423 Oswaldo",
+    "lead_id": "5511988656292",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2541,
+    "created_at": "2026-04-03T00:41:51.858308+00:00",
+    "lead_nome": "Erica Rodrigues",
+    "lead_id": "100450812559500",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2952,
+    "created_at": "2026-04-03T00:41:56.899931+00:00",
+    "lead_nome": "Rachel Mello",
+    "lead_id": "5511957859047",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2802,
+    "created_at": "2026-04-03T00:41:54.476449+00:00",
+    "lead_nome": "130423 Yago",
+    "lead_id": "5512982842210",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2747,
+    "created_at": "2026-04-03T00:41:53.718334+00:00",
+    "lead_nome": "Pedro Estevão de Lima",
+    "lead_id": "5511963689095",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2928,
+    "created_at": "2026-04-03T00:41:56.488753+00:00",
+    "lead_nome": "Reinaldo Bandu",
+    "lead_id": "5511983818921",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2821,
+    "created_at": "2026-04-03T00:41:54.775576+00:00",
+    "lead_nome": "Alex Zanata",
+    "lead_id": "5511972014000",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2769,
+    "created_at": "2026-04-03T00:41:53.74671+00:00",
+    "lead_nome": "Pedro Mota",
+    "lead_id": "5519994358069",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2860,
+    "created_at": "2026-04-03T00:41:55.455696+00:00",
+    "lead_nome": "Adauto Bastos",
+    "lead_id": "5516992447847",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2589,
+    "created_at": "2026-04-03T00:41:52.789836+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "263101307990264",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2811,
+    "created_at": "2026-04-03T00:41:54.646766+00:00",
+    "lead_nome": "Rafaela",
+    "lead_id": "5519995844428",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2691,
+    "created_at": "2026-04-03T00:41:53.508899+00:00",
+    "lead_nome": "Olympio Neto",
+    "lead_id": "5519999916737",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2580,
+    "created_at": "2026-04-03T00:41:52.534357+00:00",
+    "lead_nome": "Jt Transportes por app",
+    "lead_id": "124266322358497",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2850,
+    "created_at": "2026-04-03T00:41:55.28975+00:00",
+    "lead_nome": "Donata Pappalardo",
+    "lead_id": "5515998243386",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2653,
+    "created_at": "2026-04-03T00:41:53.110174+00:00",
+    "lead_nome": "Renan Bicudo",
+    "lead_id": "5519998501940",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2840,
+    "created_at": "2026-04-03T00:41:55.159986+00:00",
+    "lead_nome": "130423 Mario Tavares",
+    "lead_id": "5511968913407",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2625,
+    "created_at": "2026-04-03T00:41:52.979916+00:00",
+    "lead_nome": "Leandro Ovo",
+    "lead_id": "5519999694927",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2703,
+    "created_at": "2026-04-03T00:41:53.566594+00:00",
+    "lead_nome": "Patrícia 03/04",
+    "lead_id": "5511968864428",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2711,
+    "created_at": "2026-04-03T00:41:53.586141+00:00",
+    "lead_nome": "Osmar 2",
+    "lead_id": "5511991720196",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2682,
+    "created_at": "2026-04-03T00:41:53.305196+00:00",
+    "lead_nome": "Alf Esfiraria",
+    "lead_id": "5519998919701",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2758,
+    "created_at": "2026-04-03T00:41:53.73162+00:00",
+    "lead_nome": "Aline Franciele",
+    "lead_id": "5519997767501",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2567,
+    "created_at": "2026-04-03T00:41:52.204607+00:00",
+    "lead_nome": "Claudinei",
+    "lead_id": "36893869764792",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2670,
+    "created_at": "2026-04-03T00:41:53.186105+00:00",
+    "lead_nome": "Eduardo Mathias",
+    "lead_id": "5511996133376",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2633,
+    "created_at": "2026-04-03T00:41:53.022119+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "154962520727583",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2730,
+    "created_at": "2026-04-03T00:41:53.66505+00:00",
+    "lead_nome": "001 Reinaldo",
+    "lead_id": "5511999074450",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2720,
+    "created_at": "2026-04-03T00:41:53.596413+00:00",
+    "lead_nome": "Osvaldo 3",
+    "lead_id": "5511992073200",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2550,
+    "created_at": "2026-04-03T00:41:52.117183+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "5519999017291",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2898,
+    "created_at": "2026-04-03T00:41:56.088751+00:00",
+    "lead_nome": "WhatsApp Business",
+    "lead_id": "0",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2616,
+    "created_at": "2026-04-03T00:41:52.8946+00:00",
+    "lead_nome": "Reinaldo",
+    "lead_id": "5511967971490",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2870,
+    "created_at": "2026-04-03T00:41:55.557162+00:00",
+    "lead_nome": "Adielson",
+    "lead_id": "5513997025563",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2888,
+    "created_at": "2026-04-03T00:41:55.785296+00:00",
+    "lead_nome": "Marcelo Produtos",
+    "lead_id": "5519992872773",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2602,
+    "created_at": "2026-04-03T00:41:52.842162+00:00",
+    "lead_nome": "sahara wagnerxt",
+    "lead_id": "269822764019718",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2909,
+    "created_at": "2026-04-03T00:41:56.183946+00:00",
+    "lead_nome": "Renata Cilnyk",
+    "lead_id": "5511987482435",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2792,
+    "created_at": "2026-04-03T00:41:53.899294+00:00",
+    "lead_nome": "00 Edenilson",
+    "lead_id": "5519995132840",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2786,
+    "created_at": "2026-04-03T00:41:53.83093+00:00",
+    "lead_nome": "Alex Luciano",
+    "lead_id": "5519996137399",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2644,
+    "created_at": "2026-04-03T00:41:53.038553+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "77155279093769",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2532,
+    "created_at": "2026-04-03T00:41:50.652751+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "271523587854364",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2608,
+    "created_at": "2026-04-03T00:41:52.864591+00:00",
+    "lead_nome": "brunna souza💁🏼‍♀️",
+    "lead_id": "32418497044631",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2763,
+    "created_at": "2026-04-03T00:41:53.739789+00:00",
+    "lead_nome": "Pedir Depisito Na Proxima",
+    "lead_id": "5511980158974",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2831,
+    "created_at": "2026-04-03T00:41:55.006033+00:00",
+    "lead_nome": "Adriana Soldera",
+    "lead_id": "5519998086155",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2697,
+    "created_at": "2026-04-03T00:41:53.545925+00:00",
+    "lead_nome": "00 Sueli",
+    "lead_id": "5511983213236",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2937,
+    "created_at": "2026-04-03T00:41:56.575212+00:00",
+    "lead_nome": "Pricila Lima",
+    "lead_id": "5514988226206",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2919,
+    "created_at": "2026-04-03T00:41:56.348626+00:00",
+    "lead_nome": "Reginaldoooo",
+    "lead_id": "5511999771264",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2736,
+    "created_at": "2026-04-03T00:41:53.700484+00:00",
+    "lead_nome": "Alexandre Dos Santos",
+    "lead_id": "5519982793198",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2765,
+    "created_at": "2026-04-03T00:41:53.739708+00:00",
+    "lead_nome": "007 Marlene",
+    "lead_id": "553598811736",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2773,
+    "created_at": "2026-04-03T00:41:53.813489+00:00",
+    "lead_nome": "Oswaldo Ogura",
+    "lead_id": "5511947892860",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2903,
+    "created_at": "2026-04-03T00:41:56.1424+00:00",
+    "lead_nome": "Alexandre Puzzle",
+    "lead_id": "5519991261412",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2922,
+    "created_at": "2026-04-03T00:41:56.394347+00:00",
+    "lead_nome": "Raquel Borsatto",
+    "lead_id": "5511972495767",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2863,
+    "created_at": "2026-04-03T00:41:55.491368+00:00",
+    "lead_nome": "Adriana Martins",
+    "lead_id": "5511974712273",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2750,
+    "created_at": "2026-04-03T00:41:53.721558+00:00",
+    "lead_nome": "Nildo 1",
+    "lead_id": "5519997004414",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2794,
+    "created_at": "2026-04-03T00:41:53.942471+00:00",
+    "lead_nome": "Adriano Máquina Lavar",
+    "lead_id": "5519997348214",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2883,
+    "created_at": "2026-04-03T00:41:55.730253+00:00",
+    "lead_nome": "Donizete Internet",
+    "lead_id": "5519996686897",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2735,
+    "created_at": "2026-04-03T00:41:53.699919+00:00",
+    "lead_nome": "Adriana 1",
+    "lead_id": "5511995712083",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2827,
+    "created_at": "2026-04-03T00:41:54.933796+00:00",
+    "lead_nome": "Priscila Photos",
+    "lead_id": "5519996490459",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2726,
+    "created_at": "2026-04-03T00:41:53.659892+00:00",
+    "lead_nome": "Cícero",
+    "lead_id": "5513991391420",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2940,
+    "created_at": "2026-04-03T00:41:56.66023+00:00",
+    "lead_nome": "Paula Rodrigues",
+    "lead_id": "5513997441778",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2913,
+    "created_at": "2026-04-03T00:41:56.248716+00:00",
+    "lead_nome": "Paulo Melo",
+    "lead_id": "5519987122034",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2932,
+    "created_at": "2026-04-03T00:41:56.529008+00:00",
+    "lead_nome": "Rafael Oliveira",
+    "lead_id": "5511976536374",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2755,
+    "created_at": "2026-04-03T00:41:53.73034+00:00",
+    "lead_nome": "Acauã Bendito de Morais Vicente",
+    "lead_id": "5519996398646",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2893,
+    "created_at": "2026-04-03T00:41:55.904506+00:00",
+    "lead_nome": "Renata Grecco",
+    "lead_id": "5513996437872",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2817,
+    "created_at": "2026-04-03T00:41:54.7323+00:00",
+    "lead_nome": "Pedro",
+    "lead_id": "5519974047568",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2874,
+    "created_at": "2026-04-03T00:41:55.636658+00:00",
+    "lead_nome": "Adelino",
+    "lead_id": "5511976291277",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2785,
+    "created_at": "2026-04-03T00:41:53.829536+00:00",
+    "lead_nome": "Pedro Arikawa",
+    "lead_id": "5513982216688",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2948,
+    "created_at": "2026-04-03T00:41:56.930636+00:00",
+    "lead_nome": "Sem nome",
+    "lead_id": "69067520106675",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2837,
+    "created_at": "2026-04-03T00:41:55.114811+00:00",
+    "lead_nome": "130423 Joadir",
+    "lead_id": "5511998224469",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2846,
+    "created_at": "2026-04-03T00:41:55.196601+00:00",
+    "lead_nome": "Adriana 12",
+    "lead_id": "5519994481056",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 2855,
+    "created_at": "2026-04-03T00:41:55.357424+00:00",
+    "lead_nome": "Adalberto Vicent",
+    "lead_id": "5513991632856",
+    "labels": [],
+    "chatbot_ativo": false
+  },
+  {
+    "id": 1390,
+    "created_at": "2026-03-31T16:09:48.165021+00:00",
+    "lead_nome": "Peixoto Claudinei",
+    "lead_id": "5519971303480",
+    "labels": [],
+    "chatbot_ativo": false
+  }
+]

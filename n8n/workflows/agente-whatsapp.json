@@ -1,20 +1,20 @@
 {
-  "name": "Agente Whatsapp",
+  "name": "Agente Whatsapp copy",
   "nodes": [
     {
       "parameters": {
         "operation": "get",
-        "tableId": "Leads",
+        "tableId": "kanban_cards",
         "filters": {
           "conditions": [
             {
               "keyName": "lead_id",
-              "keyValue": "={{ $('Dados Lead').item.json.IdConversa }}"
+              "keyValue": "={{ $('Dados Lead').item.json.remoteJid }}"
             }
           ]
         }
       },
-      "id": "a1e17ec1-e309-4eb0-a2cd-79ec37500333",
+      "id": "cba086cf-c162-41f1-82b0-29fdaa6ebfa8",
       "name": "Encontrar Cliente1",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -55,7 +55,7 @@
         },
         "options": {}
       },
-      "id": "438e89e4-06ad-4bce-85ce-e336f0cca05f",
+      "id": "f0d822eb-12a3-4c81-938b-cf49846edc13",
       "name": "Cliente Existe?1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
@@ -67,21 +67,21 @@
     },
     {
       "parameters": {
-        "tableId": "Leads",
+        "tableId": "kanban_cards",
         "fieldsUi": {
           "fieldValues": [
             {
-              "fieldId": "lead_nome",
+              "fieldId": "hospede_nome",
               "fieldValue": "={{ $('Dados Lead').item.json.LeadNome }}"
             },
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Dados Lead').item.json.IdConversa }}"
+              "fieldValue": "={{ $('Dados Lead').item.json.remoteJid }}"
             }
           ]
         }
       },
-      "id": "8963e0c1-daf6-4a2b-9b12-d0018373a3c7",
+      "id": "68699c59-75f9-415e-b8be-2c853f11ba62",
       "name": "Criar Cliente1",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -98,7 +98,7 @@
     },
     {
       "parameters": {},
-      "id": "ca02e599-cc7f-48b6-8050-cf3a8baa0a52",
+      "id": "d12554bc-b5c0-4106-8af9-1c25e2086f04",
       "name": "Merge1",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
@@ -112,7 +112,8 @@
         "promptType": "define",
         "text": "={{ $('texto').item.json.Mensagem }}",
         "options": {
-          "systemMessage": "=<identity>\n  <name>Larissa</name>\n  <alias>Lari</alias>\n  <role>Atendente de Reservas</role>\n  <brand>Pousada Delplata</brand>\n  <mission>\n    Atender hóspedes, tirar dúvidas e converter reservas diretas com clareza,\n    evitando promessas incorretas e garantindo uma boa experiência.\n  </mission>\n  <audience>\n    Casais, famílias e viajantes interessados em se hospedar em Serra Negra.\n  </audience>\n  <tone>\n    Profissional, direto, amigável, estilo WhatsApp.\n    Frases curtas, perguntas objetivas, linguagem simples.\n  </tone>\n</identity>\n\n<variables>\n  DataAtual: {{ $now }}\n</variables>\n\n<constraints>\n  - Nunca invente disponibilidade ou valores.\n  - Nunca confirme reserva sem validação.\n  - Nunca prometa early check-in ou late check-out.\n  - Nunca garanta upgrade.\n  - Não prometa desconto automático.\n  - Sempre deixe claro quando algo depende de disponibilidade.\n</constraints>\n\n<knowledge>\n  - Café da manhã incluso em todas as reservas.\n\n  Acomodações:\n\n  Apto Superior:\n  - Mais completo\n  - Possui ar condicionado\n  - Fica na ala principal\n\n  Apto Térreo:\n  - Fica na ala principal\n  - Não possui janelas\n\n  Chalés:\n  - Ficam a cerca de 70 metros da ala principal\n  - Possuem ventilador de teto (não têm ar condicionado)\n  - Aceitam pets de pequeno porte\n\n  Anexos:\n  - Mesma lógica dos chalés\n  - Fora da ala principal\n  - Sem ar condicionado\n\n  Deslocamento:\n  - Chalés e anexos precisam ir até a ala principal para o café da manhã\n\n  Check-in: a partir das 14h\n  Check-out: até 12h\n</knowledge>\n\n<interaction_logic>\n  1) Sempre entender a necessidade do cliente\n\n  2) Coletar obrigatoriamente:\n  - Data de entrada\n  - Data de saída\n  - Número de pessoas\n\n  3) Responder com base nessas informações\n\n  4) Oferecer opções de forma clara\n\n  5) Conduzir para reserva\n</interaction_logic>\n\n<selling_logic>\n  - Conforto → sugerir apto superior\n  - Economia → sugerir chalé/anexo\n  - Pet → oferecer somente chalé\n\n  Sempre explicar:\n  - Ar condicionado vs ventilador\n  - Localização (ala principal vs afastado)\n</selling_logic>\n\n<upsell_rules>\n  - Só oferecer melhoria se houver disponibilidade\n  - Nunca prometer\n\n  Usar sempre:\n  \"posso verificar disponibilidade\"\n</upsell_rules>\n\n<examples>\n  Cliente:\n  \"Quero reservar\"\n\n  Resposta:\n  \"Perfeito! Me passa só:\n  - Data de entrada\n  - Data de saída\n  - Quantas pessoas 😊\"\n\n  ----\n\n  Cliente:\n  \"Tem ar condicionado?\"\n\n  Resposta:\n  \"O apto superior possui ar condicionado e fica na ala principal.\n\n  Já os chalés e anexos têm ventilador de teto e ficam a cerca de 70 metros.\n\n  Você prefere mais conforto ou algo mais econômico?\"\n</examples>"
+          "systemMessage": "=Você é a Aura, a recepcionista proativa da Pousada Delplata em Serra Negra. Seu objetivo é fechar reservas e manter o CRM impecável.\n\n# PERSONALIDADE AURA 😊\n- Use emojis, seja humana e empática. Responda em no máximo 3 frases curtas. \n- PROATIVIDADE: Se falarem de pets, já explique sobre chalés e deslocamento. Se houver datas, já dê o valor total calculado.\n\n# TABELA DE PREÇOS (ABRIL 2026) 🌿\n- Domingo a Sexta: Chalé/Anexo R$ 349 | Apto Térreo R$ 359 | Apto Superior R$ 369.\n- Sábado: Chalé/Anexo R$ 379 | Apto Térreo R$ 389 | Apto Superior R$ 399.\n- Adicionais: Criança (0-5 anos) Grátis | Criança (6-11 anos) R$ 80 | Adulto Extra R$ 100.\n# FERIADOS (PÁSCOA/CORPUS): Chalé R$ 599 | Térreo R$ 699 | Superior R$ 799 (Mín. diárias obrigatório).\n\n# REGRAS DA POUSADA\n- Café: 08:30 às 10:30. Check-in: 14h | Check-out: 12h.\n- Pets: Até 12kg apenas em Chalés/Anexos (70m da Ala Principal). \n\n# FLUXO DE RESERVA & KANBAN (OBRIGATÓRIO) 🚀\n1. COTAÇÃO ENVIADA: Use 'atualizar_etapa_kanban' ao passar valores/datas pela primeira vez.\n2. INTENÇÃO DE RESERVA (\"Quero reservar\", \"Pode confirmar\"): \n   - Chame 'atualizar_etapa_kanban' para a etapa 'Dados Solicitados'.\n   - Responda APENAS confirmando a disponibilidade e solicitando o Nome Completo e CPF. \n   - NUNCA envie os dados bancários antes de ter o Nome e CPF.\n3. DADOS RECEBIDOS (Nome e CPF anotados):\n   - Chame 'atualizar_etapa_kanban' para a etapa 'Aguardando Pagamento'.\n   - Forneça o modelo de pagamento completo calculando os valores [50%].\n4. COMPROVANTE RECEBIDO (Imagem ou confirmação):\n   - Chame 'atualizar_etapa_kanban' para a etapa 'Reserva Confirmada'.\n   - Confirme a recepção e deseje uma estadia maravilhosa! ✨\n\n# MODELO DE PAGAMENTO (Preencha os campos [ ])\n\"Muito obrigada pelos dados! Seguem os dados para reserva de [ACOMODAÇÃO] do dia [INÍCIO] a [FIM]. O valor total é R$ [VALOR TOTAL] e o depósito de 50% é de R$ [50% DO TOTAL]. \n\nBanco Sicoob | AG: 3122 | C/C: 878.506-6\nCNPJ: 11.336.243/0001-11 | FAV: HOTEL POUSADA DELPLATA\nChave PIX: (19)99965-4866\"\n\n# REGRA DE OURO\n- NUNCA responda com texto vazio. \n- Sempre dê um retorno amigável ao hóspede ao usar qualquer ferramenta.\n",
+          "passthroughBinaryImages": true
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -121,9 +122,11 @@
         4656,
         848
       ],
-      "id": "a293a3d6-2767-4454-af10-bcc554d3a2c4",
+      "id": "f8463da8-8ade-473c-93f2-053b9d85efac",
       "name": "AI Agent1",
-      "retryOnFail": true
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "executeOnce": false
     },
     {
       "parameters": {
@@ -138,7 +141,7 @@
         2240,
         656
       ],
-      "id": "6f968557-57d6-4ac5-8b64-3409601e3921",
+      "id": "37d1fa72-4888-4dbe-a924-bb420b9ef2c7",
       "name": "Sticky Note2"
     },
     {
@@ -154,7 +157,7 @@
         2576,
         656
       ],
-      "id": "ee4c70e3-b3c1-4464-ae68-de7d071d7c15",
+      "id": "6f3b364e-8d31-43bb-a7ae-73e4f32d2194",
       "name": "Sticky Note4"
     },
     {
@@ -170,7 +173,7 @@
         2912,
         656
       ],
-      "id": "1edc9cd2-6059-4f86-b631-84f132db8585",
+      "id": "14183672-dfc3-44fb-b6d0-73c916863f8f",
       "name": "Sticky Note5"
     },
     {
@@ -185,7 +188,7 @@
         3584,
         656
       ],
-      "id": "e770797b-5cb5-4867-8d1f-b4a462c7abcc",
+      "id": "3bbedd19-73c9-483b-8e0d-311ed8e72214",
       "name": "Sticky Note7"
     },
     {
@@ -201,7 +204,7 @@
         4512,
         656
       ],
-      "id": "b49a54d1-97a6-4385-990c-61dea2d33e2d",
+      "id": "875081e6-1733-47e5-873a-af29d1cf0341",
       "name": "Sticky Note11"
     },
     {
@@ -219,12 +222,18 @@
               "name": "LeadNome",
               "value": "={{ $('Webhook').item.json.body.data?.pushName || $('Webhook').item.json.body.pushName || 'Sem nome' }}",
               "type": "string"
+            },
+            {
+              "id": "e00a17c7-7b97-44cc-ba3e-984ae92a750b",
+              "name": "=remoteJid",
+              "value": "={{$json.body.data?.key?.remoteJid || $json.body.key?.remoteJid || \"\"}}",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "d4ab3bf6-31f9-47f1-83ba-09ffc043aa1e",
+      "id": "518953f9-74d1-4c17-8891-b4e17403dde2",
       "name": "Dados Lead",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -237,7 +246,7 @@
       "parameters": {
         "content": "## Envio das Respostas\nEnvio das mensagens no whatsapp",
         "height": 508,
-        "width": 320,
+        "width": 596,
         "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -246,7 +255,7 @@
         5040,
         656
       ],
-      "id": "b8824247-40f8-4794-ae18-e954fc9a62de",
+      "id": "6f7108ef-95b5-47fe-838c-8dfc67c21faf",
       "name": "Sticky Note12"
     },
     {
@@ -261,9 +270,9 @@
         2336,
         848
       ],
-      "id": "20268b14-07ae-4d2b-b2db-8e098ede5ce9",
+      "id": "e8b997f9-739f-435d-9498-c49d14c0fd9f",
       "name": "Webhook",
-      "webhookId": "9c999047-c050-412e-9f87-6c899d49d423"
+      "webhookId": "b5a0b596-713d-4492-93dd-d2607f2d1537"
     },
     {
       "parameters": {
@@ -279,17 +288,27 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { number: $('Dados Lead').item.json.IdConversa, text: $json.output } }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.number }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5136,
+        5456,
         848
       ],
-      "id": "319794cc-2bc1-47d9-94fc-f72072d8247d",
+      "id": "4c4af415-0ca7-46de-a689-b109a770abf4",
       "name": "HTTP Request"
     },
     {
@@ -299,7 +318,7 @@
             {
               "id": "66a91f66-e755-4120-b22f-44c814f56162",
               "name": "Mensagem",
-              "value": "={{ $('Webhook').item.json.body.data?.message?.conversation || $('Webhook').item.json.body.message?.conversation || $('Webhook').item.json.body.data?.message?.extendedTextMessage?.text || $('Webhook').item.json.body.message?.extendedTextMessage?.text || '' }}",
+              "value": "={{ $('Webhook').item.json.body.data?.message?.conversation || $('Webhook').item.json.body.message?.conversation || $('Webhook').item.json.body.data?.message?.imageMessage?.caption || $('Webhook').item.json.body.message?.imageMessage?.caption || $('Webhook').item.json.body.data?.message?.extendedTextMessage?.text || $('Webhook').item.json.body.message?.extendedTextMessage?.text || \"\" }}",
               "type": "string"
             }
           ]
@@ -312,7 +331,7 @@
         3344,
         848
       ],
-      "id": "10038285-2f3d-446c-9edc-3717c2e0cf8e",
+      "id": "3755a499-2c2d-4550-9b44-ca7089f9c188",
       "name": "texto"
     },
     {
@@ -340,7 +359,7 @@
               "rightValue": "",
               "operator": {
                 "type": "boolean",
-                "operation": "false",
+                "operation": "exists",
                 "singleValue": true
               }
             },
@@ -375,7 +394,7 @@
             },
             {
               "id": "7999a694-488d-4870-9553-4cfb495de523",
-              "leftValue": "={{ !!($json.body.data?.message?.conversation || $json.body.message?.conversation || $json.body.data?.message?.extendedTextMessage?.text || $json.body.message?.extendedTextMessage?.text) }}",
+              "leftValue": "={{ !!($json.body.data?.message?.conversation || $json.body.message?.conversation || $json.body.data?.message?.extendedTextMessage?.text || $json.body.message?.extendedTextMessage?.text || $json.body.data?.message?.imageMessage || $json.body.message?.imageMessage) }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -388,7 +407,7 @@
         },
         "options": {}
       },
-      "id": "3b5b7fe5-a982-4a1f-b94e-4e0fee9e184f",
+      "id": "d6a71ddb-e575-49dc-9ba3-c5fee730fb3f",
       "name": "Filtro",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.1,
@@ -400,16 +419,16 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Dados Lead').item.json.IdConversa }}",
+        "sessionKey": "={{ $('Dados Lead').item.json.remoteJid }}",
         "contextWindowLength": 20
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        4752,
+        4704,
         1024
       ],
-      "id": "17622b2d-f838-4b54-ac72-655ed6af3e88",
+      "id": "8b16133b-c949-431f-a658-103d2641d5e4",
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
@@ -431,7 +450,7 @@
         3248,
         656
       ],
-      "id": "474e3688-1257-4bad-9d61-cbd26fda62dc",
+      "id": "29d14b24-3b3c-477a-b2fe-c68ccfd51890",
       "name": "Sticky Note"
     },
     {
@@ -439,10 +458,10 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        5424,
+        5744,
         848
       ],
-      "id": "0b7ebd5b-aa09-4ee1-a6bb-b3f0885f9820",
+      "id": "03653bb7-538d-46cf-882f-e1a2491343a3",
       "name": "No Operation, do nothing"
     },
     {
@@ -452,10 +471,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        4608,
+        4560,
         1024
       ],
-      "id": "48f97f62-c74e-4954-914e-eb2267cbc8b0",
+      "id": "6c9c8c7f-f6f1-496d-8e75-b4acfc637efe",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -463,76 +482,198 @@
           "name": "Google Gemini(PaLM) Api account"
         }
       }
-    }
-  ],
-  "pinData": {
-    "Webhook": [
-      {
-        "json": {
-          "headers": {
-            "content-type": "application/json",
-            "user-agent": "axios/1.7.9",
-            "content-length": "1086",
-            "accept-encoding": "gzip, compress, deflate, br",
-            "host": "host.docker.internal:5678",
-            "connection": "keep-alive"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "event": "messages.upsert",
-            "instance": "delplata2026",
-            "data": {
-              "key": {
-                "remoteJid": "5519998701203@s.whatsapp.net",
-                "fromMe": false,
-                "id": "3EB0503A68FDF50CED5DE7"
-              },
-              "pushName": ".",
-              "status": "DELIVERY_ACK",
-              "message": {
-                "messageContextInfo": {
-                  "deviceListMetadata": {
-                    "senderKeyHash": "F+l2t9FG8RETWA==",
-                    "senderTimestamp": "1774609026",
-                    "senderAccountType": "E2EE",
-                    "receiverAccountType": "E2EE",
-                    "recipientKeyHash": "0MJEwaQg0f1luQ==",
-                    "recipientTimestamp": "1774648413"
-                  },
-                  "deviceListMetadataVersion": 2,
-                  "messageSecret": "gz5cAvE0YZpWY67lTTOW72k65F1RTIaVfYAGh/UqwW8="
-                },
-                "conversation": "teste"
-              },
-              "contextInfo": {
-                "ephemeralSettingTimestamp": "1774377535",
-                "disappearingMode": {
-                  "initiator": "CHANGED_IN_CHAT",
-                  "trigger": "CHAT_SETTING",
-                  "initiatedByMe": false
-                }
-              },
-              "messageType": "conversation",
-              "messageTimestamp": 1774738180,
-              "instanceId": "508c6dcc-2794-44aa-836a-688b6f9de7ff",
-              "source": "web"
-            },
-            "destination": "http://host.docker.internal:5678/webhook-test/mensagem-teste",
-            "date_time": "2026-03-28T19:49:41.475Z",
-            "sender": "5519999654866@s.whatsapp.net",
-            "server_url": "http://localhost:8080",
-            "apikey": "AB1033CD5E46-474F-9537-6D1C247494E9"
-          },
-          "webhookUrl": "http://localhost:5678/webhook-test/mensagem-teste",
-          "executionMode": "test"
+    },
+    {
+      "parameters": {
+        "description": "\"Use esta ferramenta IMEDIATAMENTE quando o hóspede fornecer informações de datas ou pessoas, mesmo que você ainda não tenha o preço final. Mova para a etapa 'Cotação Enviada' e coloque as datas no resumo.\"",
+        "workflowId": {
+          "__rl": true,
+          "value": "MDB2GSW429YiggOO",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MDB2GSW429YiggOO",
+          "cachedResultName": "Aura - Ajudante Kanban"
         },
-        "pairedItem": {
-          "item": 0
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "remoteJid": "={{ $('Dados Lead').item.json.remoteJid }}",
+            "nova_etapa": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nova_etapa', `\"A etapa do funil. Ex: Nova Lead, Cotação Enviada, Negociação, Reserva Confirmada, Perdido.\"`, 'string') }}",
+            "resumo_solicitacao": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('resumo_solicitacao', `\"Resumo do que o hóspede pediu. Ex: Quarto casal, datas X a Y.\"`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "remoteJid",
+              "displayName": "remoteJid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nova_etapa",
+              "displayName": "nova_etapa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "resumo_solicitacao",
+              "displayName": "resumo_solicitacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        4848,
+        1024
+      ],
+      "id": "7a720916-6e7e-4b45-9e18-5f295abc87b6",
+      "name": "atualizar_etapa_kanban",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21aadedf-27cd-4d73-8eee-83746ba47b69",
+              "name": "number",
+              "value": "={{ $('Dados Lead').item.json.remoteJid.replace('@lid', '@s.whatsapp.net') }}",
+              "type": "string"
+            },
+            {
+              "id": "a6486ed6-de10-43c3-9649-7f1a42341c6c",
+              "name": "text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5280,
+        848
+      ],
+      "id": "64ed1f99-3c62-4613-bb52-616206d4d21d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "851f1fb8-cd90-4717-aa0f-1ef26fb88e70",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        5104,
+        848
+      ],
+      "id": "189aa22f-9a4c-4d95-9ae2-066a6ffb3a45",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Leads",
+        "returnFirst": true,
+        "where": [
+          {
+            "column": "lead_id",
+            "condition": "equal",
+            "value": "={{ $('Dados Lead').item.json.remoteJid.split('@')[0] }}"
+          }
+        ]
+      },
+      "id": "check-chatbot-status",
+      "name": "Check Chatbot Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        848
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
         }
       }
-    ]
-  },
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "bot-active-condition",
+              "leftValue": "={{ $json.chatbot_ativo }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-chatbot-active",
+      "name": "Is Chatbot Active?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3230,
+        848
+      ]
+    }
+  ],
+  "pinData": {},
   "connections": {
     "Encontrar Cliente1": {
       "main": [
@@ -589,7 +730,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Filter",
             "type": "main",
             "index": 0
           }
@@ -597,6 +738,28 @@
       ]
     },
     "Dados Lead": {
+      "main": [
+        [
+          {
+            "node": "Check Chatbot Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Chatbot Status": {
+      "main": [
+        [
+          {
+            "node": "Is Chatbot Active?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Chatbot Active?": {
       "main": [
         [
           {
@@ -672,18 +835,52 @@
           }
         ]
       ]
+    },
+    "atualizar_etapa_kanban": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "5fb8fbf4-2e65-41a6-a562-63fff8dfe7a3",
+  "versionId": "2f3643ff-2e90-4b3d-b842-5b75654f0a60",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "5899da75ae67d1ebd3667589ddb09f27975a5ddcea12c7dcc5226e44d13e5aaf"
   },
-  "id": "dIGZql5baei2kc4P",
+  "id": "OQNovYmqufz7rQ6A",
   "tags": []
 }

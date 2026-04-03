@@ -10,24 +10,42 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-interface KanbanCard {
+const STAGES = [
+  'Novo Lead',
+  'Cotação Enviada',
+  'Aguardando Pagamento',
+  'Reserva Confirmada',
+  'Check-in',
+  'Check-out/Pós-venda',
+  'Perdido/Cancelado',
+] as const;
+
+type KanbanStage = (typeof STAGES)[number];
+type KanbanPriority = 'alta' | 'media' | 'baixa';
+
+interface KanbanCardRow {
   id: number;
   lead_id: string;
-  hospede_nome: string;
+  hospede_nome: string | null;
+  origem: string | null;
   etapa: string;
-  resumo_solicitacao: string;
+  resumo_solicitacao: string | null;
+  prioridade: string | null;
   ultima_interacao: string;
 }
 
-const STAGES = [
-  'Novo Lead', 
-  'Cotação Enviada', 
-  'Aguardando Pagamento', 
-  'Reserva Confirmada', 
-  'Check-in', 
-  'Check-out/Pós-venda', 
-  'Perdido/Cancelado'
-];
+interface KanbanCard {
+  id: number;
+  lead_id: string;
+  hospede_nome: string | null;
+  origem: string;
+  etapa: KanbanStage;
+  resumo_solicitacao: string | null;
+  prioridade: KanbanPriority;
+  ultima_interacao: string;
+}
+
+type KanbanCardsByStage = Record<KanbanStage, KanbanCard[]>;
 
 export type KanbanSyncState = 'connecting' | 'realtime' | 'polling' | 'error';
 
@@ -37,6 +55,28 @@ interface KanbanBoardProps {
 
 function normalizeLeadId(value: string | null | undefined) {
   return (value || '').split('@')[0];
+}
+
+function isKanbanStage(value: string): value is KanbanStage {
+  return STAGES.includes(value as KanbanStage);
+}
+
+function isKanbanPriority(value: string | null): value is KanbanPriority {
+  return value === 'alta' || value === 'media' || value === 'baixa';
+}
+
+function createEmptyStageGroups(): KanbanCardsByStage {
+  return STAGES.reduce((acc, stage) => {
+    acc[stage] = [];
+    return acc;
+  }, {} as KanbanCardsByStage);
+}
+
+function groupCardsByStage(cards: KanbanCard[]): KanbanCardsByStage {
+  return cards.reduce((acc, card) => {
+    acc[card.etapa].push(card);
+    return acc;
+  }, createEmptyStageGroups());
 }
 
 function getCardPriority(card: KanbanCard) {
@@ -101,7 +141,20 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
         }
       } else {
         if (mounted) {
-          setCards(data || []);
+          const typedCards = ((data || []) as KanbanCardRow[])
+            .filter((card) => isKanbanStage(card.etapa))
+            .map((card) => ({
+              id: card.id,
+              lead_id: card.lead_id,
+              hospede_nome: card.hospede_nome,
+              origem: card.origem || 'WhatsApp',
+              etapa: card.etapa as KanbanStage,
+              resumo_solicitacao: card.resumo_solicitacao,
+              prioridade: isKanbanPriority(card.prioridade) ? card.prioridade : 'media',
+              ultima_interacao: card.ultima_interacao,
+            }));
+
+          setCards(typedCards);
           updateSync(
             syncStateRef.current === 'polling' ? 'polling' : 'realtime',
             'Kanban sincronizado com o banco.',
@@ -219,6 +272,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       return acc;
     }, new Map<string, KanbanCard>()).values()
   );
+  const cardsByStage = groupCardsByStage(dedupedCards);
 
   if (loading) {
     return (
@@ -247,7 +301,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     >
       <div className="flex h-full min-w-max p-6 gap-6">
         {STAGES.map((stage) => {
-          const stageCards = dedupedCards.filter(card => card.etapa === stage);
+          const stageCards = cardsByStage[stage];
           return (
             <div key={stage} className="w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
               <div className="flex items-center justify-between mb-4 px-2">

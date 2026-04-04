@@ -13,9 +13,7 @@ Current key files:
 - `agents/aura.md`
 - `architecture/overview.md`
 - `setup/crm-kit-replicacao.md`
-- `setup/n8n-config.md`
-- `setup/aura-operational-roadmap.md`
-- `setup/aura-data-operations-guide.md`
+- `setup/implementation-master-guide.md`
 - `setup/assistant-settings-migration-20260404.sql`
 - `setup/kanban-stage-handoff-migration-20260404.sql`
 - `setup/assistant-rules-migration-20260404.sql`

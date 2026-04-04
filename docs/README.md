@@ -17,3 +17,4 @@ Current key files:
 - `setup/aura-operational-roadmap.md`
 - `setup/assistant-settings-migration-20260404.sql`
 - `setup/kanban-stage-handoff-migration-20260404.sql`
+- `setup/assistant-rules-migration-20260404.sql`

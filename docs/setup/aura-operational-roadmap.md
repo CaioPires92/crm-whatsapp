@@ -206,16 +206,16 @@ Implementar:
 - consolidacao dessas regras em contexto simples para o agente
 
 Concluido:
-- [ ] schema criado
-- [ ] regras iniciais cadastradas
-- [ ] workflow lendo regras
-- [ ] Aura respondendo com base nas regras lidas
+- [x] schema criado
+- [x] regras iniciais cadastradas
+- [x] workflow lendo regras
+- [x] Aura respondendo com base nas regras lidas
 
 Teste minimo:
-- [ ] pergunta sobre senha do wifi
-- [ ] pergunta sobre check-in e check-out
-- [ ] pergunta sobre politica de pets
-- [ ] alteracao no banco reflete na proxima resposta sem editar workflow
+- [x] pergunta sobre senha do wifi
+- [x] pergunta sobre check-in e check-out
+- [x] pergunta sobre politica de pets
+- [x] alteracao no banco reflete na proxima resposta sem editar workflow
 
 Gate para seguir:
 - so seguir quando alterar o banco mudar a resposta da Aura

@@ -451,10 +451,57 @@
     },
     {
       "parameters": {
+        "operation": "get",
+        "tableId": "assistant_rules",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "cbac27c6-b5f4-4b01-b8eb-3c6b8659ed64",
+      "name": "Supabase - Get Assistant Rules",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -180
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
+      "notes": "Fase 3: busca a base editavel de regras do hotel direto do Supabase antes da Aura responder."
+    },
+    {
+      "parameters": {
+        "jsCode": "const validRules = items\n  .map((item) => item.json || {})\n  .filter((rule) => Object.keys(rule).length > 0)\n  .filter((rule) => rule.active !== false)\n  .filter((rule) => String(rule.category || '').trim() && String(rule.rule_key || '').trim());\n\nconst grouped = new Map();\nfor (const rule of validRules) {\n  const category = String(rule.category).trim();\n  const ruleKey = String(rule.rule_key).trim();\n  const value = String(rule.value || '').trim() || 'Nao cadastrado';\n  if (!grouped.has(category)) grouped.set(category, []);\n  grouped.get(category).push(`- ${ruleKey}: ${value}`);\n}\n\nconst knowledgeContext = grouped.size\n  ? Array.from(grouped.entries())\n      .sort(([a], [b]) => a.localeCompare(b))\n      .map(([category, entries]) => [`[${category}]`, ...entries.sort()].join('\\n'))\n      .join('\\n\\n')\n  : 'Nenhuma regra operacional cadastrada.';\n\nreturn [{\n  json: {\n    knowledgeContext,\n    ruleCount: validRules.length,\n  },\n}];"
+      },
+      "id": "f89f0eb1-c3c2-4dbd-8ad7-7b0a0939d847",
+      "name": "Consolidar Regras Aura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        -180
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 3: consolida as regras editaveis em um contexto curto e previsivel para a Aura usar sem hardcode."
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "text": "={{ $('Mensagem Interpretada').first().json.messageText }}",
         "options": {
-          "systemMessage": "Voc\u00ea \u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\u00e3o \u00e9 atender h\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. N\u00e3o d\u00ea pre\u00e7os gen\u00e9ricos; pe\u00e7a datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudan\u00e7a de est\u00e1gio comercial, use a ferramenta update_kanban_stage.\n6. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\n\nETAPAS DISPON\u00cdVEIS:\n- Novo Lead\n- Cota\u00e7\u00e3o Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/P\u00f3s-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forne\u00e7a um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\u00e7\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\u00f3s-venda, Perdido/Cancelado."
+          "systemMessage": "={{ `Voc\\u00ea \\u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\\u00e3o \\u00e9 atender h\\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\\n\\nDIRETRIZES DE ATENDIMENTO:\\n1. Seja cordial, profissional e use um tom acolhedor.\\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\\n3. N\\u00e3o d\\u00ea pre\\u00e7os gen\\u00e9ricos; pe\\u00e7a datas para consultar disponibilidade e melhor oferta.\\n4. Responda de forma curta e natural para WhatsApp.\\n5. Se perceber mudan\\u00e7a de est\\u00e1gio comercial, use a ferramenta update_kanban_stage.\\n6. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\\n7. Use a BASE OPERACIONAL DINAMICA abaixo como fonte primaria para Wi-Fi, check-in, check-out, pets, cafe da manha e regras internas.\\n8. Se um valor estiver como \\\"Nao cadastrado\\\" ou \\\"Nao cadastrada\\\", diga que a equipe ainda precisa atualizar essa informacao no sistema e nao invente detalhes.\\n\\nBASE OPERACIONAL DINAMICA:\\n${$('Consolidar Regras Aura').first().json.knowledgeContext || 'Nenhuma regra operacional cadastrada.'}\\n\\nETAPAS DISPONIVEIS:\\n- Novo Lead\\n- Cota\\u00e7\\u00e3o Enviada\\n- Aguardando Pagamento\\n- Reserva Confirmada\\n- Check-in\\n- Check-out/P\\u00f3s-venda\\n- Perdido/Cancelado\\n\\nSempre que atualizar a etapa, forne\\u00e7a um breve resumo_solicitacao objetivo.\\n\\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\\u00e7\\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\\u00f3s-venda, Perdido/Cancelado.` }}"
         }
       },
       "id": "82d1f283-7f59-481d-ac6a-c90817d1c32e",
@@ -1178,6 +1225,28 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Supabase - Get Assistant Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Assistant Rules": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Regras Aura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar Regras Aura": {
+      "main": [
         [
           {
             "node": "AI Agent Aura",

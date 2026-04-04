@@ -78,3 +78,25 @@ O Dashboard no frontend já foi configurado para monitorar a coluna ultima_inter
 Verde: < 4 horas sem resposta.
 Amarelo: > 12 horas (Atenção).
 Vermelho + Animação: > 24 horas (SLA Crítico).
+
+5. Base Editavel de Regras (Fase 3)
+O workflow oficial agora consulta a tabela `assistant_rules` antes da Aura responder.
+
+Campos esperados:
+- `category`
+- `rule_key`
+- `value`
+- `active`
+- `notes`
+
+Categorias iniciais:
+- `wifi`
+- `checkin_checkout`
+- `pets`
+- `menu`
+- `internal_policies`
+
+Comportamento:
+- a Aura usa essas regras como fonte primaria para perguntas operacionais
+- se um valor estiver como `Nao cadastrado` ou `Nao cadastrada`, a Aura nao inventa a resposta
+- alterar um valor em `assistant_rules` muda a proxima resposta sem editar o workflow

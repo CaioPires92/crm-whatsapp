@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Bot, BotOff, RefreshCw } from 'lucide-react';
 import LeadList from '../components/chat/LeadList';
 import ChatArea from '../components/chat/ChatArea';
 import { supabase } from '../lib/supabase';
+import AuraModeControl, { type AssistantMode } from '../components/AuraModeControl';
 
 interface Lead {
   id: number;
@@ -14,8 +14,6 @@ interface Lead {
   last_message_at?: string | null;
   avatar_url?: string | null;
 }
-
-type AssistantMode = 'auto' | 'manual' | 'hybrid';
 
 export default function Contatos() {
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
@@ -84,28 +82,11 @@ export default function Contatos() {
           <h1 className="mt-1 text-lg font-semibold text-white">Status operacional da Aura</h1>
         </div>
 
-        <div
-          className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
-            isAutoReplyActive
-              ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15'
-              : 'border-amber-500/20 bg-amber-500/10 text-amber-200 hover:bg-amber-500/15'
-          }`}
-        >
-          {loadingAssistantMode ? (
-            <RefreshCw className="h-4 w-4 animate-spin" />
-          ) : isAutoReplyActive ? (
-            <Bot className="h-4 w-4" />
-          ) : (
-            <BotOff className="h-4 w-4" />
-          )}
-          {loadingAssistantMode
-            ? 'Carregando status...'
-            : isAutoReplyActive
-              ? 'Piloto automatico ativo'
-              : assistantEnabled
-                ? 'Modo manual ativo'
-                : 'Aura desabilitada'}
-        </div>
+        <AuraModeControl
+          assistantMode={assistantMode}
+          assistantEnabled={assistantEnabled}
+          loading={loadingAssistantMode}
+        />
       </div>
 
       <div className="flex h-full w-full min-h-0">

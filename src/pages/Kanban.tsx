@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Bot, Radio, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Radio, RefreshCw } from 'lucide-react';
 import KanbanBoard, { type KanbanSyncState } from '../components/kanban/KanbanBoard';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { supabase } from '../lib/supabase';
+import AuraModeControl, { type AssistantMode } from '../components/AuraModeControl';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-type AssistantMode = 'auto' | 'manual' | 'hybrid';
 
 export default function Kanban() {
   const [sync, setSync] = useState<{
@@ -115,13 +114,6 @@ export default function Kanban() {
     setModeSaving(false);
   }
 
-  const auraStatusTone =
-    !assistantEnabled
-      ? 'border-red-500/20 bg-red-500/10 text-red-200'
-      : assistantMode === 'manual'
-        ? 'border-amber-500/20 bg-amber-500/10 text-amber-100'
-        : 'border-sky-500/20 bg-sky-500/10 text-sky-100';
-
   return (
     <div className="h-full flex flex-col bg-[#0a0a0a]">
       <div className="h-16 border-b border-[#1f1f1f] flex items-center justify-between px-8 shrink-0 bg-[#0a0a0a]/80 backdrop-blur-md z-10">
@@ -134,54 +126,13 @@ export default function Kanban() {
         </div>
         
         <div className="flex items-center gap-4">
-          <div className={cn("flex items-center gap-3 rounded-xl border px-3 py-2", auraStatusTone)}>
-            <div className="flex items-center gap-2">
-              <Bot className="h-3.5 w-3.5" />
-              <div className="leading-tight">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em]">Aura</p>
-                <p className="text-[11px] opacity-80">
-                  {settingsLoading
-                    ? 'Carregando modo operacional...'
-                    : !assistantEnabled
-                      ? 'Assistente desabilitada'
-                      : assistantMode === 'manual'
-                        ? 'Modo manual'
-                        : 'Piloto automatico'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center rounded-lg border border-white/10 bg-black/20 p-1">
-              <button
-                type="button"
-                onClick={() => updateAssistantMode('auto')}
-                disabled={settingsLoading || modeSaving || !assistantEnabled}
-                className={cn(
-                  'rounded-md px-3 py-1.5 text-[11px] font-semibold transition-colors',
-                  assistantMode === 'auto'
-                    ? 'bg-sky-500 text-slate-950'
-                    : 'text-zinc-300 hover:bg-white/5',
-                  (settingsLoading || modeSaving || !assistantEnabled) && 'cursor-not-allowed opacity-60'
-                )}
-              >
-                Piloto Automatico
-              </button>
-              <button
-                type="button"
-                onClick={() => updateAssistantMode('manual')}
-                disabled={settingsLoading || modeSaving}
-                className={cn(
-                  'rounded-md px-3 py-1.5 text-[11px] font-semibold transition-colors',
-                  assistantMode === 'manual'
-                    ? 'bg-amber-400 text-slate-950'
-                    : 'text-zinc-300 hover:bg-white/5',
-                  (settingsLoading || modeSaving) && 'cursor-not-allowed opacity-60'
-                )}
-              >
-                Modo Manual
-              </button>
-            </div>
-          </div>
+          <AuraModeControl
+            assistantMode={assistantMode}
+            assistantEnabled={assistantEnabled}
+            loading={settingsLoading}
+            saving={modeSaving}
+            onChangeMode={updateAssistantMode}
+          />
 
           <div className={cn("flex items-center gap-2 px-3 py-2 rounded-xl border text-[11px]", syncTone)}>
             <SyncIcon className={cn("h-3.5 w-3.5", sync.state === 'polling' || sync.state === 'connecting' ? 'animate-spin' : '')} />

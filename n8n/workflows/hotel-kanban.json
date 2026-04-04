@@ -17,7 +17,7 @@
       ],
       "webhookId": "hotel-crm-evolution-webhook",
       "notesInFlow": true,
-      "notes": "Recebe os eventos da Evolution API."
+      "notes": "Recebe os eventos da Evolution API. TESTE: use /webhook-test/evolution-webhook apenas apos clicar em Execute workflow, e ele vale para uma chamada. PRODUCAO: use /webhook/evolution-webhook."
     },
     {
       "parameters": {
@@ -128,7 +128,7 @@
             {
               "id": "lead-instance",
               "name": "instanceName",
-              "value": "={{ $json.body?.instance || $json.instance || 'SUA_INSTANCIA' }}",
+              "value": "={{ $json.body?.instance || $json.instance || 'delplata2026' }}",
               "type": "string"
             }
           ]
@@ -272,7 +272,10 @@
       "notes": "AJUSTADO AO BANCO REAL: cria o card inicial em kanban_cards com lead_id, hospede_nome, etapa, resumo_solicitacao e ultima_interacao."
     },
     {
-      "parameters": {},
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 2
+      },
       "id": "merge-lead",
       "name": "Merge Lead",
       "type": "n8n-nodes-base.merge",
@@ -402,8 +405,23 @@
     },
     {
       "parameters": {
+        "jsCode": "const lead = $('Normalizar Lead').first().json;\nconst reply = $('AI Agent Aura').first().json;\n\nconst instanceName = String(lead.instanceName || '').trim();\nconst number = String(lead.waNumber || '').trim();\nconst text = String(reply.output || '').trim();\n\nif (!instanceName) {\n  throw new Error('Preparar Resposta WhatsApp: instanceName vazio');\n}\n\nif (!number) {\n  throw new Error('Preparar Resposta WhatsApp: number vazio');\n}\n\nif (!text) {\n  throw new Error('Preparar Resposta WhatsApp: text vazio');\n}\n\nreturn [{\n  json: {\n    instanceName,\n    number,\n    text\n  }\n}];"
+      },
+      "id": "prepare-whatsapp-reply",
+      "name": "Preparar Resposta WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2820,
+        500
+      ],
+      "notesInFlow": true,
+      "notes": "ADICIONADO: monta e valida instanceName, number e text antes do envio para a Evolution. Se falhar aqui, o payload de entrada do teste esta incompleto ou invalido."
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "={{ ($env.EVOLUTION_API_BASE_URL || 'http://host.docker.internal:8080') + '/message/sendText/' + $('Normalizar Lead').item.json.instanceName }}",
+        "url": "={{ ($env.EVOLUTION_API_BASE_URL || 'http://host.docker.internal:8080') + '/message/sendText/' + $json.instanceName }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -415,7 +433,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: $('Normalizar Lead').item.json.waNumber, text: $json.output } }}",
+        "jsonBody": "={{ { number: $json.number, text: $json.text } }}",
         "options": {}
       },
       "id": "http-reply",
@@ -427,7 +445,7 @@
         340
       ],
       "notesInFlow": true,
-      "notes": "AJUSTADO: envia para a Evolution o numero sem o sufixo @s.whatsapp.net, que e o formato mais seguro para sendText."
+      "notes": "AJUSTADO: envia para a Evolution o numero sem o sufixo @s.whatsapp.net, que e o formato mais seguro para sendText. Execute o fluxo completo; evitar testar este node isoladamente com dados ficticios."
     },
     {
       "parameters": {
@@ -471,7 +489,7 @@
             },
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.numeroSemSufixo }}"
+              "fieldValue": "={{ $('Normalizar Lead').item.json.waNumber }}"
             }
           ]
         }
@@ -498,7 +516,7 @@
             },
             {
               "fieldId": "message",
-              "fieldValue": "={{ { role: 'assistant', content: $json.output } }}"
+              "fieldValue": "={{ { role: 'assistant', content: $('AI Agent Aura').item.json.output } }}"
             },
             {
               "fieldId": "hora_data_mensagem",
@@ -691,6 +709,17 @@
       ]
     },
     "Supabase - Save Assistant History": {
+      "main": [
+        [
+          {
+            "node": "Preparar Resposta WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Resposta WhatsApp": {
       "main": [
         [
           {

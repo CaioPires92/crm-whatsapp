@@ -498,10 +498,57 @@
     },
     {
       "parameters": {
+        "operation": "get",
+        "tableId": "room_rates",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "c61c24d5-5960-47f7-a5a9-a90b0caef1b4",
+      "name": "Supabase - Get Room Rates",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -180
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
+      "notes": "Fase 4: busca as tarifas editaveis por periodo e tipo de acomodacao antes da Aura cotar."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $('Mensagem Interpretada').first().json;\nconst text = String(msg.messageText || '').trim();\n\nconst normalize = (value) => String(value || '')\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase();\n\nconst normalizedText = normalize(text);\nconst rates = items\n  .map((item) => item.json || {})\n  .filter((rate) => Object.keys(rate).length > 0)\n  .filter((rate) => rate.active !== false);\n\nconst parseDateValue = (value) => {\n  if (!value) return null;\n  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;\n  const textValue = String(value).trim();\n  if (!textValue) return null;\n  const iso = textValue.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);\n  if (iso) {\n    const date = new Date(Date.UTC(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3])));\n    return Number.isNaN(date.getTime()) ? null : date;\n  }\n  return null;\n};\n\nconst parseMessageDates = (value) => {\n  const found = [];\n  const slashMatches = [...String(value).matchAll(/\\b(\\d{1,2})\\/(\\d{1,2})(?:\\/(\\d{2,4}))?\\b/g)];\n  for (const match of slashMatches) {\n    let year = match[3] ? Number(match[3]) : 2026;\n    if (year < 100) year += 2000;\n    const date = new Date(Date.UTC(year, Number(match[2]) - 1, Number(match[1])));\n    if (!Number.isNaN(date.getTime())) found.push(date);\n  }\n  const isoMatches = [...String(value).matchAll(/\\b(\\d{4})-(\\d{2})-(\\d{2})\\b/g)];\n  for (const match of isoMatches) {\n    const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));\n    if (!Number.isNaN(date.getTime())) found.push(date);\n  }\n  return found.sort((a, b) => a.getTime() - b.getTime());\n};\n\nconst detectRoomType = (value) => {\n  if (value.includes('superior')) return 'Apto Superior';\n  if (value.includes('terreo') || value.includes('térreo')) return 'Apto Terreo';\n  if (value.includes('chale') || value.includes('chalé') || value.includes('anexo')) return 'Chale/Anexo';\n  return null;\n};\n\nconst parseDaysOfWeek = (value) => {\n  if (Array.isArray(value)) return value.map((entry) => Number(entry)).filter((entry) => Number.isInteger(entry));\n  const textValue = String(value || '').trim();\n  if (!textValue) return [0,1,2,3,4,5,6];\n  return textValue.replace(/[{}]/g, '').split(',').map((entry) => Number(entry.trim())).filter((entry) => Number.isInteger(entry));\n};\n\nconst formatCurrency = (value) => `R$ ${Number(value || 0).toFixed(2).replace('.', ',')}`;\nconst formatDate = (date) => `${String(date.getUTCDate()).padStart(2, '0')}/${String(date.getUTCMonth() + 1).padStart(2, '0')}/${date.getUTCFullYear()}`;\n\nconst parsedDates = parseMessageDates(text);\nconst checkIn = parsedDates[0] || null;\nconst checkOut = parsedDates[1] || null;\nconst requestedRoomType = detectRoomType(normalizedText);\n\nconst seasonSummary = rates.length\n  ? rates\n      .slice()\n      .sort((a, b) => String(a.room_type || '').localeCompare(String(b.room_type || '')) || Number(a.priority || 100) - Number(b.priority || 100))\n      .map((rate) => {\n        const roomType = String(rate.room_type || '').trim();\n        const seasonName = String(rate.season_name || '').trim();\n        const from = parseDateValue(rate.date_from);\n        const to = parseDateValue(rate.date_to);\n        return `- ${roomType}: ${seasonName} | ${formatCurrency(rate.base_price)} por diaria | periodo ${from ? formatDate(from) : '?'} a ${to ? formatDate(to) : '?'} | minimo ${rate.min_nights || 1} diaria(s)`;\n      })\n      .join('\\n')\n  : '- Nenhuma tarifa cadastrada.';\n\nlet rateContext = 'BASE DE TARIFAS: nenhuma tarifa cadastrada.';\nif (!checkIn || !checkOut || checkOut <= checkIn) {\n  rateContext = `BASE DE TARIFAS DISPONIVEIS:\\n${seasonSummary}\\n\\nNao foi possivel calcular uma cotacao completa porque a mensagem nao trouxe duas datas validas de hospedagem. Se o cliente pedir preco, solicite check-in e check-out no formato DD/MM/AAAA.`;\n} else {\n  const nights = Math.round((checkOut.getTime() - checkIn.getTime()) / 86400000);\n  const roomTypes = requestedRoomType ? [requestedRoomType] : Array.from(new Set(rates.map((rate) => String(rate.room_type || '').trim()).filter(Boolean)));\n  const lines = [];\n\n  for (const roomType of roomTypes) {\n    const nightlyMatches = [];\n    let cursor = new Date(checkIn);\n    while (cursor < checkOut) {\n      const day = cursor.getUTCDay();\n      const applicable = rates\n        .filter((rate) => String(rate.room_type || '').trim() === roomType)\n        .map((rate) => ({ ...rate, from: parseDateValue(rate.date_from), to: parseDateValue(rate.date_to), parsedDays: parseDaysOfWeek(rate.days_of_week) }))\n        .filter((rate) => rate.from && rate.to)\n        .filter((rate) => cursor >= rate.from && cursor <= rate.to)\n        .filter((rate) => rate.parsedDays.includes(day))\n        .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100));\n      if (!applicable.length) {\n        nightlyMatches.length = 0;\n        break;\n      }\n      nightlyMatches.push(applicable[0]);\n      cursor = new Date(cursor.getTime() + 86400000);\n    }\n\n    if (!nightlyMatches.length) {\n      lines.push(`- ${roomType}: sem tarifa cadastrada para todo o periodo de ${formatDate(checkIn)} a ${formatDate(checkOut)}.`);\n      continue;\n    }\n\n    const total = nightlyMatches.reduce((acc, rate) => acc + Number(rate.base_price || 0), 0);\n    const highestMinNights = nightlyMatches.reduce((acc, rate) => Math.max(acc, Number(rate.min_nights || 1)), 1);\n    const seasons = Array.from(new Set(nightlyMatches.map((rate) => String(rate.season_name || '').trim()).filter(Boolean))).join(', ');\n    const extraAdult = Math.max(...nightlyMatches.map((rate) => Number(rate.extra_adult_price || 0)), 0);\n    const child611 = Math.max(...nightlyMatches.map((rate) => Number(rate.child_price_6_11 || 0)), 0);\n    const child05 = Math.max(...nightlyMatches.map((rate) => Number(rate.child_price_0_5 || 0)), 0);\n\n    if (nights < highestMinNights) {\n      lines.push(`- ${roomType}: ${seasons || 'temporada cadastrada'} exige minimo de ${highestMinNights} diarias. A consulta recebida tem ${nights} diaria(s). Valor base por diaria neste periodo: ${formatCurrency(nightlyMatches[0].base_price)}.`);\n      continue;\n    }\n\n    lines.push(`- ${roomType}: ${nights} diaria(s) de ${formatDate(checkIn)} a ${formatDate(checkOut)} | total base ${formatCurrency(total)} | temporadas aplicadas: ${seasons || 'regular'} | adicional adulto ${formatCurrency(extraAdult)} | crianca 6-11 ${formatCurrency(child611)} | crianca 0-5 ${formatCurrency(child05)}.`);\n  }\n\n  rateContext = `COTACAO DINAMICA PARA O PERIODO ${formatDate(checkIn)} a ${formatDate(checkOut)} (${nights} diaria(s)):\\n${lines.join('\\n')}`;\n}\n\nreturn [{\n  json: {\n    rateContext,\n    parsedCheckIn: checkIn ? formatDate(checkIn) : null,\n    parsedCheckOut: checkOut ? formatDate(checkOut) : null,\n    requestedRoomType,\n    totalRateRows: rates.length,\n  },\n}];"
+      },
+      "id": "556f2c82-4a4f-4b06-bf06-a97f9b0f8e7d",
+      "name": "Consolidar Tarifas Aura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2280,
+        -180
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 4: calcula o contexto de tarifas por periodo a partir da tabela room_rates antes da Aura cotar."
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "text": "={{ $('Mensagem Interpretada').first().json.messageText }}",
         "options": {
-          "systemMessage": "={{ `Voc\\u00ea \\u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\\u00e3o \\u00e9 atender h\\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\\n\\nDIRETRIZES DE ATENDIMENTO:\\n1. Seja cordial, profissional e use um tom acolhedor.\\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\\n3. N\\u00e3o d\\u00ea pre\\u00e7os gen\\u00e9ricos; pe\\u00e7a datas para consultar disponibilidade e melhor oferta.\\n4. Responda de forma curta e natural para WhatsApp.\\n5. Se perceber mudan\\u00e7a de est\\u00e1gio comercial, use a ferramenta update_kanban_stage.\\n6. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\\n7. Use a BASE OPERACIONAL DINAMICA abaixo como fonte primaria para Wi-Fi, check-in, check-out, pets, cafe da manha e regras internas.\\n8. Se um valor estiver como \\\"Nao cadastrado\\\" ou \\\"Nao cadastrada\\\", diga que a equipe ainda precisa atualizar essa informacao no sistema e nao invente detalhes.\\n\\nBASE OPERACIONAL DINAMICA:\\n${$('Consolidar Regras Aura').first().json.knowledgeContext || 'Nenhuma regra operacional cadastrada.'}\\n\\nETAPAS DISPONIVEIS:\\n- Novo Lead\\n- Cota\\u00e7\\u00e3o Enviada\\n- Aguardando Pagamento\\n- Reserva Confirmada\\n- Check-in\\n- Check-out/P\\u00f3s-venda\\n- Perdido/Cancelado\\n\\nSempre que atualizar a etapa, forne\\u00e7a um breve resumo_solicitacao objetivo.\\n\\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\\u00e7\\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\\u00f3s-venda, Perdido/Cancelado.` }}"
+          "systemMessage": "={{ `Voc\\u00ea \\u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\\u00e3o \\u00e9 atender h\\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\\n\\nDIRETRIZES DE ATENDIMENTO:\\n1. Seja cordial, profissional e use um tom acolhedor.\\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\\n3. N\\u00e3o confirme disponibilidade real; isso ainda depende de consulta externa futura.\\n4. Use apenas valores presentes na BASE DE TARIFAS DINAMICA abaixo. Se as datas nao estiverem claras, pe\\u00e7a check-in e check-out.\\n5. Se a BASE DE TARIFAS DINAMICA indicar minimo de diarias, explique essa regra em vez de inventar um total fora da politica.\\n6. Responda de forma curta e natural para WhatsApp.\\n7. Se perceber mudan\\u00e7a de est\\u00e1gio comercial, use a ferramenta update_kanban_stage.\\n8. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\\n9. Use a BASE OPERACIONAL DINAMICA abaixo como fonte primaria para Wi-Fi, check-in, check-out, pets, cafe da manha e regras internas.\\n10. Se um valor estiver como \\\"Nao cadastrado\\\" ou \\\"Nao cadastrada\\\", diga que a equipe ainda precisa atualizar essa informacao no sistema e nao invente detalhes.\\n\\nBASE OPERACIONAL DINAMICA:\\n${$('Consolidar Regras Aura').first().json.knowledgeContext || 'Nenhuma regra operacional cadastrada.'}\\n\\nBASE DE TARIFAS DINAMICA:\\n${$('Consolidar Tarifas Aura').first().json.rateContext || 'Nenhuma tarifa cadastrada.'}\\n\\nETAPAS DISPONIVEIS:\\n- Novo Lead\\n- Cota\\u00e7\\u00e3o Enviada\\n- Aguardando Pagamento\\n- Reserva Confirmada\\n- Check-in\\n- Check-out/P\\u00f3s-venda\\n- Perdido/Cancelado\\n\\nSempre que atualizar a etapa, forne\\u00e7a um breve resumo_solicitacao objetivo.\\n\\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\\u00e7\\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\\u00f3s-venda, Perdido/Cancelado.` }}"
         }
       },
       "id": "82d1f283-7f59-481d-ac6a-c90817d1c32e",
@@ -1246,6 +1293,28 @@
       ]
     },
     "Consolidar Regras Aura": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Room Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Room Rates": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Tarifas Aura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar Tarifas Aura": {
       "main": [
         [
           {

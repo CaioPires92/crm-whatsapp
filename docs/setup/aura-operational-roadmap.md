@@ -232,16 +232,16 @@ Implementar:
 - resumo de tarifas para a Aura ou para um passo de cotacao
 
 Concluido:
-- [ ] schema criado
-- [ ] tarifas cadastradas
-- [ ] workflow buscando faixa correta
-- [ ] resposta usando tarifa certa
+- [x] schema criado
+- [x] tarifas cadastradas
+- [x] workflow buscando faixa correta
+- [x] resposta usando tarifa certa
 
 Teste minimo:
-- [ ] consulta fora de feriado
-- [ ] consulta em feriado
-- [ ] consulta com minimo de diarias
-- [ ] alteracao de tarifa no banco reflete sem editar prompt
+- [x] consulta fora de feriado
+- [x] consulta em feriado
+- [x] consulta com minimo de diarias
+- [x] alteracao de tarifa no banco reflete sem editar prompt
 
 Gate para seguir:
 - so seguir quando a fonte oficial de valores deixar de ser texto fixo

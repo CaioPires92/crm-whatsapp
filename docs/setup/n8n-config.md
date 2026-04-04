@@ -100,3 +100,26 @@ Comportamento:
 - a Aura usa essas regras como fonte primaria para perguntas operacionais
 - se um valor estiver como `Nao cadastrado` ou `Nao cadastrada`, a Aura nao inventa a resposta
 - alterar um valor em `assistant_rules` muda a proxima resposta sem editar o workflow
+
+6. Base Editavel de Tarifas (Fase 4)
+O workflow oficial agora consulta a tabela `room_rates` antes da Aura cotar.
+
+Campos principais:
+- `room_type`
+- `season_name`
+- `date_from`
+- `date_to`
+- `days_of_week`
+- `base_price`
+- `min_nights`
+- `priority`
+- `extra_adult_price`
+- `child_price_6_11`
+- `child_price_0_5`
+- `active`
+
+Comportamento:
+- a Aura calcula cotacoes a partir das tarifas do banco
+- periodos especiais com prioridade maior sobrepoem tarifa regular
+- se o periodo tiver minimo de diarias, a Aura informa a regra em vez de inventar total invalido
+- alterar um valor em `room_rates` muda a proxima cotacao sem editar o workflow

@@ -7,13 +7,13 @@
         "path": "evolution-webhook",
         "options": {}
       },
-      "id": "webhook-1",
+      "id": "c1ea2acb-8804-4b51-b652-32fe49c5cae0",
       "name": "Webhook Evolution",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        220,
-        320
+        -3040,
+        0
       ],
       "webhookId": "hotel-crm-evolution-webhook",
       "notesInFlow": true,
@@ -79,7 +79,7 @@
             },
             {
               "id": "filter-text",
-              "leftValue": "={{ !!($json.body?.data?.message?.conversation || $json.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || $json.data?.message?.extendedTextMessage?.text || $json.body?.data?.message?.imageMessage?.caption || $json.data?.message?.imageMessage?.caption) }}",
+              "leftValue": "={{ !!($json.body?.data?.message?.conversation || $json.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || $json.data?.message?.extendedTextMessage?.text || $json.body?.data?.message?.imageMessage || $json.data?.message?.imageMessage || $json.body?.data?.message?.audioMessage || $json.data?.message?.audioMessage || $json.body?.data?.base64 || $json.data?.base64 || $json.body?.data?.message?.base64 || $json.data?.message?.base64) }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -92,16 +92,16 @@
         },
         "options": {}
       },
-      "id": "message-filter",
+      "id": "390bef07-0681-45f8-9f4b-ec77b0068d17",
       "name": "Filtro Entrada WhatsApp",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.1,
       "position": [
-        440,
-        320
+        -2760,
+        0
       ],
       "notesInFlow": true,
-      "notes": "ADICIONADO: ignora grupos, newsletter, status e mensagens enviadas pela propria instância."
+      "notes": "ADICIONADO: ignora grupos, newsletter, status e mensagens enviadas pela propria inst\u00e2ncia."
     },
     {
       "parameters": {
@@ -135,41 +135,31 @@
         },
         "options": {}
       },
-      "id": "normalize-lead",
+      "id": "4b4a6c6b-73c5-4c6c-91a4-98d4232ab6b0",
       "name": "Normalizar Lead",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        660,
-        320
+        -2480,
+        0
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: padroniza remoteJid, numero sem sufixo e nome do lead para o restante do fluxo."
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "message-text",
-              "name": "messageText",
-              "value": "={{ $json.body?.data?.message?.conversation || $json.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || $json.data?.message?.extendedTextMessage?.text || $json.body?.data?.message?.imageMessage?.caption || $json.data?.message?.imageMessage?.caption || '' }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "const webhookItem = $('Webhook Evolution').first();\nif (!webhookItem) {\n  throw new Error('Normalizar Mensagem: payload do webhook ausente');\n}\n\nconst source = webhookItem.json.body ?? webhookItem.json;\nconst data = source.data ?? {};\nconst message = data.message ?? {};\nconst imageMessage = message.imageMessage ?? {};\nconst audioMessage = message.audioMessage ?? {};\n\nconst rawText = String(\n  message.conversation ||\n  message.extendedTextMessage?.text ||\n  imageMessage.caption ||\n  ''\n).trim();\n\nconst hasImage = imageMessage && Object.keys(imageMessage).length > 0;\nconst hasAudio = audioMessage && Object.keys(audioMessage).length > 0;\nconst messageType = hasImage ? 'image' : hasAudio ? 'audio' : 'text';\n\nconst rawBase64 = String(\n  data.base64 ||\n  source.base64 ||\n  message.base64 ||\n  imageMessage.base64 ||\n  audioMessage.base64 ||\n  ''\n).trim();\nconst mediaBase64 = rawBase64.replace(/^data:[^;]+;base64,/, '');\nconst mimeType = String(imageMessage.mimetype || audioMessage.mimetype || data.mimetype || '').trim();\nconst messageId = String(data.key?.id || '').trim();\nconst minBase64Length = messageType === 'image' ? 500 : 100;\nconst canAnalyzeMedia = Boolean((messageType === 'image' || messageType === 'audio') && mediaBase64 && mimeType && mediaBase64.length >= minBase64Length);\n\nconst extensionFromMime = (type) => {\n  const normalized = String(type || '').toLowerCase();\n  if (!normalized) return 'bin';\n  if (normalized.includes('jpeg')) return 'jpg';\n  if (normalized.includes('png')) return 'png';\n  if (normalized.includes('webp')) return 'webp';\n  if (normalized.includes('ogg')) return 'ogg';\n  if (normalized.includes('mpeg')) return 'mp3';\n  if (normalized.includes('mp4')) return 'mp4';\n  const raw = normalized.split('/')[1] || 'bin';\n  return raw.split(';')[0].split(',')[0].trim() || 'bin';\n};\n\nlet fallbackText = rawText;\nif (!fallbackText) {\n  if (messageType === 'image') {\n    fallbackText = 'O cliente enviou uma imagem.';\n  } else if (messageType === 'audio') {\n    fallbackText = 'O cliente enviou um audio.';\n  }\n}\n\nconst item = {\n  json: {\n    messageType,\n    rawText,\n    fallbackText,\n    mimeType,\n    messageId,\n    canAnalyzeMedia,\n  },\n};\n\nif (canAnalyzeMedia) {\n  const extension = extensionFromMime(mimeType);\n  item.binary = {\n    data: {\n      data: mediaBase64,\n      mimeType,\n      fileExtension: extension,\n      fileName: `${messageType}-${messageId || Date.now()}.${extension}`,\n    },\n  };\n}\n\nreturn [item];"
       },
-      "id": "normalize-message",
+      "id": "760f9e93-03d6-4794-af4f-e332ee25029f",
       "name": "Normalizar Mensagem",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        880,
-        320
+        -2200,
+        0
       ],
       "notesInFlow": true,
-      "notes": "ADICIONADO: extrai o texto da mensagem para o agente ler sempre do mesmo campo."
+      "notes": "AJUSTADO: detecta texto, imagem e audio; prepara binario da midia quando o webhook da Evolution chegar com base64."
     },
     {
       "parameters": {
@@ -184,16 +174,22 @@
           ]
         }
       },
-      "id": "supabase-get",
+      "id": "b748a550-ca46-4c34-8f64-0fd226a8c459",
       "name": "Supabase - Get Lead Stage",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1320,
-        320
+        -520,
+        0
       ],
       "alwaysOutputData": true,
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "AJUSTADO: usa o formato atual do node Supabase (tableId, keyName, keyValue)."
     },
     {
@@ -208,11 +204,11 @@
           "conditions": [
             {
               "id": "lead-exists",
-              "leftValue": "={{ $json.id || $json.lead_id }}",
+              "leftValue": "={{ !!$json.id }}",
               "rightValue": "",
               "operator": {
-                "type": "string",
-                "operation": "exists",
+                "type": "boolean",
+                "operation": "true",
                 "singleValue": true
               }
             }
@@ -221,13 +217,13 @@
         },
         "options": {}
       },
-      "id": "if-lead-exists",
+      "id": "5c9aee05-8530-41eb-bf99-aa84e67423cd",
       "name": "Lead Existe?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        1540,
-        320
+        -240,
+        0
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: se o card nao existir, cria um registro inicial no Kanban antes de conversar."
@@ -260,29 +256,32 @@
           ]
         }
       },
-      "id": "supabase-create",
+      "id": "4b59498a-fdeb-4e51-8d4c-2f0a09a4527c",
       "name": "Supabase - Create Lead",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1760,
-        320
+        -240,
+        180
       ],
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "AJUSTADO AO BANCO REAL: cria o card inicial em kanban_cards com lead_id, hospede_nome, etapa, resumo_solicitacao e ultima_interacao."
     },
     {
-      "parameters": {
-        "mode": "append",
-        "numberInputs": 2
-      },
-      "id": "merge-lead",
+      "parameters": {},
+      "id": "8f0f7ad0-e69b-4c27-abf2-913027d74eb7",
       "name": "Merge Lead",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        2200,
-        320
+        40,
+        0
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: junta o caminho do lead existente com o caminho do lead-criado e segue para a IA."
@@ -290,39 +289,21 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $('Normalizar Mensagem').item.json.messageText }}",
+        "text": "={{ $('Mensagem Interpretada').item.json.messageText }}",
         "options": {
-          "systemMessage": "Você é a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua missão é atender hóspedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. Não dê preços genéricos; peça datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudança de estágio comercial, use a ferramenta update_kanban_stage.\n\nETAPAS DISPONÍVEIS:\n- Novo Lead\n- Cotação Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/Pós-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forneça um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cotação Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/Pós-venda, Perdido/Cancelado."
+          "systemMessage": "Voc\u00ea \u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\u00e3o \u00e9 atender h\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. N\u00e3o d\u00ea pre\u00e7os gen\u00e9ricos; pe\u00e7a datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudan\u00e7a de est\u00e1gio comercial, use a ferramenta update_kanban_stage.\n\nETAPAS DISPON\u00cdVEIS:\n- Novo Lead\n- Cota\u00e7\u00e3o Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/P\u00f3s-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forne\u00e7a um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\u00e7\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\u00f3s-venda, Perdido/Cancelado."
         }
       },
-      "id": "ai-agent",
+      "id": "82d1f283-7f59-481d-ac6a-c90817d1c32e",
       "name": "AI Agent Aura",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2420,
-        340
+        360,
+        0
       ],
       "notesInFlow": true,
-      "notes": "AJUSTADO: agora le o texto normalizado da Evolution e segue para resposta no WhatsApp."
-    },
-    {
-      "parameters": {
-        "model": "gpt-4.1-mini",
-        "options": {
-          "temperature": 0.4
-        }
-      },
-      "id": "openai-chat-model",
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1,
-      "position": [
-        2260,
-        540
-      ],
-      "notesInFlow": true,
-      "notes": "ADICIONADO: modelo de chat do agente."
+      "notes": "AJUSTADO: agora le texto normalizado, descricao de imagem ou transcricao de audio antes de responder no WhatsApp."
     },
     {
       "parameters": {
@@ -330,31 +311,31 @@
         "sessionKey": "={{ $('Normalizar Lead').item.json.remoteJid }}",
         "contextWindowLength": 10
       },
-      "id": "memory-window",
+      "id": "a173408c-13c3-4a05-9408-1c288b0baf41",
       "name": "Window Buffer Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        2560,
-        540
+        520,
+        220
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: memoria por remoteJid para manter contexto por hospede."
     },
     {
       "parameters": {
-        "description": "Atualiza a etapa do hóspede no Kanban e salva o resumo da solicitação. Use esta ferramenta sempre que houver mudança de etapa no funil.",
+        "description": "Atualiza a etapa do h\u00f3spede no Kanban e salva o resumo da solicita\u00e7\u00e3o. Use esta ferramenta sempre que houver mudan\u00e7a de etapa no funil.",
+        "jsCode": "const input = typeof $input.item.json === 'object' && $input.item.json !== null ? $input.item.json : {};\nconst new_stage = input.new_stage || 'Novo Lead';\nconst summary = input.summary || 'Lead sem resumo informado';\n\nreturn [{\n  json: {\n    new_stage,\n    summary,\n    lead_id: $('Normalizar Lead').first().json.remoteJid,\n    ultima_interacao: new Date().toISOString()\n  }\n}];",
         "specifyInputSchema": true,
-        "jsonSchemaExample": "{\n  \"new_stage\": \"Cotação Enviada\",\n  \"summary\": \"Casal, 3 diarias, quarto luxo, 12 a 15 de julho\"\n}",
-        "jsCode": "const input = typeof $input.item.json === 'object' && $input.item.json !== null ? $input.item.json : {};\nconst new_stage = input.new_stage || 'Novo Lead';\nconst summary = input.summary || 'Lead sem resumo informado';\n\nreturn [{\n  json: {\n    new_stage,\n    summary,\n    lead_id: $('Normalizar Lead').first().json.remoteJid,\n    ultima_interacao: new Date().toISOString()\n  }\n}];"
+        "jsonSchemaExample": "{\n  \"new_stage\": \"Cota\u00e7\u00e3o Enviada\",\n  \"summary\": \"Casal, 3 diarias, quarto luxo, 12 a 15 de julho\"\n}"
       },
-      "id": "tool-update",
+      "id": "593a26a8-392a-422a-9038-bd7f346c9fe1",
       "name": "update_kanban_stage",
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        2420,
-        180
+        360,
+        -220
       ],
       "notesInFlow": true,
       "notes": "AJUSTADO: tool do agente com etapas compativeis com o enum do kanban e saida main para atualizar o card."
@@ -392,15 +373,21 @@
           ]
         }
       },
-      "id": "supabase-update",
+      "id": "4c0d2699-eeff-4466-9592-5493d6386108",
       "name": "Supabase - Update Kanban",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2620,
-        180
+        640,
+        -220
       ],
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "AJUSTADO AO BANCO REAL: atualiza hospede_nome, etapa, resumo_solicitacao e ultima_interacao em kanban_cards filtrando por lead_id."
     },
     {
@@ -412,8 +399,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2820,
-        500
+        960,
+        0
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: monta e valida instanceName, number e text antes do envio para a Evolution. Se falhar aqui, o payload de entrada do teste esta incompleto ou invalido."
@@ -436,13 +423,13 @@
         "jsonBody": "={{ { number: $json.number, text: $json.text } }}",
         "options": {}
       },
-      "id": "http-reply",
+      "id": "b7e75ed9-2475-4272-82af-b5858ddd2622",
       "name": "HTTP Request - Send WhatsApp Reply",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2820,
-        340
+        1240,
+        0
       ],
       "notesInFlow": true,
       "notes": "AJUSTADO: envia para a Evolution o numero sem o sufixo @s.whatsapp.net, que e o formato mais seguro para sendText. Execute o fluxo completo; evitar testar este node isoladamente com dados ficticios."
@@ -458,7 +445,7 @@
             },
             {
               "fieldId": "message",
-              "fieldValue": "={{ { role: 'user', content: $('Normalizar Mensagem').item.json.messageText, pushName: $('Normalizar Lead').item.json.pushName } }}"
+              "fieldValue": "={{ { role: 'user', content: $('Mensagem Interpretada').item.json.messageText, pushName: $('Normalizar Lead').item.json.pushName, messageType: $('Mensagem Interpretada').item.json.messageType } }}"
             },
             {
               "fieldId": "hora_data_mensagem",
@@ -467,15 +454,21 @@
           ]
         }
       },
-      "id": "supabase-save-user-history",
+      "id": "6b4bdafb-1648-4cef-b55a-f18a2a803583",
       "name": "Supabase - Save User History",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1100,
-        500
+        -800,
+        0
       ],
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "ADICIONADO: salva a mensagem recebida na tabela n8n_chat_histories."
     },
     {
@@ -494,15 +487,21 @@
           ]
         }
       },
-      "id": "supabase-create-lead-master",
+      "id": "cdeb4e58-1ebf-4d9b-b669-420f8401ad9b",
       "name": "Supabase - Create Lead Master",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1980,
-        320
+        40,
+        180
       ],
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "ADICIONADO: sincroniza a tabela Leads quando um novo contato entra no funil."
     },
     {
@@ -525,16 +524,334 @@
           ]
         }
       },
-      "id": "supabase-save-assistant-history",
+      "id": "1aa5917c-208f-448a-a934-729fe5343511",
       "name": "Supabase - Save Assistant History",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2620,
-        500
+        680,
+        0
       ],
       "notesInFlow": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
       "notes": "ADICIONADO: salva a resposta da Aura em n8n_chat_histories antes do envio ao WhatsApp."
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        220
+      ],
+      "id": "734af457-7a93-4773-b7f0-7e84155d4530",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "diFMALZF6UJa35nv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Entrada WhatsApp\nWebhook e filtros basicos para aceitar apenas eventos validos do atendimento.",
+        "height": 280,
+        "width": 820,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3160,
+        -180
+      ],
+      "id": "02334010-40cd-4847-9852-15bcce2b3fd4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Normalizacao\nPadroniza lead, texto e tipo da mensagem antes de qualquer decisao do fluxo.",
+        "height": 280,
+        "width": 520,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2320,
+        -180
+      ],
+      "id": "0fd99020-537e-4d3e-a91e-1a62020da18c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Interpretacao de Conteudo\nImagem e audio passam por um branch proprio. Quando a midia nao puder ser analisada, o fluxo cai no fallback textual.",
+        "height": 660,
+        "width": 1040,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2040,
+        40
+      ],
+      "id": "d822db1c-452e-4588-b07b-5f9813aa739d",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## CRM e Historico\nSalva a mensagem, identifica ou cria o lead e prepara o contexto comercial para a Aura.",
+        "height": 460,
+        "width": 1040,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        -180
+      ],
+      "id": "c6c470eb-3598-4eea-8d02-afc5c316f70d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Agente Comercial\nA Aura responde com memoria, usa Gemini como modelo e pode mover o card no Kanban pela tool.",
+        "height": 620,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -300
+      ],
+      "id": "0e10c054-1146-4c16-95d4-68dfd6777354",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Resposta ao Cliente\nSalva a resposta da Aura, valida o payload final e envia a mensagem para a Evolution.",
+        "height": 280,
+        "width": 520,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -180
+      ],
+      "id": "97481dca-355e-4c37-91bc-2f02c6c5b12d",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "message-is-image",
+              "leftValue": "={{ $json.messageType === 'image' && $json.canAnalyzeMedia === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-message-image",
+      "name": "Mensagem E Imagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -1920,
+        150
+      ],
+      "notesInFlow": true,
+      "notes": "Roteia para interpretacao multimodal quando a mensagem recebida for imagem com base64 disponivel."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "message-is-audio",
+              "leftValue": "={{ $json.messageType === 'audio' && $json.canAnalyzeMedia === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-message-audio",
+      "name": "Mensagem E Audio?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        -1920,
+        330
+      ],
+      "notesInFlow": true,
+      "notes": "Roteia para transcricao quando a mensagem recebida for audio com base64 disponivel."
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash"
+        },
+        "text": "={{ $json.rawText ? 'Descreva e interprete esta imagem para atendimento hoteleiro. Considere a legenda do cliente: ' + $json.rawText : 'Descreva e interprete esta imagem para atendimento hoteleiro. Extraia qualquer texto visivel e explique o que o hospede quer comunicar.' }}",
+        "inputType": "binary",
+        "binaryPropertyName": "data",
+        "simplify": true,
+        "options": {
+          "maxOutputTokens": 300
+        }
+      },
+      "id": "gemini-image-analyze",
+      "name": "Google Gemini - Analyze Image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1640,
+        150
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "diFMALZF6UJa35nv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "Analisa imagens recebidas no WhatsApp usando o mesmo provedor Gemini ja configurado no n8n."
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "binaryPropertyName": "data",
+        "simplify": true,
+        "options": {}
+      },
+      "id": "gemini-audio-transcribe",
+      "name": "Google Gemini - Transcribe Audio",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1640,
+        330
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "diFMALZF6UJa35nv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "Transcreve audios recebidos no WhatsApp antes de enviar o contexto para a Aura."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $('Normalizar Mensagem').first().json;\nconst messageText = String(msg.fallbackText || '').trim();\nif (!messageText) {\n  throw new Error('Preparar Texto Original: mensagem vazia');\n}\nreturn [{ json: { ...msg, messageText } }];"
+      },
+      "id": "prepare-text-original",
+      "name": "Preparar Texto Original",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1640,
+        510
+      ],
+      "notesInFlow": true,
+      "notes": "Mantem texto puro e tambem gera fallback limpo quando chegar midia sem base64 analisavel."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $('Normalizar Mensagem').first().json;\nconst analysis = String((($json.content?.parts) || []).map((part) => part.text).filter(Boolean).join('\\n')).trim();\nconst caption = String(msg.rawText || '').trim();\nconst interpretation = analysis || 'Imagem recebida, mas a analise retornou vazia.';\nconst messageText = caption\n  ? `O cliente enviou uma imagem com legenda: \"${caption}\". Interpretacao da imagem: ${interpretation}`\n  : `O cliente enviou uma imagem. Interpretacao da imagem: ${interpretation}`;\nreturn [{ json: { ...msg, messageText } }];"
+      },
+      "id": "prepare-text-image",
+      "name": "Preparar Texto da Imagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        150
+      ],
+      "notesInFlow": true,
+      "notes": "Transforma a analise multimodal da imagem em texto que a Aura consegue usar no atendimento."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $('Normalizar Mensagem').first().json;\nconst transcript = String((($json.content?.parts) || []).map((part) => part.text).filter(Boolean).join('\\n')).trim();\nconst finalTranscript = transcript || 'Audio recebido, mas a transcricao retornou vazia.';\nconst messageText = `O cliente enviou um audio. Transcricao: ${finalTranscript}`;\nreturn [{ json: { ...msg, messageText } }];"
+      },
+      "id": "prepare-text-audio",
+      "name": "Preparar Texto do Audio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        330
+      ],
+      "notesInFlow": true,
+      "notes": "Transforma a transcricao do audio em texto unico para historico, IA e CRM."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json } }));"
+      },
+      "id": "interpreted-message",
+      "name": "Mensagem Interpretada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1080,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Ponto unico do fluxo apos a interpretacao de texto, imagem ou audio."
     }
   ],
   "connections": {
@@ -575,7 +892,7 @@
       "main": [
         [
           {
-            "node": "Supabase - Save User History",
+            "node": "Mensagem E Imagem?",
             "type": "main",
             "index": 0
           }
@@ -633,17 +950,6 @@
         ]
       ]
     },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent Aura",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Window Buffer Memory": {
       "ai_memory": [
         [
@@ -661,15 +967,6 @@
           {
             "node": "AI Agent Aura",
             "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ],
-      "main": [
-        [
-          {
-            "node": "Supabase - Update Kanban",
-            "type": "main",
             "index": 0
           }
         ]
@@ -729,16 +1026,131 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem E Imagem?": {
+      "main": [
+        [
+          {
+            "node": "Google Gemini - Analyze Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem E Audio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem E Audio?": {
+      "main": [
+        [
+          {
+            "node": "Google Gemini - Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar Texto Original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini - Analyze Image": {
+      "main": [
+        [
+          {
+            "node": "Preparar Texto da Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini - Transcribe Audio": {
+      "main": [
+        [
+          {
+            "node": "Preparar Texto do Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Texto Original": {
+      "main": [
+        [
+          {
+            "node": "Mensagem Interpretada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Texto da Imagem": {
+      "main": [
+        [
+          {
+            "node": "Mensagem Interpretada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Texto do Audio": {
+      "main": [
+        [
+          {
+            "node": "Mensagem Interpretada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem Interpretada": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save User History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "pinData": {},
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
-  "versionId": "hotel-crm-kanban-v6",
+  "versionId": "hotel-crm-kanban-v7",
   "meta": {
-    "templateCredsSetupCompleted": false
+    "templateCredsSetupCompleted": true
   },
   "tags": []
 }

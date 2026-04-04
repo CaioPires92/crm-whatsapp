@@ -25,7 +25,6 @@ interface ChatAreaProps {
   lead?: {
     lead_nome: string;
     lead_id: string;
-    chatbot_ativo?: boolean;
     id: number;
     remote_jid?: string;
     avatar_url?: string | null;
@@ -286,10 +285,10 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                 : "bg-amber-500/10 border-amber-500/20 text-amber-400"
             )}
-            title={isChatbotAtivo ? "IA global ativada" : "IA global pausada"}
+            title={isChatbotAtivo ? "Piloto automatico ativo" : "Modo manual ativo"}
           >
             {isChatbotAtivo ? <Bot className="w-3.5 h-3.5" /> : <BotOff className="w-3.5 h-3.5" />}
-            {isChatbotAtivo ? "IA Global Ativa" : "IA Global Pausada"}
+            {isChatbotAtivo ? "Piloto Automatico" : "Modo Manual"}
           </div>
         </div>
       </div>

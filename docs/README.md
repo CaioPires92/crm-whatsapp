@@ -14,3 +14,5 @@ Current key files:
 - `architecture/overview.md`
 - `setup/crm-kit-replicacao.md`
 - `setup/n8n-config.md`
+- `setup/aura-operational-roadmap.md`
+- `setup/assistant-settings-migration-20260404.sql`

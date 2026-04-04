@@ -10,102 +10,102 @@ interface Lead {
   lead_id: string;
   created_at: string;
   labels?: any[];
-  chatbot_ativo?: boolean;
   remote_jid?: string;
   last_message_at?: string | null;
   avatar_url?: string | null;
 }
 
+type AssistantMode = 'auto' | 'manual' | 'hybrid';
+
 export default function Contatos() {
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
-  const [globalAiEnabled, setGlobalAiEnabled] = useState(true);
-  const [loadingGlobalAi, setLoadingGlobalAi] = useState(true);
-  const [updatingGlobalAi, setUpdatingGlobalAi] = useState(false);
+  const [assistantMode, setAssistantMode] = useState<AssistantMode>('auto');
+  const [assistantEnabled, setAssistantEnabled] = useState(true);
+  const [loadingAssistantMode, setLoadingAssistantMode] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
-    async function loadGlobalAiState() {
+    async function loadAssistantState() {
       const { data, error } = await supabase
-        .from('Leads')
-        .select('id, chatbot_ativo')
-        .limit(1000);
+        .from('assistant_settings')
+        .select('mode, assistant_enabled')
+        .eq('id', 1)
+        .maybeSingle();
 
       if (error) {
-        console.error('Erro ao carregar status global da IA:', error);
+        console.error('Erro ao carregar status da Aura:', error);
         if (mounted) {
-          setLoadingGlobalAi(false);
+          setLoadingAssistantMode(false);
         }
         return;
       }
 
       if (mounted) {
-        const rows = data || [];
-        const enabled = rows.some((lead) => lead.chatbot_ativo !== false);
-        setGlobalAiEnabled(enabled);
-        setLoadingGlobalAi(false);
+        setAssistantMode((data?.mode as AssistantMode) || 'auto');
+        setAssistantEnabled(data?.assistant_enabled !== false);
+        setLoadingAssistantMode(false);
       }
     }
 
-    loadGlobalAiState();
+    loadAssistantState();
+
+    const channel = supabase
+      .channel('assistant-settings-chat-view')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'assistant_settings' },
+        (payload) => {
+          const row = payload.new as { mode?: AssistantMode; assistant_enabled?: boolean } | undefined;
+          if (!mounted || !row) {
+            return;
+          }
+
+          setAssistantMode(row.mode || 'auto');
+          setAssistantEnabled(row.assistant_enabled !== false);
+          setLoadingAssistantMode(false);
+        }
+      )
+      .subscribe();
 
     return () => {
       mounted = false;
+      supabase.removeChannel(channel);
     };
   }, []);
 
-  async function toggleGlobalAi() {
-    const newValue = !globalAiEnabled;
-    setUpdatingGlobalAi(true);
-
-    const { error } = await supabase
-      .from('Leads')
-      .update({ chatbot_ativo: newValue })
-      .not('id', 'is', null);
-
-    if (error) {
-      console.error('Erro ao atualizar IA global:', error);
-    } else {
-      setGlobalAiEnabled(newValue);
-      setSelectedLead((current) => (current ? { ...current, chatbot_ativo: newValue } : current));
-    }
-
-    setUpdatingGlobalAi(false);
-  }
+  const isAutoReplyActive = assistantEnabled && assistantMode === 'auto';
 
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex items-center justify-between border-b border-[#1f1f1f] bg-[#0a0a0a] px-6 py-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Automacao</p>
-          <h1 className="mt-1 text-lg font-semibold text-white">Controle global da IA</h1>
+          <h1 className="mt-1 text-lg font-semibold text-white">Status operacional da Aura</h1>
         </div>
 
-        <button
-          type="button"
-          onClick={toggleGlobalAi}
-          disabled={loadingGlobalAi || updatingGlobalAi}
+        <div
           className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
-            globalAiEnabled
+            isAutoReplyActive
               ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15'
               : 'border-amber-500/20 bg-amber-500/10 text-amber-200 hover:bg-amber-500/15'
           }`}
         >
-          {loadingGlobalAi || updatingGlobalAi ? (
+          {loadingAssistantMode ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
-          ) : globalAiEnabled ? (
+          ) : isAutoReplyActive ? (
             <Bot className="h-4 w-4" />
           ) : (
             <BotOff className="h-4 w-4" />
           )}
-          {loadingGlobalAi
+          {loadingAssistantMode
             ? 'Carregando status...'
-            : updatingGlobalAi
-              ? 'Atualizando...'
-              : globalAiEnabled
-                ? 'Desligar IA global'
-                : 'Ligar IA global'}
-        </button>
+            : isAutoReplyActive
+              ? 'Piloto automatico ativo'
+              : assistantEnabled
+                ? 'Modo manual ativo'
+                : 'Aura desabilitada'}
+        </div>
       </div>
 
       <div className="flex h-full w-full min-h-0">
@@ -113,7 +113,7 @@ export default function Contatos() {
         onSelectLead={setSelectedLead} 
         selectedLeadId={selectedLead?.lead_id} 
       />
-      <ChatArea lead={selectedLead} globalAiEnabled={globalAiEnabled} />
+      <ChatArea lead={selectedLead} globalAiEnabled={isAutoReplyActive} />
       </div>
     </div>
   );

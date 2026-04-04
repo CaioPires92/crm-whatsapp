@@ -58,6 +58,75 @@ Ja existem ou foram preparados:
 - `hospedin_settings`
 - `hospedin_room_mappings`
 
+## Auditoria Segura - Snapshot de 04/04/2026
+
+Escopo:
+- branch dedicada `refactor/safe-audit`
+- auditoria com foco em estabilidade
+- sem alteracao do fluxo principal durante ETAPA 1 a ETAPA 4
+
+ETAPA 1 - mapeamento concluido:
+- fluxo principal mapeado ponta a ponta entre Evolution, n8n e Supabase
+- tabelas criticas confirmadas: `Leads`, `kanban_cards`, `n8n_chat_histories`, `assistant_settings`, `assistant_rules`, `room_rates`, `hospedin_settings`, `hospedin_room_mappings`
+- webhook oficial confirmado: `POST /webhook/evolution-webhook`
+
+ETAPA 2 - funcionalidade validada:
+- mensagem de primeiro contato criou lead, card e historico corretamente
+- segunda mensagem sensivel reutilizou o mesmo lead
+- handoff humano moveu o card para `Aguardando Humano`
+- nao houve duplicidade no lead nem no card
+- o fluxo principal ativo executou com status `success` no n8n
+
+ETAPA 3 - problemas detectados:
+- critico: o frontend expoe `VITE_EVOLUTION_API_KEY` no navegador e faz chamadas diretas para a Evolution
+- critico: workflows legados arquivados continham segredos e URLs reais versionados
+- medio: o script `npm run lint` existe, mas `eslint` nao esta instalado e nao ha configuracao de lint no repositorio
+- medio: a integracao da Hospedin segue dependente de credenciais e disponibilidade externa, ainda sem validacao ponta a ponta por manutencao da API
+- baixo: o build passa, mas o bundle principal do frontend ficou acima de 500 kB minificado
+
+ETAPA 4 - plano de refatoracao:
+- mudancas seguras:
+  - sanitizar segredos dos workflows legados arquivados
+  - registrar o snapshot da auditoria neste documento
+- mudancas com risco que exigem validacao antes de implementar:
+  - remover a chamada direta do frontend para a Evolution e mover o envio/leitura para backend seguro
+  - introduzir lint de verdade com dependencia e configuracao
+  - alterar a arquitetura de consulta da Hospedin
+
+ETAPA 5 - refatoracao controlada aplicada:
+- segredos dos workflows legados arquivados foram substituidos por placeholders
+- nenhum node do workflow principal foi alterado
+- build de producao continuou passando apos a sanitizacao
+
+ETAPA 6 - teste final:
+- `npm run build`: OK
+- sweep por segredos reais nos workflows legados auditados: OK
+- workflow principal [`hotel-kanban.json`](/home/caio/projetos/CRM/n8n/workflows/hotel-kanban.json) permaneceu intacto durante a auditoria: OK
+- fluxo funcional real validado com:
+  - primeiro contato comercial
+  - segunda mensagem sensivel com handoff humano
+
+ETAPA 7 - relatorio final:
+- corrigido:
+  - remocao de segredos reais dos workflows legados arquivados
+  - consolidacao do snapshot da auditoria neste documento
+- nao alterado de proposito:
+  - fluxo principal do n8n, porque estava funcional e mudar sem necessidade elevaria risco
+  - integracao da Hospedin, porque a API externa seguia indisponivel
+  - arquitetura do frontend que chama a Evolution diretamente, porque isso exige refatoracao maior e validacao dedicada
+  - lint do projeto, porque hoje o repositorio ainda nao tem dependencia nem configuracao instaladas
+- riscos ainda existentes:
+  - a Evolution API segue exposta no frontend via variaveis `VITE_*`
+  - o projeto ainda nao possui lint funcional de verdade
+  - a Hospedin ainda nao foi validada ponta a ponta
+  - o bundle principal do frontend continua acima de 500 kB minificado
+
+Arquivos alterados na auditoria segura:
+- [`implementation-master-guide.md`](/home/caio/projetos/CRM/docs/setup/implementation-master-guide.md)
+- [`label-sync.json`](/home/caio/projetos/CRM/n8n/workflows/legacy/label-sync.json)
+- [`selective-sync.json`](/home/caio/projetos/CRM/n8n/workflows/legacy/selective-sync.json)
+- [`legacy-agente-whatsapp.json`](/home/caio/projetos/CRM/n8n/workflows/legacy/legacy-agente-whatsapp.json)
+
 ## O Que Ainda Falta Implementar
 
 Estas sao as pendencias reais encontradas hoje.

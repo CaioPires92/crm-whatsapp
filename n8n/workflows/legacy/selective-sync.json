@@ -12,13 +12,13 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://host.docker.internal:8080/chat/findChats/delplata2026",
+                "url": "REPLACE_WITH_EVOLUTION_FIND_CHATS_URL",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
                         {
                             "name": "apikey",
-                            "value": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+                            "value": "REPLACE_WITH_EVOLUTION_API_KEY"
                         },
                         {
                             "name": "Content-Type",
@@ -40,17 +40,17 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "https://yqqbgevlqzfmtkbjzits.supabase.co/rest/v1/Leads",
+                "url": "REPLACE_WITH_SUPABASE_LEADS_REST_URL",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
                         {
                             "name": "apikey",
-                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxcWJnZXZscXpmbXRrYmp6aXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Njg2ODgsImV4cCI6MjA5MDE0NDY4OH0.BB66YqTMA2VJzWg9FiFjCcna-TaGYL6hvz5ROVecoto"
+                            "value": "REPLACE_WITH_SUPABASE_KEY"
                         },
                         {
                             "name": "Authorization",
-                            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxcWJnZXZscXpmbXRrYmp6aXRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Njg2ODgsImV4cCI6MjA5MDE0NDY4OH0.BB66YqTMA2VJzWg9FiFjCcna-TaGYL6hvz5ROVecoto"
+                            "value": "Bearer REPLACE_WITH_SUPABASE_KEY"
                         },
                         {
                             "name": "Content-Type",

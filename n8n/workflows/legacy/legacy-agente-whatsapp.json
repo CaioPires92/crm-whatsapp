@@ -277,13 +277,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:8080/message/sendText/delplata2026",
+        "url": "REPLACE_WITH_EVOLUTION_SENDTEXT_URL",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "8129ABA9826B-420A-88E0-6B2DDE20482B"
+              "value": "REPLACE_WITH_EVOLUTION_API_KEY"
             }
           ]
         },

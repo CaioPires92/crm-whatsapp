@@ -12,7 +12,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -3040,
+        -3200,
         0
       ],
       "webhookId": "hotel-crm-evolution-webhook",
@@ -97,7 +97,7 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.1,
       "position": [
-        -2760,
+        -2920,
         0
       ],
       "notesInFlow": true,
@@ -140,7 +140,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2480,
+        -2640,
         0
       ],
       "notesInFlow": true,
@@ -155,7 +155,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2200,
+        -2360,
         0
       ],
       "notesInFlow": true,
@@ -179,7 +179,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -520,
+        -680,
         0
       ],
       "alwaysOutputData": true,
@@ -222,7 +222,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        -240,
+        -400,
         0
       ],
       "notesInFlow": true,
@@ -261,7 +261,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -240,
+        -400,
         180
       ],
       "notesInFlow": true,
@@ -280,7 +280,7 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        40,
+        -120,
         0
       ],
       "notesInFlow": true,
@@ -304,7 +304,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        320,
+        160,
         0
       ],
       "alwaysOutputData": true,
@@ -326,7 +326,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        600,
+        440,
         0
       ],
       "notesInFlow": true,
@@ -362,7 +362,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        880,
+        720,
         0
       ],
       "notesInFlow": true,
@@ -377,7 +377,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        880,
+        720,
         180
       ],
       "notesInFlow": true,
@@ -392,7 +392,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
+        1000,
         0
       ],
       "notesInFlow": true,
@@ -428,7 +428,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        1440,
+        1280,
         0
       ],
       "notesInFlow": true,
@@ -443,7 +443,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1440,
+        1280,
         180
       ],
       "notesInFlow": true,
@@ -468,8 +468,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1440,
-        -180
+        1560,
+        -240
       ],
       "alwaysOutputData": true,
       "notesInFlow": true,
@@ -490,8 +490,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1720,
-        -180
+        1840,
+        -240
       ],
       "notesInFlow": true,
       "notes": "Fase 3: consolida as regras editaveis em um contexto curto e previsivel para a Aura usar sem hardcode."
@@ -515,8 +515,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2000,
-        -180
+        2120,
+        -240
       ],
       "alwaysOutputData": true,
       "notesInFlow": true,
@@ -537,8 +537,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2280,
-        -180
+        2400,
+        -240
       ],
       "notesInFlow": true,
       "notes": "Fase 4: calcula o contexto de tarifas por periodo a partir da tabela room_rates antes da Aura cotar."
@@ -556,7 +556,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1720,
+        3800,
         0
       ],
       "notesInFlow": true,
@@ -573,8 +573,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1880,
-        220
+        3940,
+        240
       ],
       "notesInFlow": true,
       "notes": "ADICIONADO: memoria por remoteJid para manter contexto por hospede."
@@ -591,8 +591,8 @@
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        1720,
-        -220
+        3800,
+        220
       ],
       "notesInFlow": true,
       "notes": "AJUSTADO: tool do agente com etapas compativeis com o enum do kanban e saida main para atualizar o card."
@@ -640,8 +640,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2000,
-        -220
+        4080,
+        220
       ],
       "notesInFlow": true,
       "credentials": {
@@ -661,7 +661,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2320,
+        4360,
         0
       ],
       "notesInFlow": true,
@@ -690,7 +690,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2600,
+        4640,
         0
       ],
       "notesInFlow": true,
@@ -721,7 +721,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -800,
+        -960,
         0
       ],
       "notesInFlow": true,
@@ -754,7 +754,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        40,
+        -120,
         180
       ],
       "notesInFlow": true,
@@ -791,7 +791,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2040,
+        4080,
         0
       ],
       "notesInFlow": true,
@@ -810,8 +810,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1600,
-        220
+        3660,
+        240
       ],
       "id": "734af457-7a93-4773-b7f0-7e84155d4530",
       "name": "Google Gemini Chat Model",
@@ -824,15 +824,15 @@
     },
     {
       "parameters": {
-        "content": "## Entrada WhatsApp\nWebhook e filtros basicos para aceitar apenas eventos validos do atendimento.",
-        "height": 280,
-        "width": 820,
+        "content": "## Entrada WhatsApp\nRecebe o webhook da Evolution, filtra eventos invalidos e prepara a base do atendimento.",
+        "height": 220,
+        "width": 1120,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -3160,
+        -3360,
         -180
       ],
       "id": "02334010-40cd-4847-9852-15bcce2b3fd4",
@@ -840,15 +840,15 @@
     },
     {
       "parameters": {
-        "content": "## Normalizacao\nPadroniza lead, texto e tipo da mensagem antes de qualquer decisao do fluxo.",
-        "height": 280,
-        "width": 520,
+        "content": "## Normalizacao e Midia\nPadroniza lead e mensagem. Imagem e audio passam por branches proprios e convergem em `Mensagem Interpretada` sem quebrar o fluxo principal.",
+        "height": 820,
+        "width": 1480,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -2320,
+        -2480,
         -180
       ],
       "id": "0fd99020-537e-4d3e-a91e-1a62020da18c",
@@ -872,15 +872,15 @@
     },
     {
       "parameters": {
-        "content": "## CRM, Historico e Controle Operacional\nSalva a mensagem, identifica ou cria o lead e decide se a Aura responde em modo automatico ou se o fluxo para em modo manual.",
-        "height": 460,
-        "width": 1520,
+        "content": "## CRM, Historico e Controle Operacional\nSalva a mensagem, cria ou reaproveita o lead, aplica modo manual/automatico e faz handoff humano quando necessario.",
+        "height": 480,
+        "width": 2600,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -920,
+        -1080,
         -180
       ],
       "id": "c6c470eb-3598-4eea-8d02-afc5c316f70d",
@@ -888,31 +888,31 @@
     },
     {
       "parameters": {
-        "content": "## Agente Comercial\nA Aura so entra em acao quando o modo operacional estiver em auto e quando a mensagem nao exigir handoff humano. Com isso aprovado, responde com memoria, usa Gemini como modelo e pode mover o card no Kanban pela tool.",
-        "height": 620,
-        "width": 1640,
+        "content": "## Contexto Comercial\nBusca regras operacionais, tarifas e disponibilidade da Hospedin para montar um contexto previsivel antes da Aura responder.",
+        "height": 220,
+        "width": 2200,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        200,
-        -300
+        1480,
+        -360
       ],
       "id": "0e10c054-1146-4c16-95d4-68dfd6777354",
       "name": "Sticky Note7"
     },
     {
       "parameters": {
-        "content": "## Resposta ao Cliente\nSalva a resposta da Aura, valida o payload final e envia a mensagem para a Evolution. No branch de handoff humano, a automacao termina sem resposta.",
-        "height": 280,
-        "width": 520,
+        "content": "## Agente e Resposta\nA Aura responde com memoria e tool de Kanban. Depois o fluxo salva historico, valida o payload final e envia a mensagem ao WhatsApp.",
+        "height": 520,
+        "width": 1320,
         "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1680,
+        3640,
         -180
       ],
       "id": "97481dca-355e-4c37-91bc-2f02c6c5b12d",
@@ -948,8 +948,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        -1920,
-        150
+        -2080,
+        140
       ],
       "notesInFlow": true,
       "notes": "Roteia para interpretacao multimodal quando a mensagem recebida for imagem com base64 disponivel."
@@ -984,8 +984,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.1,
       "position": [
-        -1920,
-        330
+        -2080,
+        340
       ],
       "notesInFlow": true,
       "notes": "Roteia para transcricao quando a mensagem recebida for audio com base64 disponivel."
@@ -1012,8 +1012,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        -1640,
-        150
+        -1800,
+        140
       ],
       "credentials": {
         "googlePalmApi": {
@@ -1043,8 +1043,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        -1640,
-        330
+        -1800,
+        340
       ],
       "credentials": {
         "googlePalmApi": {
@@ -1064,8 +1064,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1640,
-        510
+        -1800,
+        540
       ],
       "notesInFlow": true,
       "notes": "Mantem texto puro e tambem gera fallback limpo quando chegar midia sem base64 analisavel."
@@ -1079,8 +1079,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1360,
-        150
+        -1520,
+        140
       ],
       "notesInFlow": true,
       "notes": "Transforma a analise multimodal da imagem em texto que a Aura consegue usar no atendimento."
@@ -1094,8 +1094,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1360,
-        330
+        -1520,
+        340
       ],
       "notesInFlow": true,
       "notes": "Transforma a transcricao do audio em texto unico para historico, IA e CRM."
@@ -1109,7 +1109,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1080,
+        -1240,
         0
       ],
       "notesInFlow": true,
@@ -1133,8 +1133,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2560,
-        -180
+        2680,
+        -240
       ],
       "alwaysOutputData": true,
       "notesInFlow": true,
@@ -1155,8 +1155,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2840,
-        -180
+        2960,
+        -240
       ],
       "notesInFlow": true,
       "notes": "Fase 5: decide se a consulta em tempo real deve rodar ou se a Aura recebe um contexto seguro de fallback.",
@@ -1180,8 +1180,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3120,
-        -180
+        3240,
+        -240
       ],
       "alwaysOutputData": true,
       "notesInFlow": true,
@@ -1202,8 +1202,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3400,
-        -180
+        3520,
+        -240
       ],
       "notesInFlow": true,
       "notes": "Fase 5: autentica na Hospedin e consolida a disponibilidade real com fallback seguro para manutencao, timeout ou credenciais ausentes.",

@@ -554,13 +554,13 @@
             {
               "id": "21aadedf-27cd-4d73-8eee-83746ba47b69",
               "name": "number",
-              "value": "={{ $('Dados Lead').item.json.remoteJid.replace('@lid', '@s.whatsapp.net') }}",
+              "value": "={{ (($('Dados Lead').item.json.remoteJid || '').replace('@lid', '@s.whatsapp.net').split('@')[0] || '').replace(/\\D/g, '') }}",
               "type": "string"
             },
             {
               "id": "a6486ed6-de10-43c3-9649-7f1a42341c6c",
               "name": "text",
-              "value": "={{ $json.output }}",
+              "value": "={{ String($json.output || '').trim() }}",
               "type": "string"
             }
           ]
@@ -575,6 +575,50 @@
       ],
       "id": "64ed1f99-3c62-4613-bb52-616206d4d21d",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "send-number-valid",
+              "leftValue": "={{ /^\\d{10,15}$/.test($json.number || '') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "send-text-not-empty",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        5376,
+        848
+      ],
+      "id": "8d18fd00-85ef-4c3d-a26f-6dcf24d81541",
+      "name": "Validar Envio"
     },
     {
       "parameters": {
@@ -614,14 +658,14 @@
       "parameters": {
         "operation": "get",
         "tableId": "Leads",
-        "returnFirst": true,
-        "where": [
-          {
-            "column": "lead_id",
-            "condition": "equal",
-            "value": "={{ $('Dados Lead').item.json.remoteJid.split('@')[0] }}"
-          }
-        ]
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "keyValue": "={{ $('Dados Lead').item.json.remoteJid.split('@')[0] }}"
+            }
+          ]
+        }
       },
       "id": "check-chatbot-status",
       "name": "Check Chatbot Status",
@@ -651,7 +695,7 @@
             {
               "id": "bot-active-condition",
               "leftValue": "={{ $json.chatbot_ativo }}",
-              "rightValue": "true",
+              "rightValue": true,
               "operator": {
                 "type": "boolean",
                 "operation": "equals",
@@ -848,6 +892,17 @@
       ]
     },
     "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Validar Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Envio": {
       "main": [
         [
           {

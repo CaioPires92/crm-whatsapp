@@ -123,3 +123,30 @@ Comportamento:
 - periodos especiais com prioridade maior sobrepoem tarifa regular
 - se o periodo tiver minimo de diarias, a Aura informa a regra em vez de inventar total invalido
 - alterar um valor em `room_rates` muda a proxima cotacao sem editar o workflow
+
+7. Disponibilidade em Tempo Real (Fase 5)
+O workflow oficial passa a consultar a Hospedin apenas para confirmar disponibilidade real do periodo solicitado.
+
+Tabelas envolvidas:
+- `hospedin_settings`
+- `hospedin_room_mappings`
+
+Variaveis de ambiente esperadas no n8n:
+- `HOSPEDIN_API_EMAIL`
+- `HOSPEDIN_API_PASSWORD`
+
+Fluxo:
+- `Supabase - Get Hospedin Settings`
+- `Resolver Consulta Hospedin`
+- `Supabase - Get Hospedin Room Mappings`
+- `Consultar Disponibilidade Hospedin`
+
+Comportamento:
+- a consulta so roda quando houver check-in e check-out validos
+- a consulta so roda quando `hospedin_settings.enabled = true`
+- a Aura usa a Hospedin para disponibilidade real e continua usando `room_rates` para cotacao comercial
+- se a API falhar, estiver em manutencao ou sem credenciais, o workflow nao quebra; ele injeta um contexto de fallback para a Aura responder com confirmacao manual
+
+Observacao operacional:
+- em 04/04/2026 a autenticacao da Hospedin respondeu `403` com a mensagem `Acesso desativado para manutencao.`
+- por isso a integracao foi implementada com fallback seguro, mas a validacao ponta a ponta ficou pendente ate a API voltar

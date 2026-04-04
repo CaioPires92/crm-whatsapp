@@ -20,3 +20,4 @@ Current key files:
 - `setup/kanban-stage-handoff-migration-20260404.sql`
 - `setup/assistant-rules-migration-20260404.sql`
 - `setup/room-rates-migration-20260404.sql`
+- `setup/hospedin-availability-migration-20260404.sql`

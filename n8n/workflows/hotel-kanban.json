@@ -101,7 +101,7 @@
         0
       ],
       "notesInFlow": true,
-      "notes": "ADICIONADO: ignora grupos, newsletter, status e mensagens enviadas pela propria inst\u00e2ncia."
+      "notes": "ADICIONADO: ignora grupos, newsletter, status e mensagens enviadas pela propria instância."
     },
     {
       "parameters": {
@@ -548,7 +548,7 @@
         "promptType": "define",
         "text": "={{ $('Mensagem Interpretada').first().json.messageText }}",
         "options": {
-          "systemMessage": "={{ `Voc\\u00ea \\u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\\u00e3o \\u00e9 atender h\\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\\n\\nDIRETRIZES DE ATENDIMENTO:\\n1. Seja cordial, profissional e use um tom acolhedor.\\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\\n3. N\\u00e3o confirme disponibilidade real; isso ainda depende de consulta externa futura.\\n4. Use apenas valores presentes na BASE DE TARIFAS DINAMICA abaixo. Se as datas nao estiverem claras, pe\\u00e7a check-in e check-out.\\n5. Se a BASE DE TARIFAS DINAMICA indicar minimo de diarias, explique essa regra em vez de inventar um total fora da politica.\\n6. Responda de forma curta e natural para WhatsApp.\\n7. Se perceber mudan\\u00e7a de est\\u00e1gio comercial, use a ferramenta update_kanban_stage.\\n8. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\\n9. Use a BASE OPERACIONAL DINAMICA abaixo como fonte primaria para Wi-Fi, check-in, check-out, pets, cafe da manha e regras internas.\\n10. Se um valor estiver como \\\"Nao cadastrado\\\" ou \\\"Nao cadastrada\\\", diga que a equipe ainda precisa atualizar essa informacao no sistema e nao invente detalhes.\\n\\nBASE OPERACIONAL DINAMICA:\\n${$('Consolidar Regras Aura').first().json.knowledgeContext || 'Nenhuma regra operacional cadastrada.'}\\n\\nBASE DE TARIFAS DINAMICA:\\n${$('Consolidar Tarifas Aura').first().json.rateContext || 'Nenhuma tarifa cadastrada.'}\\n\\nETAPAS DISPONIVEIS:\\n- Novo Lead\\n- Cota\\u00e7\\u00e3o Enviada\\n- Aguardando Pagamento\\n- Reserva Confirmada\\n- Check-in\\n- Check-out/P\\u00f3s-venda\\n- Perdido/Cancelado\\n\\nSempre que atualizar a etapa, forne\\u00e7a um breve resumo_solicitacao objetivo.\\n\\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\\u00e7\\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\\u00f3s-venda, Perdido/Cancelado.` }}"
+          "systemMessage": "={{ `Você é a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua missão é atender hóspedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. Use a DISPONIBILIDADE HOSPEDIN abaixo para confirmar disponibilidade real quando ela estiver disponível.\n4. Se a DISPONIBILIDADE HOSPEDIN indicar indisponibilidade, manutenção, timeout, credenciais ausentes ou confirmação manual, explique isso com clareza e não garanta vaga.\n5. Use apenas valores presentes na BASE DE TARIFAS DINAMICA abaixo. Se as datas não estiverem claras, peça check-in e check-out.\n6. Se a BASE DE TARIFAS DINAMICA indicar mínimo de diárias, explique essa regra em vez de inventar um total fora da política.\n7. Responda de forma curta e natural para WhatsApp.\n8. Se perceber mudança de estágio comercial, use a ferramenta update_kanban_stage.\n9. Casos sensíveis de manutenção, reclamação, cobrança ou pedido de humano já foram filtrados antes de chegar até você.\n10. Use a BASE OPERACIONAL DINAMICA abaixo como fonte primária para Wi-Fi, check-in, check-out, pets, café da manhã e regras internas.\n11. Se um valor estiver como \"Nao cadastrado\" ou \"Nao cadastrada\", diga que a equipe ainda precisa atualizar essa informação no sistema e não invente detalhes.\n\nBASE OPERACIONAL DINAMICA:\n${$('Consolidar Regras Aura').first().json.knowledgeContext || 'Nenhuma regra operacional cadastrada.'}\n\nBASE DE TARIFAS DINAMICA:\n${$('Consolidar Tarifas Aura').first().json.rateContext || 'Nenhuma tarifa cadastrada.'}\n\nDISPONIBILIDADE HOSPEDIN:\n${$('Consultar Disponibilidade Hospedin').first().json.availabilityContext || 'DISPONIBILIDADE HOSPEDIN: ainda nao consultada.'}\n\nETAPAS DISPONIVEIS:\n- Novo Lead\n- Cotação Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/Pós-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forneça um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cotação Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/Pós-venda, Perdido/Cancelado.` }}"
         }
       },
       "id": "82d1f283-7f59-481d-ac6a-c90817d1c32e",
@@ -560,7 +560,7 @@
         0
       ],
       "notesInFlow": true,
-      "notes": "AJUSTADO: agora le texto normalizado, descricao de imagem ou transcricao de audio antes de responder no WhatsApp."
+      "notes": "AJUSTADO: agora le texto normalizado, descricao de imagem, transcricao de audio e disponibilidade real da Hospedin antes de responder no WhatsApp."
     },
     {
       "parameters": {
@@ -581,10 +581,10 @@
     },
     {
       "parameters": {
-        "description": "Atualiza a etapa do h\u00f3spede no Kanban e salva o resumo da solicita\u00e7\u00e3o. Use esta ferramenta sempre que houver mudan\u00e7a de etapa no funil.",
+        "description": "Atualiza a etapa do hóspede no Kanban e salva o resumo da solicitação. Use esta ferramenta sempre que houver mudança de etapa no funil.",
         "jsCode": "const input = typeof $input.item.json === 'object' && $input.item.json !== null ? $input.item.json : {};\nconst new_stage = input.new_stage || 'Novo Lead';\nconst summary = input.summary || 'Lead sem resumo informado';\n\nreturn [{\n  json: {\n    new_stage,\n    summary,\n    lead_id: $('Normalizar Lead').first().json.remoteJid,\n    ultima_interacao: new Date().toISOString()\n  }\n}];",
         "specifyInputSchema": true,
-        "jsonSchemaExample": "{\n  \"new_stage\": \"Cota\u00e7\u00e3o Enviada\",\n  \"summary\": \"Casal, 3 diarias, quarto luxo, 12 a 15 de julho\"\n}"
+        "jsonSchemaExample": "{\n  \"new_stage\": \"Cotação Enviada\",\n  \"summary\": \"Casal, 3 diarias, quarto luxo, 12 a 15 de julho\"\n}"
       },
       "id": "593a26a8-392a-422a-9038-bd7f346c9fe1",
       "name": "update_kanban_stage",
@@ -1114,6 +1114,100 @@
       ],
       "notesInFlow": true,
       "notes": "Ponto unico do fluxo apos a interpretacao de texto, imagem ou audio."
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "hospedin_settings",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Hospedin Settings",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        -180
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "Fase 5: le a configuracao singleton da Hospedin sem depender de valores fixos no workflow.",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
+      "id": "40e347f6-d29a-49cd-988a-5d93cab3c318"
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $json && typeof $json === 'object' ? $json : {};\nconst rateData = $('Consolidar Tarifas Aura').first().json;\n\nconst parsedCheckIn = String(rateData.parsedCheckIn || '').trim();\nconst parsedCheckOut = String(rateData.parsedCheckOut || '').trim();\nconst requestedRoomType = String(rateData.requestedRoomType || '').trim() || null;\nconst apiBaseUrl = String(row.api_base_url || 'https://pms.hospedin.com/api/v2').trim().replace(/\\/$/, '');\nconst accountId = String(row.account_id || '').trim();\nconst enabled = row.enabled === true;\nconst timeoutMsRaw = Number(row.timeout_ms || 10000);\nconst timeoutMs = Number.isFinite(timeoutMsRaw) && timeoutMsRaw >= 1000 ? timeoutMsRaw : 10000;\nconst fallbackMessage = String(row.fallback_message || 'No momento nao consegui confirmar a disponibilidade em tempo real. Posso seguir com a cotacao e a equipe confirma manualmente.').trim();\nconst hasValidStay = Boolean(parsedCheckIn && parsedCheckOut);\nconst shouldConsult = Boolean(enabled && hasValidStay && accountId);\n\nlet skipReason = null;\nif (!enabled) skipReason = 'integration_disabled';\nelse if (!hasValidStay) skipReason = 'missing_dates';\nelse if (!accountId) skipReason = 'missing_account_id';\n\nlet defaultAvailabilityContext = '';\nif (!enabled) {\n  defaultAvailabilityContext = `DISPONIBILIDADE HOSPEDIN: integracao desativada. ${fallbackMessage}`;\n} else if (!hasValidStay) {\n  defaultAvailabilityContext = 'DISPONIBILIDADE HOSPEDIN: ainda nao foi possivel consultar porque faltam check-in e check-out validos.';\n} else if (!accountId) {\n  defaultAvailabilityContext = `DISPONIBILIDADE HOSPEDIN: integracao configurada sem account_id. ${fallbackMessage}`;\n}\n\nreturn [{\n  json: {\n    enabled,\n    apiBaseUrl,\n    accountId,\n    timeoutMs,\n    fallbackMessage,\n    parsedCheckIn,\n    parsedCheckOut,\n    requestedRoomType,\n    shouldConsult,\n    skipReason,\n    defaultAvailabilityContext,\n  },\n}];"
+      },
+      "name": "Resolver Consulta Hospedin",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2840,
+        -180
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 5: decide se a consulta em tempo real deve rodar ou se a Aura recebe um contexto seguro de fallback.",
+      "id": "be822e2d-f3f2-4cda-af20-353b678fc26d"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "hospedin_room_mappings",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Hospedin Room Mappings",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        -180
+      ],
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "Fase 5: resolve os place_type_id da Hospedin para cada acomodacao interna.",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kEIfGjkEJRgMsIdQ",
+          "name": "Supabase account"
+        }
+      },
+      "id": "e89fa39d-84a7-4095-81f5-eb9bc0ad43fa"
+    },
+    {
+      "parameters": {
+        "jsCode": "const settings = $('Resolver Consulta Hospedin').first().json;\nconst mappings = items\n  .map((item) => item.json || {})\n  .filter((row) => Object.keys(row).length > 0)\n  .filter((row) => row.active !== false);\n\nconst normalize = (value) => String(value || '')\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase()\n  .trim();\n\nconst parseBrDateToIso = (value) => {\n  const text = String(value || '').trim();\n  const match = text.match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/);\n  if (!match) return null;\n  return `${match[3]}-${match[2]}-${match[1]}`;\n};\n\nconst formatStatus = (status, detail) => `DISPONIBILIDADE HOSPEDIN: ${status}.${detail ? ` ${detail}` : ''}`.trim();\n\nif (!settings.shouldConsult) {\n  return [{\n    json: {\n      availabilityContext: settings.defaultAvailabilityContext || formatStatus('consulta nao executada', settings.fallbackMessage),\n      availabilityLive: false,\n      availabilityStatus: settings.skipReason || 'skipped',\n      checkedPlaceTypes: 0,\n      consultedRoomType: settings.requestedRoomType || null,\n      hospedinApiStatus: null,\n    },\n  }];\n}\n\nconst email = String(process.env.HOSPEDIN_API_EMAIL || '').trim();\nconst password = String(process.env.HOSPEDIN_API_PASSWORD || '').trim();\nif (!email || !password) {\n  return [{\n    json: {\n      availabilityContext: formatStatus('credenciais ausentes no ambiente do n8n', settings.fallbackMessage),\n      availabilityLive: false,\n      availabilityStatus: 'credentials_missing',\n      checkedPlaceTypes: 0,\n      consultedRoomType: settings.requestedRoomType || null,\n      hospedinApiStatus: null,\n    },\n  }];\n}\n\nconst requestedRoomType = String(settings.requestedRoomType || '').trim();\nconst selectedMappings = mappings.filter((row) => {\n  const hasPlaceType = String(row.place_type_id || '').trim();\n  if (!hasPlaceType) return false;\n  if (!requestedRoomType) return true;\n  return normalize(row.room_type) === normalize(requestedRoomType);\n});\n\nif (!selectedMappings.length) {\n  return [{\n    json: {\n      availabilityContext: formatStatus('mapeamento de acomodacao ausente', settings.fallbackMessage),\n      availabilityLive: false,\n      availabilityStatus: 'mapping_missing',\n      checkedPlaceTypes: 0,\n      consultedRoomType: requestedRoomType || null,\n      hospedinApiStatus: null,\n    },\n  }];\n}\n\nconst beginDate = parseBrDateToIso(settings.parsedCheckIn);\nconst endDate = parseBrDateToIso(settings.parsedCheckOut);\nif (!beginDate || !endDate) {\n  return [{\n    json: {\n      availabilityContext: formatStatus('datas invalidas para consulta', settings.fallbackMessage),\n      availabilityLive: false,\n      availabilityStatus: 'invalid_dates',\n      checkedPlaceTypes: 0,\n      consultedRoomType: requestedRoomType || null,\n      hospedinApiStatus: null,\n    },\n  }];\n}\n\nconst controller = new AbortController();\nconst timeout = setTimeout(() => controller.abort(), Number(settings.timeoutMs || 10000));\n\ntry {\n  const authResponse = await fetch(`${settings.apiBaseUrl}/authentication/sessions`, {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },\n    body: JSON.stringify({ email, password }),\n    signal: controller.signal,\n  });\n\n  if (!authResponse.ok) {\n    const errorText = (await authResponse.text().catch(() => '')).trim();\n    return [{\n      json: {\n        availabilityContext: formatStatus(`autenticacao indisponivel (HTTP ${authResponse.status})`, errorText || settings.fallbackMessage),\n        availabilityLive: false,\n        availabilityStatus: 'auth_error',\n        checkedPlaceTypes: 0,\n        consultedRoomType: requestedRoomType || null,\n        hospedinApiStatus: authResponse.status,\n      },\n    }];\n  }\n\n  const authJson = await authResponse.json().catch(() => ({}));\n  const token = String(authJson.token || '').trim();\n  if (!token) {\n    return [{\n      json: {\n        availabilityContext: formatStatus('token de autenticacao ausente', settings.fallbackMessage),\n        availabilityLive: false,\n        availabilityStatus: 'auth_token_missing',\n        checkedPlaceTypes: 0,\n        consultedRoomType: requestedRoomType || null,\n        hospedinApiStatus: authResponse.status,\n      },\n    }];\n  }\n\n  const headers = { Authorization: `Bearer ${token}`, Accept: 'application/json' };\n  const summaries = [];\n  let successCount = 0;\n  let lastStatus = 200;\n\n  for (const mapping of selectedMappings) {\n    const roomType = String(mapping.room_type || '').trim() || 'Acomodacao sem nome';\n    const placeTypeId = String(mapping.place_type_id || '').trim();\n    const url = `${settings.apiBaseUrl}/${encodeURIComponent(settings.accountId)}/place_types/${encodeURIComponent(placeTypeId)}/rates_and_availabilities?begin_date=${encodeURIComponent(beginDate)}&end_date=${encodeURIComponent(endDate)}`;\n    const response = await fetch(url, { method: 'GET', headers, signal: controller.signal });\n    lastStatus = response.status;\n\n    if (!response.ok) {\n      summaries.push(`- ${roomType}: nao foi possivel confirmar na Hospedin agora (HTTP ${response.status}).`);\n      continue;\n    }\n\n    successCount += 1;\n    const payload = await response.json().catch(() => []);\n    const rows = Array.isArray(payload) ? payload : [];\n    const stayRows = rows.filter((row) => {\n      const date = String(row.date || '').trim();\n      return date >= beginDate && date < endDate;\n    });\n\n    if (!stayRows.length) {\n      summaries.push(`- ${roomType}: a Hospedin nao retornou dias suficientes para o periodo consultado.`);\n      continue;\n    }\n\n    const availabilities = stayRows.map((row) => Number(row.availability || 0)).filter((value) => Number.isFinite(value));\n    const minAvailability = availabilities.length ? Math.min(...availabilities) : 0;\n    const isAvailable = stayRows.every((row) => Number(row.availability || 0) > 0);\n\n    if (isAvailable) {\n      summaries.push(`- ${roomType}: disponivel em todo o periodo consultado. Menor disponibilidade diaria encontrada: ${minAvailability} unidade(s).`);\n    } else {\n      summaries.push(`- ${roomType}: indisponivel em pelo menos uma das datas consultadas.`);\n    }\n  }\n\n  const availabilityContext = successCount\n    ? `DISPONIBILIDADE HOSPEDIN PARA ${settings.parsedCheckIn} a ${settings.parsedCheckOut}:\\n${summaries.join('\\n')}`\n    : formatStatus('sem resposta valida da Hospedin', settings.fallbackMessage);\n\n  return [{\n    json: {\n      availabilityContext,\n      availabilityLive: successCount > 0,\n      availabilityStatus: successCount > 0 ? 'ok' : 'no_valid_response',\n      checkedPlaceTypes: selectedMappings.length,\n      consultedRoomType: requestedRoomType || null,\n      hospedinApiStatus: lastStatus,\n    },\n  }];\n} catch (error) {\n  const reason = error && error.name === 'AbortError' ? 'timeout na consulta da Hospedin' : 'falha ao consultar a Hospedin';\n  const detail = error && error.message ? String(error.message) : settings.fallbackMessage;\n  return [{\n    json: {\n      availabilityContext: formatStatus(reason, detail || settings.fallbackMessage),\n      availabilityLive: false,\n      availabilityStatus: error && error.name === 'AbortError' ? 'timeout' : 'request_failed',\n      checkedPlaceTypes: selectedMappings.length,\n      consultedRoomType: requestedRoomType || null,\n      hospedinApiStatus: null,\n    },\n  }];\n} finally {\n  clearTimeout(timeout);\n}"
+      },
+      "name": "Consultar Disponibilidade Hospedin",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3400,
+        -180
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 5: autentica na Hospedin e consolida a disponibilidade real com fallback seguro para manutencao, timeout ou credenciais ausentes.",
+      "id": "d2862dec-569a-49e7-b72e-fe37268683bf"
     }
   ],
   "connections": {
@@ -1318,7 +1412,7 @@
       "main": [
         [
           {
-            "node": "AI Agent Aura",
+            "node": "Supabase - Get Hospedin Settings",
             "type": "main",
             "index": 0
           }
@@ -1520,6 +1614,50 @@
         [
           {
             "node": "Supabase - Save User History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Hospedin Settings": {
+      "main": [
+        [
+          {
+            "node": "Resolver Consulta Hospedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolver Consulta Hospedin": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Hospedin Room Mappings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Hospedin Room Mappings": {
+      "main": [
+        [
+          {
+            "node": "Consultar Disponibilidade Hospedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Disponibilidade Hospedin": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Aura",
             "type": "main",
             "index": 0
           }

@@ -13,6 +13,10 @@ Hoje a Aura consulta duas tabelas operacionais:
 - `assistant_rules`: regras e informacoes textuais
 - `room_rates`: tarifas e minimos de diarias
 
+Na Fase 5, a disponibilidade em tempo real passa a usar mais duas tabelas:
+- `hospedin_settings`: configuracao da integracao com a Hospedin
+- `hospedin_room_mappings`: mapeamento entre nomes internos dos quartos e `place_type_id` da Hospedin
+
 Quando os dados reais estiverem disponiveis, a atualizacao deve ser feita nessas tabelas, nao no prompt e nao no JSON do workflow.
 
 ## Onde Editar
@@ -20,6 +24,8 @@ Quando os dados reais estiverem disponiveis, a atualizacao deve ser feita nessas
 Editar pelo `Table Editor` do Supabase:
 - `public.assistant_rules`
 - `public.room_rates`
+- `public.hospedin_settings`
+- `public.hospedin_room_mappings`
 
 Depois de salvar, a proxima execucao do workflow ja usa os novos valores.
 
@@ -118,11 +124,76 @@ Se a Aura responder errado, conferir nesta ordem:
 5. `room_rates.priority`
 6. `room_rates.active`
 
+Se o erro for sobre disponibilidade real, conferir nesta ordem:
+
+1. `hospedin_settings.enabled`
+2. `hospedin_settings.account_id`
+3. `hospedin_room_mappings.place_type_id`
+4. `HOSPEDIN_API_EMAIL` no ambiente do n8n
+5. `HOSPEDIN_API_PASSWORD` no ambiente do n8n
+6. status atual da API da Hospedin
+
+## Disponibilidade Real via Hospedin
+
+Use a Hospedin apenas para confirmar disponibilidade real. A cotacao comercial continua vindo de `room_rates`.
+
+### Tabela hospedin_settings
+
+Use para a configuracao singleton da integracao.
+
+Campos:
+- `enabled`: liga ou desliga a consulta em tempo real
+- `api_base_url`: base da API, normalmente `https://pms.hospedin.com/api/v2`
+- `account_id`: slug ou ID da conta usado nos endpoints `/api/v2/{account_id}/...`
+- `timeout_ms`: tempo maximo da consulta
+- `fallback_message`: texto usado quando a API estiver fora do ar, em manutencao ou sem credenciais
+
+Regras praticas:
+- manter `enabled=false` ate preencher `account_id` e os `place_type_id`
+- nao versionar credenciais em tabelas do projeto
+- manter a mensagem de fallback objetiva, sem prometer vaga
+
+### Tabela hospedin_room_mappings
+
+Use para ligar o nome interno de acomodacao ao tipo correspondente na Hospedin.
+
+Campos:
+- `room_type`: nome interno usado pela Aura e por `room_rates`
+- `place_type_id`: identificador real do tipo de acomodacao na Hospedin
+- `place_type_title`: rotulo livre para conferencia humana
+- `active`: controla se o mapeamento entra na consulta
+- `notes`: observacao operacional
+
+Regras praticas:
+- manter `room_type` exatamente igual ao usado em `room_rates`
+- preencher `place_type_id` com o valor real vindo da API `/place_types`
+- usar `active=false` se uma acomodacao nao deve mais entrar na consulta
+
+### Credenciais da Hospedin
+
+As credenciais devem ficar no ambiente do n8n:
+- `HOSPEDIN_API_EMAIL`
+- `HOSPEDIN_API_PASSWORD`
+
+Nao colocar login e senha em:
+- `assistant_rules`
+- `room_rates`
+- arquivos versionados do repositório
+
+### Ordem Recomendada para Ativar a Hospedin
+
+1. Preencher `hospedin_settings.account_id`
+2. Consultar `/api/v2/{account_id}/place_types`
+3. Atualizar `hospedin_room_mappings.place_type_id`
+4. Configurar `HOSPEDIN_API_EMAIL` e `HOSPEDIN_API_PASSWORD` no n8n
+5. Validar uma consulta real
+6. So depois mudar `hospedin_settings.enabled` para `true`
+
 ## Regra Mental Simples
 
 - texto operacional: `assistant_rules`
 - preco: `room_rates`
-- disponibilidade real: integracao futura com Hospedin
+- disponibilidade real: `hospedin_settings` + `hospedin_room_mappings` + API da Hospedin
 
 ## Evolucao Deste Guia
 
@@ -133,4 +204,4 @@ Adicionar aqui, quando necessario:
 - exemplos de SQL util
 - regras de temporadas
 - padroes de nomes de acomodacao
-- integracao com disponibilidade real
+- exemplos reais de `account_id` e `place_type_id`

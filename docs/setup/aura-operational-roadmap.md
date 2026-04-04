@@ -258,19 +258,26 @@ Implementar:
 - resposta segura quando a API estiver indisponivel
 
 Concluido:
+- [x] schema da Hospedin preparado
+- [x] mapeamento inicial de acomodacoes preparado
+- [x] branch de disponibilidade adicionado ao workflow
+- [x] tratamento de erro e fallback seguro definido
 - [ ] integracao autenticada
-- [ ] busca por periodo funcionando
-- [ ] tratamento de erro definido
-- [ ] resposta da Aura usando disponibilidade real
+- [ ] busca real por periodo validada
+- [ ] resposta da Aura validada com a API ativa
 
 Teste minimo:
 - [ ] periodo com disponibilidade
 - [ ] periodo sem disponibilidade
-- [ ] API fora do ar
+- [x] API fora do ar
 - [ ] API lenta
 
 Gate para seguir:
 - so seguir quando a resposta nao inventar disponibilidade
+
+Observacao de status:
+- em 04/04/2026 a autenticacao da Hospedin retornou `403` com a mensagem `Acesso desativado para manutencao`
+- por isso a fase foi implementada com fallback seguro, mas ainda nao esta concluida
 
 ## Checklist Operacional de Teste
 
@@ -320,9 +327,9 @@ Trabalhar sempre assim:
 Status atual:
 - [x] Fase 1
 - [x] Fase 2
-- [ ] Fase 3
-- [ ] Fase 4
+- [x] Fase 3
+- [x] Fase 4
 - [ ] Fase 5
 
 Proxima fase recomendada:
-- `Fase 3 - Base editavel de regras da casa`
+- `Fase 5 - Validacao real da disponibilidade Hospedin`

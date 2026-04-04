@@ -235,11 +235,11 @@
           "fieldValues": [
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.remoteJid }}"
             },
             {
               "fieldId": "hospede_nome",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.pushName }}"
             },
             {
               "fieldId": "etapa",
@@ -385,10 +385,76 @@
     },
     {
       "parameters": {
+        "jsCode": "const msg = $('Mensagem Interpretada').first().json;\nconst settings = $('Resolver Modo Aura').first().json;\nconst text = String(msg.messageText || '').trim();\n\nconst normalize = (value) => String(value || '')\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase();\n\nconst normalizedText = normalize(text);\nconst handoffRules = [\n  { reason: 'manutencao', patterns: ['chuveiro queimou', 'chuveiro queimado', 'sem agua', 'sem energia', 'ar condicionado nao funciona', 'ar condicionado quebrou', 'tv nao funciona', 'manutencao', 'quarto com problema', 'problema no quarto', 'banheiro entupido', 'vazamento'] },\n  { reason: 'reclamacao', patterns: ['quero reclamar', 'fazer reclamacao', 'fazer uma reclamacao', 'reclamacao', 'reclamar', 'insatisfeito', 'insatisfacao'] },\n  { reason: 'humano', patterns: ['quero falar com humano', 'quero falar com atendente', 'quero falar com uma pessoa', 'falar com humano', 'falar com atendente', 'atendente humano', 'me chama um humano'] },\n  { reason: 'cobranca', patterns: ['cobranca errada', 'cobranca indevida', 'cobraram errado', 'pagamento errado', 'estorno', 'reembolso'] },\n  { reason: 'urgente', patterns: ['urgente', 'emergencia', 'socorro'] },\n  { reason: 'cancelamento sensivel', patterns: ['quero cancelar', 'cancelamento', 'cancelar reserva'] },\n];\n\nlet matchedRule = null;\nlet matchedPattern = null;\nfor (const rule of handoffRules) {\n  const found = rule.patterns.find((pattern) => normalizedText.includes(pattern));\n  if (found) {\n    matchedRule = rule.reason;\n    matchedPattern = found;\n    break;\n  }\n}\n\nconst needsHuman = Boolean(settings.humanHandoffEnabled !== false && matchedRule);\nconst handoffSummary = needsHuman\n  ? `Handoff humano: ${matchedRule}. Mensagem do cliente: ${text || 'sem conteudo legivel'}`\n  : '';\n\nreturn [{\n  json: {\n    ...msg,\n    needsHuman,\n    handoffReason: matchedRule,\n    handoffMatchedPattern: matchedPattern,\n    handoffSummary,\n  },\n}];"
+      },
+      "id": "7f5df6d4-2a7d-4678-a9c5-aeb866cbf9a4",
+      "name": "Classificar Handoff Humano",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 2: classifica mensagens sensiveis por regras simples. Se detectar manutencao, reclamacao, cobranca, urgencia ou pedido explicito por humano, o fluxo vai para handoff humano."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "needs-human-handoff",
+              "leftValue": "={{ $json.needsHuman === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4e21c5ab-7c87-4f5a-9604-d985aa5e5672",
+      "name": "Precisa Handoff Humano?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        1440,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 2: interrompe o fluxo automatico quando a mensagem exige um humano."
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $('Normalizar Lead').first().json;\nconst classification = $('Classificar Handoff Humano').first().json;\n\nreturn [{\n  json: {\n    lead_id: lead.remoteJid,\n    new_stage: 'Aguardando Humano',\n    summary: classification.handoffSummary || 'Handoff humano solicitado.',\n    prioridade: 'alta',\n    ultima_interacao: new Date().toISOString(),\n    handoff_reason: classification.handoffReason || 'motivo_nao_identificado',\n  },\n}];"
+      },
+      "id": "b661c0d3-6218-4b9d-9920-75f67c80f3a3",
+      "name": "Preparar Handoff Humano",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Fase 2: prepara a atualizacao do card para atendimento humano e encerra a automacao sem resposta da Aura."
+    },
+    {
+      "parameters": {
         "promptType": "define",
-        "text": "={{ $('Mensagem Interpretada').item.json.messageText }}",
+        "text": "={{ $('Mensagem Interpretada').first().json.messageText }}",
         "options": {
-          "systemMessage": "Voc\u00ea \u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\u00e3o \u00e9 atender h\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. N\u00e3o d\u00ea pre\u00e7os gen\u00e9ricos; pe\u00e7a datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudan\u00e7a de est\u00e1gio comercial, use a ferramenta update_kanban_stage.\n\nETAPAS DISPON\u00cdVEIS:\n- Novo Lead\n- Cota\u00e7\u00e3o Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/P\u00f3s-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forne\u00e7a um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\u00e7\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\u00f3s-venda, Perdido/Cancelado."
+          "systemMessage": "Voc\u00ea \u00e9 a \"Aura\", a recepcionista e vendedora virtual de elite do Hotel Estrela do Mar. Sua miss\u00e3o \u00e9 atender h\u00f3spedes via WhatsApp, qualificar o interesse deles e gerenciar o funil de vendas no CRM.\n\nDIRETRIZES DE ATENDIMENTO:\n1. Seja cordial, profissional e use um tom acolhedor.\n2. Tente sempre extrair quantidade de pessoas, datas desejadas e tipo de quarto.\n3. N\u00e3o d\u00ea pre\u00e7os gen\u00e9ricos; pe\u00e7a datas para consultar disponibilidade e melhor oferta.\n4. Responda de forma curta e natural para WhatsApp.\n5. Se perceber mudan\u00e7a de est\u00e1gio comercial, use a ferramenta update_kanban_stage.\n6. Casos sensiveis de manutencao, reclamacao, cobranca ou pedido de humano ja foram filtrados antes de chegar ate voce.\n\nETAPAS DISPON\u00cdVEIS:\n- Novo Lead\n- Cota\u00e7\u00e3o Enviada\n- Aguardando Pagamento\n- Reserva Confirmada\n- Check-in\n- Check-out/P\u00f3s-venda\n- Perdido/Cancelado\n\nSempre que atualizar a etapa, forne\u00e7a um breve resumo_solicitacao objetivo.\n\nUse exatamente uma destas etapas ao chamar a tool: Novo Lead, Cota\u00e7\u00e3o Enviada, Aguardando Pagamento, Reserva Confirmada, Check-in, Check-out/P\u00f3s-venda, Perdido/Cancelado."
         }
       },
       "id": "82d1f283-7f59-481d-ac6a-c90817d1c32e",
@@ -396,7 +462,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1160,
+        1720,
         0
       ],
       "notesInFlow": true,
@@ -405,7 +471,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Normalizar Lead').item.json.remoteJid }}",
+        "sessionKey": "={{ $('Normalizar Lead').first().json.remoteJid }}",
         "contextWindowLength": 10
       },
       "id": "a173408c-13c3-4a05-9408-1c288b0baf41",
@@ -413,7 +479,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1320,
+        1880,
         220
       ],
       "notesInFlow": true,
@@ -431,7 +497,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        1160,
+        1720,
         -220
       ],
       "notesInFlow": true,
@@ -445,6 +511,7 @@
           "conditions": [
             {
               "keyName": "lead_id",
+              "condition": "eq",
               "keyValue": "={{ $json.lead_id }}"
             }
           ]
@@ -453,7 +520,7 @@
           "fieldValues": [
             {
               "fieldId": "hospede_nome",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.pushName }}"
             },
             {
               "fieldId": "etapa",
@@ -466,6 +533,10 @@
             {
               "fieldId": "ultima_interacao",
               "fieldValue": "={{ $json.ultima_interacao }}"
+            },
+            {
+              "fieldId": "prioridade",
+              "fieldValue": "={{ $json.prioridade || 'media' }}"
             }
           ]
         }
@@ -475,7 +546,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1440,
+        2000,
         -220
       ],
       "notesInFlow": true,
@@ -496,7 +567,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        2320,
         0
       ],
       "notesInFlow": true,
@@ -525,7 +596,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2040,
+        2600,
         0
       ],
       "notesInFlow": true,
@@ -538,11 +609,11 @@
           "fieldValues": [
             {
               "fieldId": "session_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.remoteJid }}"
             },
             {
               "fieldId": "message",
-              "fieldValue": "={{ { role: 'user', content: $('Mensagem Interpretada').item.json.messageText, pushName: $('Normalizar Lead').item.json.pushName, messageType: $('Mensagem Interpretada').item.json.messageType } }}"
+              "fieldValue": "={{ { role: 'user', content: $('Mensagem Interpretada').first().json.messageText, pushName: $('Normalizar Lead').first().json.pushName, messageType: $('Mensagem Interpretada').first().json.messageType } }}"
             },
             {
               "fieldId": "hora_data_mensagem",
@@ -575,11 +646,11 @@
           "fieldValues": [
             {
               "fieldId": "lead_nome",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.pushName }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.pushName }}"
             },
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.waNumber }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.waNumber }}"
             }
           ]
         }
@@ -608,11 +679,11 @@
           "fieldValues": [
             {
               "fieldId": "session_id",
-              "fieldValue": "={{ $('Normalizar Lead').item.json.remoteJid }}"
+              "fieldValue": "={{ $('Normalizar Lead').first().json.remoteJid }}"
             },
             {
               "fieldId": "message",
-              "fieldValue": "={{ { role: 'assistant', content: $('AI Agent Aura').item.json.output } }}"
+              "fieldValue": "={{ { role: 'assistant', content: $('AI Agent Aura').first().json.output } }}"
             },
             {
               "fieldId": "hora_data_mensagem",
@@ -626,7 +697,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1480,
+        2040,
         0
       ],
       "notesInFlow": true,
@@ -645,7 +716,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1040,
+        1600,
         220
       ],
       "id": "734af457-7a93-4773-b7f0-7e84155d4530",
@@ -723,9 +794,9 @@
     },
     {
       "parameters": {
-        "content": "## Agente Comercial\nA Aura so entra em acao quando o modo operacional estiver em auto. Com isso aprovado, responde com memoria, usa Gemini como modelo e pode mover o card no Kanban pela tool.",
+        "content": "## Agente Comercial\nA Aura so entra em acao quando o modo operacional estiver em auto e quando a mensagem nao exigir handoff humano. Com isso aprovado, responde com memoria, usa Gemini como modelo e pode mover o card no Kanban pela tool.",
         "height": 620,
-        "width": 1080,
+        "width": 1640,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -739,7 +810,7 @@
     },
     {
       "parameters": {
-        "content": "## Resposta ao Cliente\nSalva a resposta da Aura, valida o payload final e envia a mensagem para a Evolution.",
+        "content": "## Resposta ao Cliente\nSalva a resposta da Aura, valida o payload final e envia a mensagem para a Evolution. No branch de handoff humano, a automacao termina sem resposta.",
         "height": 280,
         "width": 520,
         "color": 7
@@ -1073,7 +1144,7 @@
       "main": [
         [
           {
-            "node": "AI Agent Aura",
+            "node": "Classificar Handoff Humano",
             "type": "main",
             "index": 0
           }
@@ -1081,6 +1152,46 @@
         [
           {
             "node": "Modo Manual - Sem Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classificar Handoff Humano": {
+      "main": [
+        [
+          {
+            "node": "Precisa Handoff Humano?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Precisa Handoff Humano?": {
+      "main": [
+        [
+          {
+            "node": "Preparar Handoff Humano",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent Aura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Handoff Humano": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Update Kanban",
             "type": "main",
             "index": 0
           }

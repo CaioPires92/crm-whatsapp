@@ -181,15 +181,15 @@ Implementar:
 - mensagem padrao opcional de encaminhamento
 
 Concluido:
-- [ ] branch de handoff criada
-- [ ] lista inicial de gatilhos definida
-- [ ] atualizacao de etapa no Kanban funcionando
-- [ ] mensagem de encaminhamento definida
+- [x] branch de handoff criada
+- [x] lista inicial de gatilhos definida
+- [x] atualizacao de etapa no Kanban funcionando
+- [x] mensagem de encaminhamento definida
 
 Teste minimo:
-- [ ] "meu chuveiro queimou" vai para humano
-- [ ] "quero reclamar" vai para humano
-- [ ] "quero reservar para casal" continua com Aura
+- [x] "meu chuveiro queimou" vai para humano
+- [x] "quero reclamar" vai para humano
+- [x] "quero reservar para casal" continua com Aura
 
 Gate para seguir:
 - so seguir quando os cenarios sensiveis nao responderem automaticamente
@@ -319,10 +319,10 @@ Trabalhar sempre assim:
 
 Status atual:
 - [x] Fase 1
-- [ ] Fase 2
+- [x] Fase 2
 - [ ] Fase 3
 - [ ] Fase 4
 - [ ] Fase 5
 
 Proxima fase recomendada:
-- `Fase 2 - Filtro de handoff humano`
+- `Fase 3 - Base editavel de regras da casa`

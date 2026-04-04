@@ -16,3 +16,4 @@ Current key files:
 - `setup/n8n-config.md`
 - `setup/aura-operational-roadmap.md`
 - `setup/assistant-settings-migration-20260404.sql`
+- `setup/kanban-stage-handoff-migration-20260404.sql`

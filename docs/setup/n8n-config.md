@@ -43,6 +43,7 @@ GERENCIAMENTO DE FUNIL (TOOL CALLING):
 Você deve usar a ferramenta 'update_kanban_stage' sempre que identificar uma mudança no estado do cliente.
 ETAPAS DISPONÍVEIS:
 - 'Novo Lead': Primeiro contato.
+- 'Aguardando Humano': Caso sensivel que deve ser tratado por uma pessoa da equipe.
 - 'Cotação Enviada': Assim que você passar valores de reserva.
 - 'Aguardando Pagamento': O cliente disse que quer fechar e você enviou o link/PIX.
 - 'Reserva Confirmada': O cliente confirmou o pagamento (ou enviou comprovante).
@@ -62,7 +63,7 @@ json
   "properties": {
     "new_stage": {
       "type": "string",
-      "enum": ["Novo Lead", "Cotação Enviada", "Aguardando Pagamento", "Reserva Confirmada", "Check-in", "Check-out/Pós-venda", "Perdido/Cancelado"]
+      "enum": ["Novo Lead", "Aguardando Humano", "Cotação Enviada", "Aguardando Pagamento", "Reserva Confirmada", "Check-in", "Check-out/Pós-venda", "Perdido/Cancelado"]
     },
     "summary": {
       "type": "string",

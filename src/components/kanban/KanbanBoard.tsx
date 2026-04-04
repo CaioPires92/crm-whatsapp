@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { differenceInHours, formatDistanceToNow } from 'date-fns';
+import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Clock, MessageSquare, AlertCircle, User as UserIcon, MessageCircle, Instagram, Globe } from 'lucide-react';
+import { Clock, MessageSquare, AlertCircle, User as UserIcon, MessageCircle, Instagram, Globe, Phone, CalendarDays, Bot, BadgeDollarSign } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -12,6 +12,7 @@ function cn(...inputs: ClassValue[]) {
 
 const STAGES = [
   'Novo Lead',
+  'Aguardando Humano',
   'Cotação Enviada',
   'Aguardando Pagamento',
   'Reserva Confirmada',
@@ -169,52 +170,68 @@ function KanbanLeadCard({ card }: { card: KanbanCard }) {
   const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
   const origem = getOrigemConfig(card.origem);
   const OrigemIcon = origem.icon;
+  const leadPhone = card.lead_id.split('@')[0];
+  const interactionDate = format(new Date(card.ultima_interacao), 'dd/MM/yyyy', { locale: ptBR });
+  const resumo = card.resumo_solicitacao || 'Sem resumo da solicitação';
 
   return (
     <div
-      className="group bg-[#161616] border border-[#1f1f1f] rounded-xl p-3 shadow-sm hover:shadow-xl hover:border-zinc-700/50 hover:bg-[#1c1c1c] transition-all duration-300 cursor-default border-l-4"
+      className="group relative overflow-hidden bg-[#0f1117] border border-[#1b2230] rounded-xl px-3 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:border-[#2b3b57] hover:bg-[#111626] transition-all duration-300 cursor-default border-l-[3px]"
       style={{ borderLeftColor: urgencia === 'Verde' ? '#22c55e' : urgencia === 'Amarelo' ? '#eab308' : '#ef4444' }}
     >
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-[10px] text-zinc-400 font-bold border border-white/10 group-hover:border-white/20">
+      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-[#2ea8ff]/80 via-[#1f8cf0]/50 to-transparent opacity-70" />
+
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2 min-w-0">
+          <div className="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a364c] to-[#1c2535] flex items-center justify-center text-[10px] text-zinc-300 font-bold border border-[#2a3448] group-hover:border-[#3a4a67]">
             {card.hospede_nome?.substring(0, 1).toUpperCase() || <UserIcon className="w-3 h-3" />}
           </div>
-          <span className="text-sm font-semibold text-white tracking-tight leading-none truncate w-32">
-            {card.hospede_nome || 'Hóspede'}
-          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-white truncate leading-none">
+              {card.hospede_nome || 'Hóspede'}
+            </p>
+            <p className="text-[11px] text-zinc-500 truncate mt-1">
+              {leadPhone}
+            </p>
+          </div>
         </div>
-        <div className={cn(
-          "px-2 py-0.5 rounded-full text-[9px] font-bold border flex items-center gap-1",
-          getUrgenciaColorClass(urgencia)
-        )}>
-          <Clock className="w-2.5 h-2.5" />
-          {formatDistanceToNow(new Date(card.ultima_interacao), { addSuffix: true, locale: ptBR })}
-        </div>
+        <div className="text-[10px] text-zinc-500 tabular-nums shrink-0 pt-0.5">{interactionDate}</div>
       </div>
 
-      <div className="mb-3">
-        <span className={cn("inline-flex items-center gap-1 rounded-md px-2 py-1 border text-[10px] font-medium", origem.className)}>
-          <OrigemIcon className="h-3 w-3" />
-          {origem.label}
+      <div className="mt-2.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", origem.className)}>
+            <OrigemIcon className="h-2.5 w-2.5" />
+            {origem.label}
+          </span>
+          <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", getUrgenciaColorClass(urgencia))}>
+            <Clock className="h-2.5 w-2.5" />
+            {formatDistanceToNow(new Date(card.ultima_interacao), { addSuffix: true, locale: ptBR })}
+          </span>
+        </div>
+        <span className="text-[11px] text-white/90 font-semibold tabular-nums shrink-0">
+          R$ 0,00
         </span>
       </div>
 
-      <div className="bg-black/20 rounded-lg p-2 mb-3 border border-white/5 group-hover:border-white/10 transition-colors">
-        <p className="text-[11px] text-zinc-400 leading-relaxed line-clamp-2 italic">
-          {card.resumo_solicitacao ? `"${card.resumo_solicitacao}"` : 'Sem resumo da solicitação'}
+      <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5">
+        <p className="text-[11px] text-zinc-300 leading-snug line-clamp-2">
+          {resumo}
         </p>
       </div>
 
-      <div className="flex items-center justify-between mt-auto">
-        <div className="flex items-center gap-2 text-zinc-600 group-hover:text-zinc-500">
+      <div className="mt-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-zinc-500">
+          <CalendarDays className="w-3 h-3" />
+          <Phone className="w-3 h-3" />
           <MessageSquare className="w-3 h-3" />
-          <span className="text-[10px] tabular-nums">@{card.lead_id.split('@')[0]}</span>
+          <Bot className="w-3 h-3" />
+          <BadgeDollarSign className="w-3 h-3" />
         </div>
 
         {urgencia === 'Vermelho' && (
-          <div className="animate-bounce">
-            <AlertCircle className="w-3.5 h-3.5 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
+          <div className="animate-pulse">
+            <AlertCircle className="w-3.5 h-3.5 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
           </div>
         )}
       </div>

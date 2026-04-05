@@ -13,7 +13,13 @@ import {
   Instagram,
   Globe,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Phone,
+  MessageSquare,
+  Bot,
+  BadgeDollarSign,
+  AlertCircle,
+  CalendarDays
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StageSelect from './StageSelect';
@@ -38,6 +44,7 @@ interface KanbanCardRow {
   resumo_solicitacao: string | null;
   prioridade: string | null;
   ultima_interacao: string;
+  hospede_foto_url?: string | null;
 }
 
 interface KanbanCard {
@@ -338,7 +345,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
         id: card.id,
         lead_id: card.lead_id,
         hospede_nome: card.hospede_nome,
-        hospede_foto_url: card.hospede_foto_url,
+        hospede_foto_url: card.hospede_foto_url || null,
         origem: card.origem || 'WhatsApp',
         etapa: card.etapa as KanbanStage,
         resumo_solicitacao: card.resumo_solicitacao,
@@ -350,10 +357,6 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   };
 
   const deleteCard = async (id: number) => {
-    if (!window.confirm('Tem certeza que deseja excluir este card? Esta ação não pode ser desfeita.')) {
-      return;
-    }
-
     const { error } = await supabase
       .from('kanban_cards')
       .delete()

@@ -2,26 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Clock, MessageSquare, AlertCircle, User as UserIcon, MessageCircle, Instagram, Globe, Phone, CalendarDays, Bot, BadgeDollarSign, Trash2, ChevronDown } from 'lucide-react';
+import { Search, Filter, Plus, MoreVertical, LayoutGrid, List, User as UserIcon, Phone, MessageSquare, Bot, BadgeDollarSign, CalendarDays, Clock, AlertCircle, Trash2, ChevronDown, Check, MessageCircle, Instagram, Globe } from 'lucide-react';
+import StageSelect from './StageSelect';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { STAGES, type KanbanStage } from '../../types/kanban';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const STAGES = [
-  'Novo Lead',
-  'Aguardando Humano',
-  'Cotação Enviada',
-  'Aguardando Pagamento',
-  'Reserva Confirmada',
-  'Check-in',
-  'Check-out/Pós-venda',
-  'Perdido/Cancelado',
-] as const;
-
-type KanbanStage = (typeof STAGES)[number];
 type KanbanPriority = 'alta' | 'media' | 'baixa';
 type UrgenciaCor = 'Verde' | 'Amarelo' | 'Vermelho';
 
@@ -203,7 +193,19 @@ function KanbanLeadCard({
             </p>
           </div>
         </div>
-        <div className="text-[10px] text-zinc-500 tabular-nums shrink-0 pt-0.5">{interactionDate}</div>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="text-[10px] text-zinc-500 tabular-nums pt-0.5">{interactionDate}</div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(card.id);
+            }}
+            className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95"
+            title="Excluir card"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-2.5 flex items-center justify-between gap-2">
@@ -229,8 +231,8 @@ function KanbanLeadCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-zinc-500">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 text-zinc-500 shrink-0">
             <CalendarDays className="w-3 h-3" />
             <Phone className="w-3 h-3" />
             <MessageSquare className="w-3 h-3" />
@@ -238,40 +240,21 @@ function KanbanLeadCard({
             <BadgeDollarSign className="w-3 h-3" />
           </div>
 
-          <div className="h-3 w-[1px] bg-white/10 mx-1" />
+          <div className="h-3 w-[1px] bg-white/10 mx-1 shrink-0" />
 
           {/* Seletor de Etapa Manual */}
-          <div className="relative group/select">
-            <select
-              value={card.etapa}
-              onChange={(e) => onMove(card.id, e.target.value as KanbanStage)}
-              className="appearance-none bg-transparent text-[10px] text-zinc-400 hover:text-white cursor-pointer pr-4 outline-none transition-colors border-none"
-            >
-              {STAGES.map(s => (
-                <option key={s} value={s} className="bg-[#0f1117] text-white font-sans">{s}</option>
-              ))}
-            </select>
-            <ChevronDown className="w-2.5 h-2.5 text-zinc-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none group-hover/select:text-white transition-colors" />
-          </div>
+          <StageSelect
+            value={card.etapa}
+            onChange={(newStage: KanbanStage) => onMove(card.id, newStage)}
+          />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 shrink-0 ml-2">
           {urgencia === 'Vermelho' && (
             <div className="animate-pulse">
               <AlertCircle className="w-3.5 h-3.5 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
             </div>
           )}
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(card.id);
-            }}
-            className="p-1 rounded-md hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200"
-            title="Excluir card"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
     </div>

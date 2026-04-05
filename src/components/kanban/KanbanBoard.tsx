@@ -19,7 +19,8 @@ import {
   Bot,
   BadgeDollarSign,
   AlertCircle,
-  CalendarDays
+  CalendarDays,
+  Maximize2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StageSelect from './StageSelect';
@@ -204,8 +205,15 @@ function KanbanLeadCard({
       layoutId={`card-${card.id}`}
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.9}
-      whileDrag={{ scale: 1.05, zIndex: 9999, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)" }}
+      dragElastic={0.6}
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+      whileDrag={{ 
+        scale: 1.05, 
+        zIndex: 9999, 
+        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)",
+        cursor: "grabbing"
+      }}
+      layout
       onDragEnd={(e, info) => {
         const elements = document.elementsFromPoint(info.point.x, info.point.y);
         const column = elements.find(el => el.classList.contains('kanban-column'));
@@ -219,7 +227,7 @@ function KanbanLeadCard({
       onDragStart={() => {
         onDragStart?.(card.etapa);
       }}
-      onClick={() => onExpand(card.id)}
+      onDoubleClick={() => onExpand(card.id)}
       className="kanban-card group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none"
     >
       <div className="flex items-start justify-between gap-2 pointer-events-none">
@@ -242,16 +250,28 @@ function KanbanLeadCard({
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="text-[10px] text-zinc-500 tabular-nums pt-0.5">{interactionDate}</div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(card.id);
-            }}
-            className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95 pointer-events-auto"
-            title="Excluir card"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onExpand(card.id);
+              }}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-600 hover:text-white transition-all duration-200 border border-transparent hover:border-white/10 active:scale-95 pointer-events-auto"
+              title="Abrir detalhes (ou clique duplo)"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(card.id);
+              }}
+              className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95 pointer-events-auto"
+              title="Excluir card"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -552,10 +572,13 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                   </span>
                 </div>
 
-                <div className={cn(
-                  "flex-1 space-y-3 pr-1 no-scrollbar transition-all duration-200",
-                  activeDragColumn ? "overflow-visible" : "overflow-y-auto"
-                )}>
+                <motion.div 
+                  layout
+                  className={cn(
+                    "flex-1 space-y-3 pr-1 no-scrollbar transition-all duration-200",
+                    activeDragColumn ? "overflow-visible" : "overflow-y-auto"
+                  )}
+                >
                   {stageCards.map((card) => {
                     return (
                       <KanbanLeadCard 
@@ -575,7 +598,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                       <p className="text-[10px] text-zinc-700 font-medium group-hover/empty:text-zinc-600 transition-colors">Sem cards nesta etapa</p>
                     </div>
                   )}
-                </div>
+                </motion.div>
               </div>
             );
           })}

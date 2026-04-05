@@ -14,6 +14,7 @@ Current key files:
 - `architecture/overview.md`
 - `setup/crm-kit-replicacao.md`
 - `setup/implementation-master-guide.md`
+- `setup/codex-superpowers-guide.md`
 - `../seeds/aura-operational-data.template.json`
 - `setup/assistant-settings-migration-20260404.sql`
 - `setup/kanban-stage-handoff-migration-20260404.sql`

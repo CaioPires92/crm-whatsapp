@@ -49,6 +49,17 @@
   }
 }
 
+@layer utilities {
+  /* Utility to hide scrollbars while keeping functionality - Ultra Aggressive */
+  .no-scrollbar, .no-scrollbar * {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar, .no-scrollbar *::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari and Opera */
+  }
+}
+
 @layer components {
   .glass-card {
     @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-lg;

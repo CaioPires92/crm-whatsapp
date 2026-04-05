@@ -3,9 +3,9 @@ import SidebarNav from '../components/layout/SidebarNav';
 
 export default function Dashboard() {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-background no-scrollbar">
       <SidebarNav />
-      <main className="flex-1 h-full min-h-0 min-w-0 relative">
+      <main className="flex-1 h-full min-h-0 min-w-0 relative no-scrollbar">
         <Outlet />
       </main>
     </div>

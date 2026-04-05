@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Clock, MessageSquare, AlertCircle, User as UserIcon, MessageCircle, Instagram, Globe, Phone, CalendarDays, Bot, BadgeDollarSign } from 'lucide-react';
+import { Clock, MessageSquare, AlertCircle, User as UserIcon, MessageCircle, Instagram, Globe, Phone, CalendarDays, Bot, BadgeDollarSign, Trash2, ChevronDown } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -166,7 +166,15 @@ function getUrgenciaColorClass(urgencia: UrgenciaCor) {
   }
 }
 
-function KanbanLeadCard({ card }: { card: KanbanCard }) {
+function KanbanLeadCard({
+  card,
+  onDelete,
+  onMove
+}: {
+  card: KanbanCard;
+  onDelete: (id: number) => void;
+  onMove: (id: number, newStage: KanbanStage) => void;
+}) {
   const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
   const origem = getOrigemConfig(card.origem);
   const OrigemIcon = origem.icon;
@@ -220,20 +228,51 @@ function KanbanLeadCard({ card }: { card: KanbanCard }) {
         </p>
       </div>
 
-      <div className="mt-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-zinc-500">
-          <CalendarDays className="w-3 h-3" />
-          <Phone className="w-3 h-3" />
-          <MessageSquare className="w-3 h-3" />
-          <Bot className="w-3 h-3" />
-          <BadgeDollarSign className="w-3 h-3" />
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 text-zinc-500">
+            <CalendarDays className="w-3 h-3" />
+            <Phone className="w-3 h-3" />
+            <MessageSquare className="w-3 h-3" />
+            <Bot className="w-3 h-3" />
+            <BadgeDollarSign className="w-3 h-3" />
+          </div>
+
+          <div className="h-3 w-[1px] bg-white/10 mx-1" />
+
+          {/* Seletor de Etapa Manual */}
+          <div className="relative group/select">
+            <select
+              value={card.etapa}
+              onChange={(e) => onMove(card.id, e.target.value as KanbanStage)}
+              className="appearance-none bg-transparent text-[10px] text-zinc-400 hover:text-white cursor-pointer pr-4 outline-none transition-colors border-none"
+            >
+              {STAGES.map(s => (
+                <option key={s} value={s} className="bg-[#0f1117] text-white font-sans">{s}</option>
+              ))}
+            </select>
+            <ChevronDown className="w-2.5 h-2.5 text-zinc-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none group-hover/select:text-white transition-colors" />
+          </div>
         </div>
 
-        {urgencia === 'Vermelho' && (
-          <div className="animate-pulse">
-            <AlertCircle className="w-3.5 h-3.5 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {urgencia === 'Vermelho' && (
+            <div className="animate-pulse">
+              <AlertCircle className="w-3.5 h-3.5 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]" />
+            </div>
+          )}
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(card.id);
+            }}
+            className="p-1 rounded-md hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200"
+            title="Excluir card"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -263,6 +302,39 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir este card? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from('kanban_cards')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Erro ao excluir card:', error);
+      alert('Erro ao excluir card. Tente novamente.');
+    }
+    // O realtime cuidará de atualizar a lista via subscription
+  };
+
+  const handleMove = async (id: number, newStage: KanbanStage) => {
+    const { error } = await supabase
+      .from('kanban_cards')
+      .update({
+        etapa: newStage,
+        ultima_interacao: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Erro ao mover card:', error);
+      alert('Erro ao mover card. Tente novamente.');
+    }
+    // O realtime cuidará de atualizar a lista via subscription
+  };
   const syncStateRef = useRef<KanbanSyncState>('connecting');
   const boardScrollRef = useRef<HTMLDivElement | null>(null);
   const dragStartXRef = useRef(0);
@@ -446,7 +518,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
           dragStartScrollLeftRef.current = board.scrollLeft;
         }}
         className={cn(
-          "flex-1 overflow-x-auto overflow-y-hidden bg-[#0a0a0a] scrollbar-thin",
+          "flex-1 overflow-x-auto overflow-y-hidden bg-[#0a0a0a] no-scrollbar",
           isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab"
         )}
       >
@@ -465,9 +537,16 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                   </span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin">
+                <div className="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar">
                   {stageCards.map((card) => {
-                    return <KanbanLeadCard key={card.id} card={card} />;
+                    return (
+                      <KanbanLeadCard
+                        key={card.id}
+                        card={card}
+                        onDelete={handleDelete}
+                        onMove={handleMove}
+                      />
+                    );
                   })}
 
                   {stageCards.length === 0 && (

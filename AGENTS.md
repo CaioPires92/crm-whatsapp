@@ -68,6 +68,30 @@ The infrastructure is located in `/infra/docker-compose.yml`.
 
 ---
 
+## 🧠 Skill Triggers For This Project
+
+When superpowers skills are available, use these trigger rules by default:
+
+- Use `systematic-debugging` for bugs, regressions, failed executions, broken workflows, missing WhatsApp replies, inconsistent Supabase writes, or unclear root-cause investigations.
+- Use `writing-plans` before implementing medium or large changes that touch more than one layer, especially combinations of `frontend + Supabase`, `n8n + Supabase`, or `frontend + n8n + Supabase`.
+- Use `brainstorming` before implementation when the user is comparing approaches, asking for the best architecture, designing a new flow, or when requirements are still ambiguous.
+- Use `verification-before-completion` before closing any task that changes workflows, data flow, operational rules, integrations, or user-visible CRM behavior.
+- Use `subagent-driven-development` only for larger tasks that can be split into independent slices with low overlap, such as separate changes in React, n8n workflows, and scripts/migrations.
+- Use `test-driven-development` mainly for changes in `src/` and `scripts/` that add or refactor critical logic. Do not force it for simple n8n-only edits.
+
+Practical defaults:
+- Small edit with low risk: work directly, then verify.
+- Medium change: use `writing-plans`, then implement, then `verification-before-completion`.
+- Strange bug: start with `systematic-debugging`.
+- Big feature or architecture change: start with `brainstorming`, then `writing-plans`.
+
+If the user explicitly requests a skill by name, always honor that request.
+
+Reference:
+- `docs/setup/codex-superpowers-guide.md`
+
+---
+
 ## 🛠️ Common Operations & Gotchas
 
 - **Label Sync**: When syncing labels, ensure the Evolution API query uses the specialized `/label/findLabelChats` endpoint for better reliability.

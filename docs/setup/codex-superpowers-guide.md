@@ -7,6 +7,22 @@ Importante:
 - elas nao mudam o produto diretamente
 - o uso faz mais diferenca em tarefas grandes, bugs estranhos e mudancas com risco de regressao
 
+## Gatilhos Automaticos Recomendados
+
+Para este projeto, a regra pratica recomendada e:
+
+- bug ou regressao: `systematic-debugging`
+- mudanca media que toca mais de uma camada: `writing-plans`
+- arquitetura, fluxo novo ou requisitos ainda abertos: `brainstorming`
+- antes de encerrar mudanca relevante: `verification-before-completion`
+- trabalho grande com frentes independentes: `subagent-driven-development`
+- logica critica em `src/` ou `scripts/`: `test-driven-development`
+
+Politica sugerida:
+- tarefa pequena: fazer direto e validar no final
+- tarefa media: `writing-plans` + execucao + `verification-before-completion`
+- tarefa grande: `brainstorming` + `writing-plans` + execucao + `verification-before-completion`
+
 ## As 4 Mais Uteis
 
 ### 1. `systematic-debugging`

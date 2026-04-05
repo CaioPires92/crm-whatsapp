@@ -2,8 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Search, Filter, Plus, MoreVertical, LayoutGrid, List, User as UserIcon, Phone, MessageSquare, Bot, BadgeDollarSign, CalendarDays, Clock, AlertCircle, Trash2, ChevronDown, Check, MessageCircle, Instagram, Globe } from 'lucide-react';
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  MoreVertical, 
+  Trash2, 
+  User as UserIcon,
+  MessageCircle,
+  Instagram,
+  Globe,
+  Clock,
+  ExternalLink
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import StageSelect from './StageSelect';
+import { ExpandedCard } from './ExpandedCard';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { STAGES, type KanbanStage } from '../../types/kanban';
@@ -30,6 +44,7 @@ interface KanbanCard {
   id: number;
   lead_id: string;
   hospede_nome: string | null;
+  hospede_foto_url: string | null;
   origem: string;
   etapa: KanbanStage;
   resumo_solicitacao: string | null;
@@ -77,7 +92,6 @@ function groupCardsByStage(cards: KanbanCard[]): KanbanCardsByStage {
 }
 
 export function calcularUrgencia(ultima_interacao: string, etapa: KanbanStage): UrgenciaCor {
-  // SLA comercial se aplica nas etapas de topo de funil.
   if (etapa !== 'Novo Lead' && etapa !== 'Cotação Enviada') {
     return 'Verde';
   }
@@ -156,14 +170,16 @@ function getUrgenciaColorClass(urgencia: UrgenciaCor) {
   }
 }
 
-function KanbanLeadCard({
-  card,
-  onDelete,
-  onMove
-}: {
-  card: KanbanCard;
+function KanbanLeadCard({ 
+  card, 
+  onMove, 
+  onDelete, 
+  onExpand 
+}: { 
+  card: KanbanCard; 
+  onMove: (id: number, stage: KanbanStage) => void;
   onDelete: (id: number) => void;
-  onMove: (id: number, newStage: KanbanStage) => void;
+  onExpand: (id: number) => void;
 }) {
   const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
   const origem = getOrigemConfig(card.origem);
@@ -173,16 +189,32 @@ function KanbanLeadCard({
   const resumo = card.resumo_solicitacao || 'Sem resumo da solicitação';
 
   return (
-    <div
-      className="group relative overflow-hidden bg-[#0f1117] border border-[#1b2230] rounded-xl px-3 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:border-[#2b3b57] hover:bg-[#111626] transition-all duration-300 cursor-default border-l-[3px]"
-      style={{ borderLeftColor: urgencia === 'Verde' ? '#22c55e' : urgencia === 'Amarelo' ? '#eab308' : '#ef4444' }}
+    <motion.div 
+      layoutId={`card-${card.id}`}
+      drag
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      dragElastic={0.9}
+      whileDrag={{ scale: 1.05, zIndex: 100, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)" }}
+      onDragEnd={(e, info) => {
+        const elements = document.elementsFromPoint(info.point.x, info.point.y);
+        const column = elements.find(el => el.classList.contains('kanban-column'));
+        const newStage = column?.getAttribute('data-stage') as KanbanStage;
+        
+        if (newStage && newStage !== card.etapa) {
+          onMove(card.id, newStage);
+        }
+      }}
+      onClick={() => onExpand(card.id)}
+      className="group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none"
     >
-      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-[#2ea8ff]/80 via-[#1f8cf0]/50 to-transparent opacity-70" />
-
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 pointer-events-none">
         <div className="flex items-start gap-2 min-w-0">
-          <div className="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a364c] to-[#1c2535] flex items-center justify-center text-[10px] text-zinc-300 font-bold border border-[#2a3448] group-hover:border-[#3a4a67]">
-            {card.hospede_nome?.substring(0, 1).toUpperCase() || <UserIcon className="w-3 h-3" />}
+          <div className="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a364c] to-[#1c2535] flex items-center justify-center text-[10px] text-zinc-300 font-bold border border-[#2a3448] group-hover:border-[#3a4a67] overflow-hidden">
+            {card.hospede_foto_url ? (
+              <img src={card.hospede_foto_url} alt={card.hospede_nome || ''} className="w-full h-full object-cover" />
+            ) : (
+              card.hospede_nome?.substring(0, 1).toUpperCase() || <UserIcon className="w-3 h-3" />
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-white truncate leading-none">
@@ -200,7 +232,7 @@ function KanbanLeadCard({
               e.stopPropagation();
               onDelete(card.id);
             }}
-            className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95"
+            className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95 pointer-events-auto"
             title="Excluir card"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -208,7 +240,7 @@ function KanbanLeadCard({
         </div>
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between gap-2">
+      <div className="mt-2.5 flex items-center justify-between gap-2 pointer-events-none">
         <div className="flex items-center gap-1.5 min-w-0">
           <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", origem.className)}>
             <OrigemIcon className="h-2.5 w-2.5" />
@@ -224,13 +256,13 @@ function KanbanLeadCard({
         </span>
       </div>
 
-      <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5">
+      <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5 pointer-events-none">
         <p className="text-[11px] text-zinc-300 leading-snug line-clamp-2">
           {resumo}
         </p>
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2">
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2 pointer-events-none">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-zinc-500 shrink-0">
             <CalendarDays className="w-3 h-3" />
@@ -242,11 +274,12 @@ function KanbanLeadCard({
 
           <div className="h-3 w-[1px] bg-white/10 mx-1 shrink-0" />
 
-          {/* Seletor de Etapa Manual */}
-          <StageSelect
-            value={card.etapa}
-            onChange={(newStage: KanbanStage) => onMove(card.id, newStage)}
-          />
+          <div className="pointer-events-auto">
+            <StageSelect
+              value={card.etapa}
+              onChange={(newStage: KanbanStage) => onMove(card.id, newStage)}
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -257,7 +290,7 @@ function KanbanLeadCard({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -285,8 +318,38 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
-  const handleDelete = async (id: number) => {
+  const fetchCards = async () => {
+    const { data, error } = await supabase
+      .from('kanban_cards')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching kanban cards:', error);
+      return;
+    }
+
+    const typedCards = ((data || []) as KanbanCardRow[])
+      .filter((card) => isKanbanStage(card.etapa))
+      .map((card) => ({
+        id: card.id,
+        lead_id: card.lead_id,
+        hospede_nome: card.hospede_nome,
+        hospede_foto_url: card.hospede_foto_url,
+        origem: card.origem || 'WhatsApp',
+        etapa: card.etapa as KanbanStage,
+        resumo_solicitacao: card.resumo_solicitacao,
+        prioridade: isKanbanPriority(card.prioridade) ? card.prioridade : 'media',
+        ultima_interacao: card.ultima_interacao,
+      }));
+
+    setCards(typedCards);
+  };
+
+  const deleteCard = async (id: number) => {
     if (!window.confirm('Tem certeza que deseja excluir este card? Esta ação não pode ser desfeita.')) {
       return;
     }
@@ -300,10 +363,9 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       console.error('Erro ao excluir card:', error);
       alert('Erro ao excluir card. Tente novamente.');
     }
-    // O realtime cuidará de atualizar a lista via subscription
   };
 
-  const handleMove = async (id: number, newStage: KanbanStage) => {
+  const moveCard = async (id: number, newStage: KanbanStage) => {
     const { error } = await supabase
       .from('kanban_cards')
       .update({
@@ -316,8 +378,8 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       console.error('Erro ao mover card:', error);
       alert('Erro ao mover card. Tente novamente.');
     }
-    // O realtime cuidará de atualizar a lista via subscription
   };
+
   const syncStateRef = useRef<KanbanSyncState>('connecting');
   const boardScrollRef = useRef<HTMLDivElement | null>(null);
   const dragStartXRef = useRef(0);
@@ -331,47 +393,13 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       onSyncChange?.({ state, message, lastUpdatedAt });
     };
 
-    async function fetchCards() {
-      const { data, error } = await supabase
-        .from('kanban_cards')
-        .select('*')
-        .order('id', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching kanban cards:', error);
-        if (mounted) {
-          updateSync('error', 'Nao foi possivel atualizar o kanban. Confira a sessao do Supabase.');
-        }
-      } else {
-        if (mounted) {
-          const typedCards = ((data || []) as KanbanCardRow[])
-            .filter((card) => isKanbanStage(card.etapa))
-            .map((card) => ({
-              id: card.id,
-              lead_id: card.lead_id,
-              hospede_nome: card.hospede_nome,
-              origem: card.origem || 'WhatsApp',
-              etapa: card.etapa as KanbanStage,
-              resumo_solicitacao: card.resumo_solicitacao,
-              prioridade: isKanbanPriority(card.prioridade) ? card.prioridade : 'media',
-              ultima_interacao: card.ultima_interacao,
-            }));
-
-          setCards(typedCards);
-          updateSync(
-            syncStateRef.current === 'polling' ? 'polling' : 'realtime',
-            'Kanban sincronizado com o banco.',
-            new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-          );
-        }
-      }
-      if (mounted) {
-        setLoading(false);
-      }
+    async function init() {
+      await fetchCards();
+      if (mounted) setLoading(false);
+      updateSync('realtime', 'Kanban sincronizado.');
     }
 
-    updateSync('connecting', 'Conectando o kanban ao Supabase...');
-    fetchCards();
+    init();
 
     const channel = supabase
       .channel('kanban-realtime')
@@ -382,30 +410,10 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
           fetchCards();
         }
       )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          updateSync('realtime', 'Kanban ouvindo mudancas em tempo real.');
-        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          updateSync('polling', 'Realtime do kanban indisponivel. Atualizando por verificacao periodica.');
-        }
-      });
-
-    const intervalId = window.setInterval(fetchCards, 30000);
-
-    const handleWindowRefresh = () => {
-      if (document.visibilityState === 'visible') {
-        fetchCards();
-      }
-    };
-
-    window.addEventListener('focus', handleWindowRefresh);
-    document.addEventListener('visibilitychange', handleWindowRefresh);
+      .subscribe();
 
     return () => {
       mounted = false;
-      window.clearInterval(intervalId);
-      window.removeEventListener('focus', handleWindowRefresh);
-      document.removeEventListener('visibilitychange', handleWindowRefresh);
       supabase.removeChannel(channel);
     };
   }, [onSyncChange]);
@@ -509,7 +517,11 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
           {STAGES.map((stage) => {
             const stageCards = cardsByStage[stage];
             return (
-              <div key={stage} className="w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4">
+              <div
+                key={stage}
+                data-stage={stage}
+                className="kanban-column w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4"
+              >
                 <div className="flex items-center justify-between mb-4 px-2">
                   <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-white/20" />
@@ -523,11 +535,12 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                 <div className="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar">
                   {stageCards.map((card) => {
                     return (
-                      <KanbanLeadCard
-                        key={card.id}
-                        card={card}
-                        onDelete={handleDelete}
-                        onMove={handleMove}
+                      <KanbanLeadCard 
+                        key={card.id} 
+                        card={card} 
+                        onMove={moveCard}
+                        onDelete={deleteCard}
+                        onExpand={(id) => setExpandedCardId(id)}
                       />
                     );
                   })}
@@ -543,6 +556,21 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
           })}
         </div>
       </div>
+
+      {/* Expanded Detail View */}
+      <AnimatePresence>
+        {expandedCardId && (
+          <ExpandedCard
+            card={cards.find(c => c.id === expandedCardId)!}
+            onClose={() => setExpandedCardId(null)}
+            onMove={moveCard}
+            onDelete={async (id) => {
+              await deleteCard(id);
+              setExpandedCardId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

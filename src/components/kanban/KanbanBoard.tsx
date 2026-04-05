@@ -181,12 +181,16 @@ function KanbanLeadCard({
   card, 
   onMove, 
   onDelete, 
-  onExpand 
+  onExpand,
+  onDragStart,
+  onDragEnd
 }: { 
   card: KanbanCard; 
-  onMove: (id: number, stage: KanbanStage) => void;
-  onDelete: (id: number) => void;
+  onMove: (id: number, stage: KanbanStage) => void; 
+  onDelete: (id: number) => void; 
   onExpand: (id: number) => void;
+  onDragStart?: (stage: KanbanStage) => void;
+  onDragEnd?: () => void;
 }) {
   const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
   const origem = getOrigemConfig(card.origem);
@@ -201,7 +205,7 @@ function KanbanLeadCard({
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.9}
-      whileDrag={{ scale: 1.05, zIndex: 100, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)" }}
+      whileDrag={{ scale: 1.05, zIndex: 9999, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)" }}
       onDragEnd={(e, info) => {
         const elements = document.elementsFromPoint(info.point.x, info.point.y);
         const column = elements.find(el => el.classList.contains('kanban-column'));
@@ -210,9 +214,13 @@ function KanbanLeadCard({
         if (newStage && newStage !== card.etapa) {
           onMove(card.id, newStage);
         }
+        onDragEnd?.();
+      }}
+      onDragStart={() => {
+        onDragStart?.(card.etapa);
       }}
       onClick={() => onExpand(card.id)}
-      className="group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none"
+      className="kanban-card group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none"
     >
       <div className="flex items-start justify-between gap-2 pointer-events-none">
         <div className="flex items-start gap-2 min-w-0">
@@ -327,6 +335,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+  const [activeDragColumn, setActiveDragColumn] = useState<string | null>(null);
 
   const fetchCards = async () => {
     const { data, error } = await supabase
@@ -504,6 +513,11 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
         ref={boardScrollRef}
         onMouseDown={(event) => {
           if (event.button !== 0) return;
+          
+          // Se clicou em um card, ignore o arrasto do board
+          const target = event.target as HTMLElement;
+          if (target.closest('.kanban-card')) return;
+
           const board = boardScrollRef.current;
           if (!board) return;
 
@@ -523,7 +537,10 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
               <div
                 key={stage}
                 data-stage={stage}
-                className="kanban-column w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4"
+                className={cn(
+                  "kanban-column w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4 transition-all duration-200",
+                  activeDragColumn === stage ? "z-[50] relative ring-2 ring-white/5 bg-[#161b22]" : "z-0"
+                )}
               >
                 <div className="flex items-center justify-between mb-4 px-2">
                   <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
@@ -535,7 +552,10 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                   </span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar">
+                <div className={cn(
+                  "flex-1 space-y-3 pr-1 no-scrollbar transition-all duration-200",
+                  activeDragColumn ? "overflow-visible" : "overflow-y-auto"
+                )}>
                   {stageCards.map((card) => {
                     return (
                       <KanbanLeadCard 
@@ -544,6 +564,8 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
                         onMove={moveCard}
                         onDelete={deleteCard}
                         onExpand={(id) => setExpandedCardId(id)}
+                        onDragStart={(stage) => setActiveDragColumn(stage)}
+                        onDragEnd={() => setActiveDragColumn(null)}
                       />
                     );
                   })}
@@ -567,7 +589,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
             card={cards.find(c => c.id === expandedCardId)!}
             onClose={() => setExpandedCardId(null)}
             onMove={moveCard}
-            onDelete={async (id) => {
+            onDelete={async (id: number) => {
               await deleteCard(id);
               setExpandedCardId(null);
             }}

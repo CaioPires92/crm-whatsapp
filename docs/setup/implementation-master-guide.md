@@ -22,6 +22,11 @@ Regra operacional:
 - novos planos para a Aura nao devem ser criados em documentos paralelos sem necessidade
 - detalhes tecnicos de schema podem continuar nos SQLs, mas o status e a intencao ficam aqui
 
+Arquivo operacional editavel:
+- template versionado: [`aura-operational-data.template.json`](/home/caio/projetos/CRM/seeds/aura-operational-data.template.json)
+- arquivo local para preenchimento real: `/home/caio/projetos/CRM/seeds/aura-operational-data.local.json`
+- regra: sempre preencher e manter atualizado o arquivo local antes de subir alteracoes reais para `assistant_rules`, `room_rates` e `hospedin_*`
+
 ## Estado Atual Consolidado
 
 ### Ja implementado no fluxo principal
@@ -288,6 +293,30 @@ Use esta ordem. Ela evita retrabalho.
 5. Ativar `hospedin_settings.enabled`
 6. Rodar QA final com disponibilidade real
 7. Se fizer sentido comercial, evoluir campanhas
+
+## Seed Operacional Local
+
+Objetivo:
+- centralizar em um unico arquivo os dados reais que depois serao aplicados no banco
+- facilitar futuras atualizacoes sem editar SQL, workflow ou prompt
+
+Arquivos:
+- template versionado: [`aura-operational-data.template.json`](/home/caio/projetos/CRM/seeds/aura-operational-data.template.json)
+- arquivo local editavel: `/home/caio/projetos/CRM/seeds/aura-operational-data.local.json`
+
+Como usar:
+1. Abra o arquivo local em `seeds/aura-operational-data.local.json`.
+2. Preencha os dados reais de:
+   - `assistant_rules`
+   - `room_rates`
+   - `hospedin`
+3. Salve o arquivo.
+4. Quando quiser, eu leio esse arquivo e sincronizo para o banco.
+
+Regra:
+- o template pode ser versionado
+- o arquivo local nao deve ir para o Git
+- sempre que a operacao mudar, atualize primeiro o seed local
 
 ## Checklist Final
 

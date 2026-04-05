@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "version": 2,
+    "description": "Preencha este arquivo com a estrutura operacional. Depois copie para aura-operational-data.local.json e edite os valores reais la.",
+    "updated_at": "",
+    "updated_by": ""
+  },
+  "assistant_rules": {
+    "checkin_checkout": {
+      "checkin_time": "",
+      "checkout_time": ""
+    },
+    "menu": {
+      "breakfast_hours": ""
+    },
+    "pets": {
+      "pet_policy": ""
+    },
+    "wifi": {
+      "wifi_name": "",
+      "wifi_password": ""
+    },
+    "smoking": {
+      "smoking_policy": ""
+    },
+    "parking": {
+      "chales_anexos_parking": "",
+      "aptos_parking": ""
+    },
+    "housekeeping": {
+      "room_cleaning_hours": ""
+    },
+    "booking": {
+      "reservation_data_request": ""
+    },
+    "payment": {
+      "common_days_deposit": "",
+      "holiday_deposit": "",
+      "credit_card_installments": "",
+      "non_pix_fallback": ""
+    },
+    "cancellation": {
+      "consumer_right_7_days": "",
+      "general_policy": "",
+      "overpayment_refund": "",
+      "no_show_policy": "",
+      "holiday_policy": "",
+      "hotel_fault_policy": "",
+      "cancellation_channel": "",
+      "reschedule_policy": ""
+    },
+    "banking": {
+      "deposit_message_template": "",
+      "payment_proof_instruction": "",
+      "bank_name": "",
+      "bank_agency": "",
+      "bank_account": "",
+      "tax_id": "",
+      "account_holder": "",
+      "pix_key": ""
+    },
+    "access": {
+      "annex_gate_policy": "",
+      "night_gate_policy": "",
+      "entry_exit_hours": ""
+    },
+    "amenities": {
+      "main_wing_amenities": "",
+      "annex_wing_amenities": "",
+      "game_room": ""
+    },
+    "accommodation_features": {
+      "all_suites": "",
+      "cooling_summary": "",
+      "window_summary": "",
+      "tv_summary": "",
+      "bed_summary": "",
+      "storage_summary": "",
+      "annex_upgrade_summary": "",
+      "varanda_summary": ""
+    },
+    "internal_policies": {
+      "house_rules_summary": ""
+    }
+  },
+  "accommodation_details": {
+    "Apto Terreo": {
+      "capacity_notes": [],
+      "window_notes": []
+    },
+    "Apto Superior": {
+      "capacity_notes": [],
+      "window_notes": []
+    },
+    "Chale/Anexo": {
+      "capacity_notes": [],
+      "location_notes": []
+    }
+  },
+  "room_rates": {
+    "Chale/Anexo": {
+      "nome_do_periodo": {
+        "season_name": "",
+        "date_from": "2026-01-01",
+        "date_to": "2026-12-31",
+        "days_of_week": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "base_price": 0,
+        "min_nights": 1,
+        "priority": 100,
+        "extra_adult_price": 0,
+        "child_price_6_11": 0,
+        "child_price_0_5": 0,
+        "notes": ""
+      }
+    },
+    "Apto Terreo": {
+      "nome_do_periodo": {
+        "season_name": "",
+        "date_from": "2026-01-01",
+        "date_to": "2026-12-31",
+        "days_of_week": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "base_price": 0,
+        "min_nights": 1,
+        "priority": 100,
+        "extra_adult_price": 0,
+        "child_price_6_11": 0,
+        "child_price_0_5": 0,
+        "notes": ""
+      }
+    },
+    "Apto Superior": {
+      "nome_do_periodo": {
+        "season_name": "",
+        "date_from": "2026-01-01",
+        "date_to": "2026-12-31",
+        "days_of_week": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "base_price": 0,
+        "min_nights": 1,
+        "priority": 100,
+        "extra_adult_price": 0,
+        "child_price_6_11": 0,
+        "child_price_0_5": 0,
+        "notes": ""
+      }
+    }
+  },
+  "hospedin": {
+    "enabled": false,
+    "account_id": "",
+    "room_mappings": {
+      "Chale/Anexo": "",
+      "Apto Terreo": "",
+      "Apto Superior": ""
+    }
+  }
+}

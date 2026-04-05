@@ -61,6 +61,8 @@ The infrastructure is located in `/infra/docker-compose.yml`.
   - next planned steps
   - validation criteria
   - future Aura / CRM / integration updates
+- Before answering questions such as what is pending, what to do today, what is next, current status, priorities, backlog, delivered work, or validation state, consult `docs/setup/implementation-master-guide.md` first.
+- Before proposing or executing work that may change current priorities, confirm the latest state in `docs/setup/implementation-master-guide.md`.
 - When a relevant implementation is completed, update this document.
 - When a backlog item is finished, mark it there or remove it from the pending list there.
 - Avoid creating parallel roadmap documents for Aura operations unless there is a strong reason.

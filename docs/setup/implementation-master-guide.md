@@ -145,6 +145,8 @@ Status:
 Bloqueio atual:
 - em `04/04/2026`, a autenticacao da Hospedin retornou `403`
 - mensagem recebida: `Acesso desativado para manutencao.`
+- em `05/04/2026`, novo probe HTTP em `https://pms.hospedin.com/api/v2/authentication/sessions` tambem retornou `403`
+- mensagem recebida novamente: `Acesso desativado para manutencao.`
 
 O que falta:
 - descobrir `account_id` real
@@ -176,13 +178,14 @@ Critério de pronto:
 ### 2. Preenchimento de dados reais da operacao
 
 Status:
-- estrutura pronta
-- seeds iniciais e placeholders ainda presentes
+- sincronizacao do seed local para o banco implementada
+- `assistant_rules` e `room_rates` conferidos no Supabase em `05/04/2026`
+- Wi-Fi, check-in/out, pets, cafe da manha, reserva, pagamento, cancelamento, dados bancarios, acesso, comodidades, voltagem e regras internas ja estao preenchidos no banco
+- a pendencia real desta frente ficou concentrada na parte da Hospedin
 
 O que falta:
-- substituir placeholders em `assistant_rules`
-- substituir seeds iniciais em `room_rates` pelos valores oficiais
-- preencher `account_id` e `place_type_id` reais na trilha da Hospedin
+- manter o seed local alinhado com futuras mudancas operacionais
+- preencher `account_id` e `place_type_id` reais na trilha da Hospedin quando a API voltar
 
 Onde editar:
 - `public.assistant_rules`
@@ -191,23 +194,18 @@ Onde editar:
 - `public.hospedin_room_mappings`
 
 Como implementar:
-1. Preencher `assistant_rules` com:
-   - Wi-Fi
-   - check-in e check-out
-   - politica de pets
-   - cafe da manha
-   - regras internas
-2. Revisar nomes de acomodacao em `room_rates`.
-3. Cadastrar:
-   - tarifa regular
-   - tarifa de sabado
-   - feriados
-   - temporadas especiais
-   - minimos de diarias
-4. Preencher a parte da Hospedin quando a API voltar.
+1. Manter `seeds/aura-operational-data.local.json` como fonte operacional local.
+2. Quando houver mudanca de regra ou tarifa, sincronizar novamente para o banco.
+3. Preencher a parte da Hospedin quando a API voltar.
+
+Sincronizacao operacional:
+- dry-run: `node scripts/sync-aura-operational-data.mjs`
+- aplicar no banco: `node scripts/sync-aura-operational-data.mjs --apply`
+- atalho npm: `npm run sync:aura`
 
 Critério de pronto:
 - mudar um valor no Supabase muda a resposta da Aura sem editar o workflow
+- `assistant_rules` e `room_rates` permanecem coerentes com a operacao real
 
 ### 3. QA operacional final da Aura
 
@@ -245,6 +243,51 @@ Como implementar:
 
 Critério de pronto:
 - nenhum branch principal fica sem validacao
+
+Checklist operacional desta rodada:
+- [`qa-aura-checklist-2026-04-05.md`](/home/caio/projetos/CRM/docs/setup/qa-aura-checklist-2026-04-05.md)
+
+Checklist manual para amanha:
+1. Cotacao comum
+   - exemplo: `Quero um apto terreo para casal de 10/08/2026 a 12/08/2026`
+   - esperado: usar tarifa de baixa temporada correta
+2. Final de semana
+   - exemplo: `Quero um chale de 14/08/2026 a 16/08/2026`
+   - esperado: usar tarifa de final de semana
+3. Reveillon
+   - exemplo: `Quero reservar de 29/12/2026 a 02/01/2027`
+   - esperado: aplicar tarifa de Reveillon e minimo de 4 diarias
+4. Wi-Fi
+   - exemplo: `Qual a senha do Wi-Fi?`
+   - esperado: informar redes e senha corretas
+5. Voltagem
+   - exemplo: `A tomada do chale e 110 ou 220?`
+   - esperado: chale/anexo 110v e aptos 220v
+6. Reserva
+   - exemplo: `Quero fechar a reserva`
+   - esperado: pedir nome completo e CPF antes dos dados bancarios
+7. Cancelamento
+   - exemplo: `Como funciona cancelamento?`
+   - esperado: responder exatamente a politica cadastrada
+8. Regra fora da base
+   - exemplo: perguntar algo nao cadastrado explicitamente
+   - esperado: informar que vai falar com o responsavel ou equipe e retornara com a confirmacao
+9. Handoff humano
+   - exemplo: `Meu chuveiro queimou`
+   - esperado: nao improvisar e mover para `Aguardando Humano`
+10. Modo manual
+   - desligar `Piloto Automatico`
+   - mandar nova mensagem
+   - esperado: registrar no CRM, mas nao responder automaticamente
+11. Persistencia no banco
+   - conferir apos os testes:
+     - `kanban_cards`
+     - `Leads`
+     - `n8n_chat_histories`
+   - esperado: lead unico, card atualizado conforme o caso e historico completo de usuario/assistente
+12. Entrega final no WhatsApp
+   - conferir se a resposta chegou no aparelho do teste
+   - esperado: nenhum caso comercial valido fica sem resposta quando `mode=auto`
 
 ### 4. Maturidade operacional de campanhas
 
@@ -286,13 +329,12 @@ Ou seja, hoje o backlog real esta concentrado em operacao e validacao, nao em bu
 
 Use esta ordem. Ela evita retrabalho.
 
-1. Preencher dados reais em `assistant_rules` e `room_rates`
-2. Fazer a rodada final de QA sem a Hospedin
-3. Esperar a API da Hospedin voltar
-4. Descobrir `account_id` e `place_type_id`
-5. Ativar `hospedin_settings.enabled`
-6. Rodar QA final com disponibilidade real
-7. Se fizer sentido comercial, evoluir campanhas
+1. Fazer a rodada final de QA sem a Hospedin
+2. Esperar a API da Hospedin voltar
+3. Descobrir `account_id` e `place_type_id`
+4. Ativar `hospedin_settings.enabled`
+5. Rodar QA final com disponibilidade real
+6. Se fizer sentido comercial, evoluir campanhas
 
 ## Seed Operacional Local
 
@@ -321,8 +363,8 @@ Regra:
 ## Checklist Final
 
 ### Aura e CRM
-- [ ] `assistant_rules` com dados reais
-- [ ] `room_rates` com dados reais
+- [x] `assistant_rules` com dados reais
+- [x] `room_rates` com dados reais
 - [ ] `hospedin_settings.account_id` preenchido
 - [ ] `hospedin_room_mappings.place_type_id` preenchidos
 - [ ] `hospedin_settings.enabled = true`

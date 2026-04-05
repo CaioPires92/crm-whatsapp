@@ -72,6 +72,7 @@
     "accommodation_features": {
       "all_suites": "",
       "cooling_summary": "",
+      "voltage_summary": "",
       "window_summary": "",
       "tv_summary": "",
       "bed_summary": "",

@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "source": "manual",
+    "updated_at": "2026-04-05",
+    "notes": "Fallback operacional enquanto Hospedin estiver indisponivel."
+  },
+  "room_types": [
+    "Apto Terreo",
+    "Apto Superior",
+    "Chale/Anexo"
+  ],
+  "default_ranges": [
+    {
+      "from": "2026-04-05",
+      "to": "2026-12-31",
+      "availability": {
+        "Apto Terreo": 2,
+        "Apto Superior": 2,
+        "Chale/Anexo": 2
+      }
+    }
+  ],
+  "overrides": []
+}

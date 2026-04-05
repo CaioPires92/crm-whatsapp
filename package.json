@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "sync:aura": "node scripts/sync-aura-operational-data.mjs --apply",
     "sync:evolution": "node scripts/sync-evolution-to-supabase.mjs",
     "sync:labels": "node scripts/sync-labels-to-supabase.mjs"
   },

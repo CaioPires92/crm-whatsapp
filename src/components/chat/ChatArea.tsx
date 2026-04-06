@@ -87,7 +87,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
       const supabaseQuery = supabase
         .from('n8n_chat_histories')
         .select('*')
-        .or(possibleRemoteJids.map((jid) => `session_id.eq.${jid},lead_id.eq.${jid}`).join(','))
+        .or(possibleRemoteJids.map((jid) => `session_id.eq.${jid}`).join(','))
         .order('hora_data_mensagem', { ascending: true });
 
       const evolutionPromises = forceFull ? possibleRemoteJids.map(jid => 
@@ -194,13 +194,14 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
           const payloadSessionId = normalizeLeadId(newMsg?.session_id);
           
           if (payloadSessionId === currentLeadId && payload.eventType === 'INSERT') {
-            // Normalizar a nova mensagem do Realtime
             const rawMsg = payload.new;
+            if (!rawMsg) return;
+            
             const isObj = typeof rawMsg.message === 'object' && rawMsg.message !== null;
             const normalizedNewMsg: Message = {
               ...rawMsg,
               message: {
-                type: rawMsg.type || rawMsg.message?.type || 'received',
+                type: rawMsg.type || (isObj ? rawMsg.message?.type : null) || 'received',
                 content: isObj ? (rawMsg.message.content || rawMsg.message.text || '') : (rawMsg.message || '')
               },
               hora_data_mensagem: rawMsg.hora_data_mensagem || rawMsg.created_at

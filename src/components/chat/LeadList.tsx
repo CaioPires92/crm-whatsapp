@@ -284,14 +284,14 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
     async function fetchLeads() {
       const evolutionChatsPromise = isEvolutionConfigured()
         ? fetchEvolutionChats(200).catch((error) => {
-            console.error('Error fetching chats from Evolution:', error);
+            console.debug('Evolution Chats offline:', error.message);
             return [];
           })
         : Promise.resolve([]);
 
       const evolutionLabelsPromise = isEvolutionConfigured()
         ? fetchEvolutionLabels().catch((error) => {
-            console.error('Error fetching labels from Evolution:', error);
+            console.debug('Evolution Labels offline:', error.message);
             return [];
           })
         : Promise.resolve([]);
@@ -303,7 +303,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
         evolutionLabels,
       ] = await Promise.all([
         supabase
-          .from('Leads')
+          .from('leads')
           .select('*')
           .order('created_at', { ascending: false }),
         supabase
@@ -415,7 +415,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
       .channel('leads-realtime')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'Leads' },
+        { event: '*', schema: 'public', table: 'leads' },
         () => {
           fetchLeads();
         }

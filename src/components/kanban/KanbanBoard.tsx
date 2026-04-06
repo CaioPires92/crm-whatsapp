@@ -34,13 +34,13 @@ type UrgenciaCor = 'Verde' | 'Amarelo' | 'Vermelho';
 interface KanbanCardRow {
   id: number;
   lead_id: string;
-  hospede_nome: string | null;
-  origem: string | null;
-  etapa: string;
+  stage: string;
   resumo_solicitacao: string | null;
   prioridade: string | null;
   ultima_interacao: string;
-  hospede_foto_url?: string | null;
+  leads?: {
+    lead_nome: string | null;
+  } | null;
 }
 
 interface KanbanCard {
@@ -441,10 +441,10 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const dragStateRef = useRef(dragState);
   dragStateRef.current = dragState;
 
-  const fetchCards = async () => {
+  const fetchCards = useCallback(async () => {
     const { data, error } = await supabase
       .from('kanban_cards')
-      .select('*')
+      .select('*, leads(lead_nome)')
       .order('id', { ascending: false });
 
     if (error) {
@@ -452,24 +452,27 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       return;
     }
 
-    const typedCards = ((data || []) as KanbanCardRow[])
-      .filter((card) => isKanbanStage(card.etapa))
+    const typedCards = ((data || []) as unknown as KanbanCardRow[])
+      .filter((card) => isKanbanStage(card.stage))
       .map((card) => ({
         id: card.id,
         lead_id: card.lead_id,
-        hospede_nome: card.hospede_nome,
-        hospede_foto_url: card.hospede_foto_url || null,
-        origem: card.origem || 'WhatsApp',
-        etapa: card.etapa as KanbanStage,
+        hospede_nome: card.leads?.lead_nome || null,
+        hospede_foto_url: null,
+        origem: 'WhatsApp',
+        etapa: card.stage as KanbanStage,
         resumo_solicitacao: card.resumo_solicitacao,
         prioridade: isKanbanPriority(card.prioridade) ? card.prioridade : 'media',
         ultima_interacao: card.ultima_interacao,
       }));
 
     setCards(typedCards);
-  };
+  }, []);
 
   const deleteCard = useCallback(async (id: number) => {
+    // Atualização otimista: remove o card da lista local imediatamente
+    setCards(prev => prev.filter(c => c.id !== id));
+
     const { error } = await supabase
       .from('kanban_cards')
       .delete()
@@ -478,14 +481,23 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     if (error) {
       console.error('Erro ao excluir card:', error);
       alert('Erro ao excluir card. Tente novamente.');
+      // Rollback: recarrega a lista se falhar no banco
+      fetchCards();
     }
-  }, []);
+  }, [fetchCards]);
 
   const moveCard = useCallback(async (id: number, newStage: KanbanStage) => {
+    // Atualização otimista: move o card visualmente para a nova coluna na hora!
+    setCards(prev => prev.map(c => 
+      c.id === id 
+        ? { ...c, etapa: newStage, ultima_interacao: new Date().toISOString() } 
+        : c
+    ));
+
     const { error } = await supabase
       .from('kanban_cards')
       .update({
-        etapa: newStage,
+        stage: newStage,
         ultima_interacao: new Date().toISOString()
       })
       .eq('id', id);
@@ -493,8 +505,10 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     if (error) {
       console.error('Erro ao mover card:', error);
       alert('Erro ao mover card. Tente novamente.');
+      // Rollback: volta o card pra posição original se o banco falhar
+      fetchCards();
     }
-  }, []);
+  }, [fetchCards]);
 
   const handleExpand = useCallback((id: number) => {
     setExpandedCardId(id);
@@ -543,7 +557,8 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     const newStage = column?.getAttribute('data-stage') as KanbanStage;
 
     if (newStage && newStage !== state.card.etapa) {
-      await moveCard(state.cardId!, newStage);
+      // Dispara a atualização em segundo plano SEM esperar (já é otimista)
+      moveCard(state.cardId!, newStage);
     }
 
     setDragState({

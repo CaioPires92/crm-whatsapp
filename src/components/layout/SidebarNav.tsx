@@ -1,171 +1,114 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Users, 
-  Settings as SettingsIcon, 
+  LayoutDashboard, 
+  Settings, 
   LogOut, 
-  MessageSquare,
-  LayoutDashboard,
+  ChevronLeft, 
   ChevronRight,
-  ChevronLeft,
-  Megaphone
+  Kanban,
+  Megaphone,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
-import { clsx, type ClassValue } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+const navItems = [
+  { to: '/kanban', icon: Kanban, label: 'Kanban' },
+  { to: '/contatos', icon: Users, label: 'Contatos' },
+  { to: '/campanhas', icon: Megaphone, label: 'Campanhas' },
+  { to: '/settings', icon: Settings, label: 'Configurações' },
+];
 
 export default function SidebarNav() {
+  const [collapsed, setCollapsed] = useState(false);
   const { signOut, user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const collapsedWidth = 72;
-  const defaultExpandedWidth = 240;
-  
-  const [width, setWidth] = useState(() => {
-    const saved = localStorage.getItem('sidebar-width');
-    return saved ? parseInt(saved, 10) : defaultExpandedWidth;
-  });
-  const [collapsed, setCollapsed] = useState(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    return saved ? saved === 'true' : true;
-  });
-  
-  const isResizing = useRef(false);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing.current || collapsed) return;
-      const newWidth = Math.min(Math.max(e.clientX, 180), 320);
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      if (isResizing.current) {
-        isResizing.current = false;
-        localStorage.setItem('sidebar-width', width.toString());
-        document.body.style.cursor = 'default';
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [width]);
-
-  useEffect(() => {
-    localStorage.setItem('sidebar-collapsed', String(collapsed));
-  }, [collapsed]);
-
-  const navItems = [
-    { to: '/kanban', icon: LayoutDashboard, label: 'Kanban' },
-    { to: '/contatos', icon: Users, label: 'Contatos' },
-    { to: '/campanhas', icon: Megaphone, label: 'Campanhas' },
-    { to: '/settings', icon: SettingsIcon, label: 'Configurações' },
-  ];
+  const cn = (...inputs: any[]) => twMerge(clsx(inputs));
 
   return (
     <aside 
-      className="h-full bg-[#0a0a0a] border-r border-[#1f1f1f] flex flex-col relative shrink-0 transition-[width]"
-      style={{ width: `${collapsed ? collapsedWidth : width}px` }}
+      className={cn(
+        "h-screen bg-zinc-950 border-r border-zinc-800 flex flex-col transition-all duration-300 ease-in-out relative z-50",
+        collapsed ? "w-20" : "w-64"
+      )}
     >
-      <button
-        type="button"
-        onClick={() => setCollapsed((current) => !current)}
-        className="absolute -right-3 top-6 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-[#2b2b2b] bg-[#151515] text-zinc-400 shadow-lg transition-colors hover:text-white"
-        aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
-      >
-        {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-      </button>
-
-      <div className={cn("flex items-center gap-3", collapsed ? "px-4 py-6 justify-center" : "p-6")}>
-        <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
-          <MessageSquare className="w-5 h-5 text-white" />
+      {/* Header / Logo */}
+      <div className="p-6 flex items-center gap-3 overflow-hidden">
+        <div className="min-w-[32px] h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-900/20">
+          <Sparkles className="w-5 h-5 text-white" />
         </div>
-        {!collapsed && <span className="font-bold text-white tracking-tight">Quanta CRM</span>}
+        {!collapsed && (
+          <span className="font-bold text-xl tracking-tight text-white whitespace-nowrap">
+            Quanta <span className="text-blue-500">CRM</span>
+          </span>
+        )}
       </div>
 
-      <nav className={cn("flex-1 space-y-1", collapsed ? "px-2" : "px-3")}>
+      {/* Navigation */}
+      <nav className="flex-1 px-3 space-y-1 mt-4">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) => cn(
-              "flex items-center rounded-lg transition-colors group",
-              collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2",
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative",
               isActive 
-                ? "bg-white/10 text-white" 
-                : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                ? "bg-blue-600/10 text-blue-400 font-medium" 
+                : "text-zinc-500 hover:text-zinc-100 hover:bg-zinc-900"
             )}
-            title={collapsed ? item.label : undefined}
           >
-            <item.icon className="w-5 h-5" />
-            {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+            <item.icon className={cn("w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110")} />
+            {!collapsed && (
+              <span className="whitespace-nowrap truncate">{item.label}</span>
+            )}
+            {/* Tooltip for collapsed mode */}
+            {collapsed && (
+              <div className="absolute left-full ml-4 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100] border border-zinc-700">
+                {item.label}
+              </div>
+            )}
           </NavLink>
         ))}
       </nav>
 
-      <div className={cn("border-t border-[#1f1f1f] space-y-4", collapsed ? "p-2" : "p-4")}>
-        <button
-          onClick={toggleTheme}
-          className={cn(
-            "w-full rounded-lg text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors text-sm",
-            collapsed ? "flex justify-center px-2 py-3" : "flex items-center gap-3 px-3 py-2"
-          )}
-          title={collapsed ? `Tema ${theme === 'dark' ? 'Escuro' : 'Claro'}` : undefined}
-        >
-          <div className="w-5 h-5 flex items-center justify-center shrink-0">
-            {theme === 'dark' ? '🌙' : '☀️'}
-          </div>
-          {!collapsed && <span>Tema {theme === 'dark' ? 'Escuro' : 'Claro'}</span>}
-        </button>
-
-        <div className={cn("flex items-center", collapsed ? "justify-center px-1" : "gap-3 px-3")}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white/10">
-            {user?.email?.substring(0, 2).toUpperCase()}
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.email}</p>
-              <button 
-                onClick={signOut}
-                className="text-xs text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1"
-              >
-                <LogOut className="w-3 h-3" />
-                Sair
-              </button>
+      {/* Footer / User Profile */}
+      <div className="p-4 border-t border-zinc-900 space-y-4">
+        {!collapsed && (
+          <div className="px-2 py-3 bg-zinc-900/50 rounded-2xl border border-zinc-800/50 mb-2 overflow-hidden">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 border border-zinc-700 uppercase">
+                {user?.email?.charAt(0) || 'U'}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-zinc-300 truncate">Usuário Logado</p>
+                <p className="text-[10px] text-zinc-500 truncate">{user?.email}</p>
+              </div>
             </div>
-          )}
-        </div>
-
-        {collapsed && (
-          <button
-            onClick={signOut}
-            className="w-full flex justify-center rounded-lg px-2 py-3 text-zinc-500 hover:bg-white/5 hover:text-red-400 transition-colors"
-            title="Sair"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          </div>
         )}
+
+        <button
+          onClick={() => signOut()}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all group",
+            collapsed ? "justify-center" : ""
+          )}
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0 group-hover:-translate-x-1 transition-transform" />
+          {!collapsed && <span className="font-medium">Sair</span>}
+        </button>
       </div>
 
-      {!collapsed && (
-        <div 
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-white/20 transition-colors group"
-          onMouseDown={() => {
-            isResizing.current = true;
-            document.body.style.cursor = 'col-resize';
-          }}
-        >
-          <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-1.5 h-12 bg-white/5 group-hover:bg-white/10 rounded-l-full" />
-        </div>
-      )}
+      {/* Toggle Button */}
+      <button 
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -right-3 top-20 bg-zinc-900 border border-zinc-800 text-zinc-500 rounded-full p-1 hover:text-white hover:bg-zinc-800 transition-colors shadow-xl"
+      >
+        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
     </aside>
   );
 }

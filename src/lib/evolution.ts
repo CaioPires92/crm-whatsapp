@@ -81,7 +81,16 @@ async function ensureConnection(): Promise<boolean> {
 }
 
 export function normalizeLeadId(value: string | null | undefined) {
-  return (value || '').split('@')[0];
+  if (!value) return '';
+  const base = value.split('@')[0];
+  const digits = base.replace(/\D/g, '');
+  
+  // Se for Brasil (10 ou 11 digitos) sem o 55, adicionar o 55 para garantir unificacao
+  if ((digits.length === 10 || digits.length === 11) && !digits.startsWith('55')) {
+    return `55${digits}`;
+  }
+  
+  return base;
 }
 
 export function isLikelyPhoneNumber(value: string | null | undefined) {

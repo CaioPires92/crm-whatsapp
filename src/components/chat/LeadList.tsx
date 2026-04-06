@@ -253,12 +253,20 @@ function hasUsefulLeadName(value: string | null | undefined) {
 }
 
 function getPreviewFromHistoryMessage(message: unknown) {
-  if (!message || typeof message !== 'object') {
-    return null;
+  if (!message) return null;
+
+  // Se for objeto (Dashboard format)
+  if (typeof message === 'object') {
+    const candidate = (message as { content?: unknown }).content || (message as { text?: unknown }).text;
+    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
   }
 
-  const candidate = (message as { content?: unknown }).content;
-  return typeof candidate === 'string' && candidate.trim() ? candidate.trim() : null;
+  // Se for string (N8N/Texto puro format)
+  if (typeof message === 'string' && message.trim()) {
+    return message.trim();
+  }
+
+  return null;
 }
 
 export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps) {

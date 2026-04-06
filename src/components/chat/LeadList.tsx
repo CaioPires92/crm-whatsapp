@@ -78,6 +78,9 @@ function mergeLeadData(base: Lead, incoming: Lead) {
       ? preferred.labels
       : fallback.labels,
     last_message_preview: preferred.last_message_preview || fallback.last_message_preview || null,
+    last_message_at: (preferred.last_message_at && fallback.last_message_at) 
+      ? (new Date(preferred.last_message_at) > new Date(fallback.last_message_at) ? preferred.last_message_at : fallback.last_message_at)
+      : (preferred.last_message_at || fallback.last_message_at),
     remote_jid: preferred.remote_jid || fallback.remote_jid,
     avatar_url: preferred.avatar_url || fallback.avatar_url || null,
   };
@@ -132,6 +135,19 @@ function getLeadNameTokens(value: string | null | undefined) {
   return getNormalizedLeadName(value)
     .split(' ')
     .filter((token) => token.length >= 3);
+}
+
+function getCanonicalKey(leadId: string | null | undefined) {
+  if (!leadId) return '';
+  const digits = leadId.replace(/\D/g, '');
+  let canonicalKey = digits.replace(/^0+/, '');
+  if (canonicalKey.startsWith('55')) {
+    canonicalKey = canonicalKey.slice(2).replace(/^0+/, '');
+  }
+  if (canonicalKey.length === 11) {
+    canonicalKey = canonicalKey.slice(0, 2) + canonicalKey.slice(3);
+  }
+  return canonicalKey;
 }
 
 function getLeadMergeKeys(lead: Lead) {
@@ -338,19 +354,19 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
         }
       } else {
         const latestMessageByLeadId = (historyData || []).reduce((acc, item) => {
-          const normalizedSessionId = normalizeLeadId(item.session_id);
+          const canonicalId = getCanonicalKey(item.session_id);
 
-          if (!normalizedSessionId) {
+          if (!canonicalId) {
             return acc;
           }
 
-          const existingEntry = acc.get(normalizedSessionId);
+          const existingEntry = acc.get(canonicalId);
           const candidateTimestamp = item.hora_data_mensagem;
           const candidateTime = candidateTimestamp ? new Date(candidateTimestamp).getTime() : 0;
           const existingTime = existingEntry?.timestamp ? new Date(existingEntry.timestamp).getTime() : 0;
 
           if (!existingEntry || candidateTime >= existingTime) {
-            acc.set(normalizedSessionId, {
+            acc.set(canonicalId, {
               timestamp: candidateTimestamp,
               preview: getPreviewFromHistoryMessage(item.message),
             });
@@ -360,18 +376,18 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
         }, new Map<string, { timestamp: string | null; preview: string | null }>());
 
         const evolutionChatByLeadId = evolutionChats.reduce((acc, chat) => {
-          const normalizedLeadId = normalizeLeadId(chat.remoteJid);
+          const canonicalId = getCanonicalKey(chat.remoteJid);
 
-          if (!normalizedLeadId) {
+          if (!canonicalId) {
             return acc;
           }
 
-          const existing = acc.get(normalizedLeadId);
+          const existing = acc.get(canonicalId);
           const candidateTimestamp = chat.updatedAt ? new Date(chat.updatedAt).getTime() : 0;
           const existingTimestamp = existing?.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
 
           if (!existing || candidateTimestamp >= existingTimestamp) {
-            acc.set(normalizedLeadId, chat);
+            acc.set(canonicalId, chat);
           }
 
           return acc;
@@ -379,7 +395,11 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
 
         const leadsWithLastMessage = (leadsData || []).map((lead) => {
           const normalizedLeadId = normalizeLeadId(lead.lead_id);
-          const evolutionChat = evolutionChatByLeadId.get(normalizedLeadId);
+          const canonicalId = getCanonicalKey(lead.lead_id);
+          
+          const evolutionChat = evolutionChatByLeadId.get(canonicalId);
+          const historyMessage = latestMessageByLeadId.get(canonicalId);
+
           return {
             ...lead,
             lead_id: normalizedLeadId,
@@ -387,16 +407,16 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
               ? (evolutionChat?.pushName || lead.lead_nome || 'Sem nome') 
               : lead.lead_nome,
             labels: Array.isArray(lead.labels) && lead.labels.length > 0 ? lead.labels : evolutionChat?.labels || [],
-            last_message_at: latestMessageByLeadId.get(normalizedLeadId)?.timestamp ?? evolutionChat?.updatedAt ?? null,
-            last_message_preview: latestMessageByLeadId.get(normalizedLeadId)?.preview ?? null,
+            last_message_at: historyMessage?.timestamp ?? evolutionChat?.updatedAt ?? lead.created_at,
+            last_message_preview: historyMessage?.preview ?? null,
             remote_jid: evolutionChat?.remoteJid || lead.lead_id,
             avatar_url: evolutionChat?.profilePicUrl || null,
           };
         });
 
-        const existingLeadIds = new Set(leadsWithLastMessage.map((lead) => lead.lead_id));
+        const existingLeadIds = new Set(leadsWithLastMessage.map((lead) => getCanonicalKey(lead.lead_id)));
         const leadsFromEvolutionOnly: Lead[] = evolutionChats
-          .filter((chat) => !existingLeadIds.has(normalizeLeadId(chat.remoteJid)))
+          .filter((chat) => !existingLeadIds.has(getCanonicalKey(chat.remoteJid)))
           .map((chat, index) => ({
             id: -1 - index,
             lead_id: normalizeLeadId(chat.remoteJid),
@@ -534,30 +554,57 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
     };
   }, []);
 
+  // -------------------------------------------------------------
+  // DESDUPLICAÇÃO AVANÇADA (Merge por Chaves Cruzadas)
+  // Permite unificar leads que vêm com @lid (N8N) e @s.whatsapp.net (Evolution)
+  // unindo-os através do Avatar ID, do Canonical ID, ou do Nome.
+  // -------------------------------------------------------------
+  // -------------------------------------------------------------
+  // DESDUPLICAÇÃO AVANÇADA (Merge Transitivo por Grafos)
+  // -------------------------------------------------------------
   const dedupedLeads = Array.from(
-    leads.reduce((acc, lead) => {
-      const normalizedLeadId = normalizeLeadId(lead.lead_id);
-      
-      // Criar chave unificadora (Canonical ID: prefixo 55 garantido + sem 9o digito se BR)
-      const digits = normalizedLeadId.replace(/\D/g, '');
-      const canonicalKey = (digits.startsWith('55') && digits.length === 13) 
-        ? digits.slice(0, 4) + digits.slice(5) 
-        : digits;
+    (() => {
+      const masterMap = new Map<string, Lead>();
 
-      if (!canonicalKey) return acc;
+      leads.forEach((lead) => {
+        const normalizedLeadId = normalizeLeadId(lead.lead_id);
+        const normalizedLead = { ...lead, lead_id: normalizedLeadId };
+        const mergeKeys = getLeadMergeKeys(normalizedLead);
 
-      const existing = acc.get(canonicalKey);
-      const normalizedLead = { ...lead, lead_id: normalizedLeadId };
+        // Coletar todos os grupos (leads existentes) que intersectam com este novo lead
+        const existingToMerge = new Set<Lead>();
+        mergeKeys.forEach(k => {
+          const match = masterMap.get(k);
+          if (match) existingToMerge.add(match);
+        });
 
-      if (!existing) {
-        acc.set(canonicalKey, normalizedLead);
-      } else {
-        // Se jah existe, funde as informacoes
-        acc.set(canonicalKey, mergeLeadData(existing, normalizedLead));
-      }
+        if (existingToMerge.size > 0) {
+          // Fundir todos os grupos encontrados + o novo lead em um só
+          let merged = normalizedLead;
+          const allKeys = new Set(mergeKeys);
 
-      return acc;
-    }, new Map<string, Lead>()).values()
+          existingToMerge.forEach(alreadyInMap => {
+            merged = mergeLeadData(merged, alreadyInMap);
+            getLeadMergeKeys(alreadyInMap).forEach(k => allKeys.add(k));
+          });
+
+          // Re-mapear todas as chaves de todos os envolvidos para a nova versão fundida
+          allKeys.forEach(k => masterMap.set(k, merged));
+        } else {
+          // Totalmente novo, mapear sob suas chaves
+          mergeKeys.forEach(k => masterMap.set(k, normalizedLead));
+        }
+      });
+
+      // Extrair valores únicos usando canonicalId como chave de de-dup final (segurança extra)
+      const uniqueLeadsObj: Record<string, Lead> = {};
+      Array.from(masterMap.values()).forEach((l) => {
+        const cid = getCanonicalKey(l.lead_id) || l.lead_id;
+        uniqueLeadsObj[cid] = l;
+      });
+
+      return Object.values(uniqueLeadsObj);
+    })()
   )
     .filter((lead) => hasUsefulLeadName(lead.lead_nome) || Boolean(getLeadContactPhone(lead.lead_id, lead.remote_jid)))
     .sort((a, b) => {

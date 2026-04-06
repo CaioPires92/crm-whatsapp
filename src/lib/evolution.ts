@@ -241,6 +241,7 @@ export async function fetchEvolutionChats(take = 100) {
       method: 'POST',
       body: {
         take,
+        orderBy: { updatedAt: 'desc' },
         include: { labels: true },
       },
     },

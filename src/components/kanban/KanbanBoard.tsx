@@ -1,26 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreVertical, 
   Trash2, 
   User as UserIcon,
   MessageCircle,
   Instagram,
   Globe,
   Clock,
-  ExternalLink,
   Phone,
   MessageSquare,
   Bot,
   BadgeDollarSign,
   AlertCircle,
   CalendarDays,
-  Maximize2
+  Maximize2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StageSelect from './StageSelect';
@@ -71,6 +66,16 @@ export type KanbanSyncState = 'connecting' | 'realtime' | 'polling' | 'error';
 
 interface KanbanBoardProps {
   onSyncChange?: (payload: { state: KanbanSyncState; message: string; lastUpdatedAt: string | null }) => void;
+}
+
+interface DragState {
+  isDragging: boolean;
+  cardId: number | null;
+  card: KanbanCard | null;
+  startX: number;
+  startY: number;
+  currentX: number;
+  currentY: number;
 }
 
 function normalizeLeadId(value: string | null | undefined) {
@@ -178,20 +183,20 @@ function getUrgenciaColorClass(urgencia: UrgenciaCor) {
   }
 }
 
-function KanbanLeadCard({ 
+const KanbanLeadCard = memo(function KanbanLeadCard({ 
   card, 
   onMove, 
   onDelete, 
   onExpand,
   onDragStart,
-  onDragEnd
+  isDragging,
 }: { 
   card: KanbanCard; 
   onMove: (id: number, stage: KanbanStage) => void; 
   onDelete: (id: number) => void; 
   onExpand: (id: number) => void;
-  onDragStart?: (stage: KanbanStage) => void;
-  onDragEnd?: () => void;
+  onDragStart?: (cardId: number, card: KanbanCard, e: React.PointerEvent) => void;
+  isDragging?: boolean;
 }) {
   const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
   const origem = getOrigemConfig(card.origem);
@@ -202,35 +207,19 @@ function KanbanLeadCard({
 
   return (
     <motion.div 
-      layoutId={`card-${card.id}`}
-      drag
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.6}
-      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-      whileDrag={{ 
-        scale: 1.05, 
-        zIndex: 9999, 
-        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)",
-        cursor: "grabbing"
-      }}
       layout
-      onDragEnd={(e, info) => {
-        const elements = document.elementsFromPoint(info.point.x, info.point.y);
-        const column = elements.find(el => el.classList.contains('kanban-column'));
-        const newStage = column?.getAttribute('data-stage') as KanbanStage;
-        
-        if (newStage && newStage !== card.etapa) {
-          onMove(card.id, newStage);
-        }
-        onDragEnd?.();
-      }}
-      onDragStart={() => {
-        onDragStart?.(card.etapa);
+      transition={{ type: "tween", duration: 0.2, ease: "easeInOut" }}
+      onPointerDown={(e) => {
+        if ((e.target as HTMLElement).closest('button, select, input, [data-no-drag]')) return;
+        onDragStart?.(card.id, card, e);
       }}
       onDoubleClick={() => onExpand(card.id)}
-      className="kanban-card group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none"
+      className={cn(
+        "kanban-card group relative bg-[#161b22] border border-[#30363d] rounded-xl p-3 hover:border-[#444c56] transition-all duration-200 cursor-grab active:cursor-grabbing overflow-visible touch-none",
+        isDragging && "opacity-30 scale-[0.98]"
+      )}
     >
-      <div className="flex items-start justify-between gap-2 pointer-events-none">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-2 min-w-0">
           <div className="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a364c] to-[#1c2535] flex items-center justify-center text-[10px] text-zinc-300 font-bold border border-[#2a3448] group-hover:border-[#3a4a67] overflow-hidden">
             {card.hospede_foto_url ? (
@@ -256,7 +245,7 @@ function KanbanLeadCard({
                 e.stopPropagation();
                 onExpand(card.id);
               }}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-600 hover:text-white transition-all duration-200 border border-transparent hover:border-white/10 active:scale-95 pointer-events-auto"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-600 hover:text-white transition-all duration-200 border border-transparent hover:border-white/10 active:scale-95"
               title="Abrir detalhes (ou clique duplo)"
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -266,7 +255,7 @@ function KanbanLeadCard({
                 e.stopPropagation();
                 onDelete(card.id);
               }}
-              className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95 pointer-events-auto"
+              className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95"
               title="Excluir card"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -275,7 +264,7 @@ function KanbanLeadCard({
         </div>
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between gap-2 pointer-events-none">
+      <div className="mt-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
           <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", origem.className)}>
             <OrigemIcon className="h-2.5 w-2.5" />
@@ -291,13 +280,13 @@ function KanbanLeadCard({
         </span>
       </div>
 
-      <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5 pointer-events-none">
+      <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5">
         <p className="text-[11px] text-zinc-300 leading-snug line-clamp-2">
           {resumo}
         </p>
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2 pointer-events-none">
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-zinc-500 shrink-0">
             <CalendarDays className="w-3 h-3" />
@@ -309,7 +298,7 @@ function KanbanLeadCard({
 
           <div className="h-3 w-[1px] bg-white/10 mx-1 shrink-0" />
 
-          <div className="pointer-events-auto">
+          <div data-no-drag>
             <StageSelect
               value={card.etapa}
               onChange={(newStage: KanbanStage) => onMove(card.id, newStage)}
@@ -327,7 +316,7 @@ function KanbanLeadCard({
       </div>
     </motion.div>
   );
-}
+});
 
 function calcularMetricas(cards: KanbanCard[]): KanbanMetrics {
   const totalLeads = cards.length;
@@ -349,13 +338,108 @@ function calcularMetricas(cards: KanbanCard[]): KanbanMetrics {
   };
 }
 
+function DragOverlay({ card, position }: { card: KanbanCard; position: { x: number; y: number } }) {
+  const urgencia = calcularUrgencia(card.ultima_interacao, card.etapa);
+  const origem = getOrigemConfig(card.origem);
+  const OrigemIcon = origem.icon;
+  const leadPhone = card.lead_id.split('@')[0];
+  const resumo = card.resumo_solicitacao || 'Sem resumo da solicitação';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1.03 }}
+      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.12 } }}
+      transition={{ type: "tween", duration: 0.1, ease: "easeOut" }}
+      style={{
+        position: 'fixed',
+        left: position.x - 144,
+        top: position.y - 40,
+        zIndex: 9999,
+        pointerEvents: 'none',
+      }}
+      className="w-72"
+    >
+      <div className="bg-[#161b22] border border-white/20 rounded-xl p-3 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start gap-2 min-w-0">
+            <div className="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a364c] to-[#1c2535] flex items-center justify-center text-[10px] text-zinc-300 font-bold border border-[#2a3448] overflow-hidden">
+              {card.hospede_foto_url ? (
+                <img src={card.hospede_foto_url} alt={card.hospede_nome || ''} className="w-full h-full object-cover" />
+              ) : (
+                card.hospede_nome?.substring(0, 1).toUpperCase() || <UserIcon className="w-3 h-3" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-white truncate leading-none">
+                {card.hospede_nome || 'Hóspede'}
+              </p>
+              <p className="text-[11px] text-zinc-500 truncate mt-1">
+                {leadPhone}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-2.5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", origem.className)}>
+              <OrigemIcon className="h-2.5 w-2.5" />
+              {origem.label}
+            </span>
+            <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 border text-[9px] font-semibold", getUrgenciaColorClass(urgencia))}>
+              <Clock className="h-2.5 w-2.5" />
+              {formatDistanceToNow(new Date(card.ultima_interacao), { addSuffix: true, locale: ptBR })}
+            </span>
+          </div>
+          <span className="text-[11px] text-white/90 font-semibold tabular-nums shrink-0">
+            R$ 0,00
+          </span>
+        </div>
+
+        <div className="mt-2 rounded-lg bg-[#0b0f18] border border-[#1b2535] px-2 py-1.5">
+          <p className="text-[11px] text-zinc-300 leading-snug line-clamp-2">
+            {resumo}
+          </p>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2">
+          <div className="flex items-center gap-1.5 text-zinc-500 shrink-0">
+            <CalendarDays className="w-3 h-3" />
+            <Phone className="w-3 h-3" />
+            <MessageSquare className="w-3 h-3" />
+            <Bot className="w-3 h-3" />
+            <BadgeDollarSign className="w-3 h-3" />
+          </div>
+          <div className="flex items-center gap-1 shrink-0 ml-2">
+            {urgencia === 'Vermelho' && (
+              <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
-  const [activeDragColumn, setActiveDragColumn] = useState<string | null>(null);
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    cardId: null,
+    card: null,
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0,
+  });
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
+
+  const dragStateRef = useRef(dragState);
+  dragStateRef.current = dragState;
 
   const fetchCards = async () => {
     const { data, error } = await supabase
@@ -385,7 +469,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     setCards(typedCards);
   };
 
-  const deleteCard = async (id: number) => {
+  const deleteCard = useCallback(async (id: number) => {
     const { error } = await supabase
       .from('kanban_cards')
       .delete()
@@ -395,9 +479,9 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       console.error('Erro ao excluir card:', error);
       alert('Erro ao excluir card. Tente novamente.');
     }
-  };
+  }, []);
 
-  const moveCard = async (id: number, newStage: KanbanStage) => {
+  const moveCard = useCallback(async (id: number, newStage: KanbanStage) => {
     const { error } = await supabase
       .from('kanban_cards')
       .update({
@@ -410,7 +494,69 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       console.error('Erro ao mover card:', error);
       alert('Erro ao mover card. Tente novamente.');
     }
-  };
+  }, []);
+
+  const handleExpand = useCallback((id: number) => {
+    setExpandedCardId(id);
+  }, []);
+
+  const handleDragStart = useCallback((cardId: number, card: KanbanCard, e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setDragState({
+      isDragging: true,
+      cardId,
+      card,
+      startX: e.clientX,
+      startY: e.clientY,
+      currentX: e.clientX,
+      currentY: e.clientY,
+    });
+
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const handleDragMove = useCallback((e: React.PointerEvent) => {
+    const state = dragStateRef.current;
+    if (!state.isDragging) return;
+
+    setDragState(prev => ({
+      ...prev,
+      currentX: e.clientX,
+      currentY: e.clientY,
+    }));
+
+    const elements = document.elementsFromPoint(e.clientX, e.clientY);
+    const column = elements.find(el => el.classList.contains('kanban-column'));
+    const targetStage = column?.getAttribute('data-stage') || null;
+    
+    setHoveredColumn(targetStage);
+  }, []);
+
+  const handleDragEnd = useCallback(async (e: React.PointerEvent) => {
+    const state = dragStateRef.current;
+    if (!state.isDragging || !state.card) return;
+
+    const elements = document.elementsFromPoint(e.clientX, e.clientY);
+    const column = elements.find(el => el.classList.contains('kanban-column'));
+    const newStage = column?.getAttribute('data-stage') as KanbanStage;
+
+    if (newStage && newStage !== state.card.etapa) {
+      await moveCard(state.cardId!, newStage);
+    }
+
+    setDragState({
+      isDragging: false,
+      cardId: null,
+      card: null,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0,
+    });
+    setHoveredColumn(null);
+  }, [moveCard]);
 
   const syncStateRef = useRef<KanbanSyncState>('connecting');
   const boardScrollRef = useRef<HTMLDivElement | null>(null);
@@ -531,10 +677,12 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
 
       <div
         ref={boardScrollRef}
+        onPointerMove={handleDragMove}
+        onPointerUp={handleDragEnd}
         onMouseDown={(event) => {
           if (event.button !== 0) return;
+          if (dragState.isDragging) return;
           
-          // Se clicou em um card, ignore o arrasto do board
           const target = event.target as HTMLElement;
           if (target.closest('.kanban-card')) return;
 
@@ -547,65 +695,104 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
         }}
         className={cn(
           "flex-1 overflow-x-auto overflow-y-hidden bg-[#0a0a0a] no-scrollbar",
-          isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab"
+          isDraggingBoard ? "cursor-grabbing select-none" : "cursor-grab",
+          dragState.isDragging && "select-none"
         )}
       >
         <div className="flex h-full min-w-max p-6 gap-6">
           {STAGES.map((stage) => {
             const stageCards = cardsByStage[stage];
+            const isHovered = hoveredColumn === stage;
             return (
               <div
                 key={stage}
                 data-stage={stage}
                 className={cn(
-                  "kanban-column w-72 shrink-0 flex flex-col h-full bg-[#0f0f0f]/40 rounded-2xl border border-[#1f1f1f]/50 p-4 transition-all duration-200",
-                  activeDragColumn === stage ? "z-[50] relative ring-2 ring-white/5 bg-[#161b22]" : "z-0"
+                  "kanban-column w-72 shrink-0 flex flex-col h-full rounded-2xl border p-4 transition-all duration-200",
+                  isHovered
+                    ? "bg-[#161b22]/80 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+                    : "bg-[#0f0f0f]/40 border-[#1f1f1f]/50"
                 )}
               >
                 <div className="flex items-center justify-between mb-4 px-2">
-                  <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-white/20" />
+                  <h3 className={cn(
+                    "text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors",
+                    isHovered ? "text-white" : "text-zinc-400"
+                  )}>
+                    <span className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      isHovered ? "bg-white/60" : "bg-white/20"
+                    )} />
                     {stage}
                   </h3>
-                  <span className="text-[10px] font-bold bg-white/5 text-zinc-500 px-2.5 py-1 rounded-full border border-white/5 shadow-inner">
+                  <span className={cn(
+                    "text-[10px] font-bold px-2.5 py-1 rounded-full border shadow-inner transition-colors",
+                    isHovered 
+                      ? "bg-white/10 text-white border-white/20" 
+                      : "bg-white/5 text-zinc-500 border-white/5"
+                  )}>
                     {stageCards.length}
                   </span>
                 </div>
 
-                <motion.div 
-                  layout
-                  className={cn(
+                  <div className={cn(
                     "flex-1 space-y-3 pr-1 no-scrollbar transition-all duration-200",
-                    activeDragColumn ? "overflow-visible" : "overflow-y-auto"
-                  )}
-                >
-                  {stageCards.map((card) => {
-                    return (
-                      <KanbanLeadCard 
-                        key={card.id} 
-                        card={card} 
-                        onMove={moveCard}
-                        onDelete={deleteCard}
-                        onExpand={(id) => setExpandedCardId(id)}
-                        onDragStart={(stage) => setActiveDragColumn(stage)}
-                        onDragEnd={() => setActiveDragColumn(null)}
-                      />
-                    );
-                  })}
+                    isHovered ? "overflow-visible" : "overflow-y-auto"
+                  )}>
+                    <AnimatePresence mode="popLayout">
+                      {stageCards.map((card) => {
+                        return (
+                          <motion.div
+                            key={card.id}
+                            layout
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ layout: { duration: 0.2, ease: "easeInOut" }, opacity: { duration: 0.15 } }}
+                          >
+                            <KanbanLeadCard 
+                              card={card} 
+                              onMove={moveCard}
+                              onDelete={deleteCard}
+                              onExpand={handleExpand}
+                              onDragStart={handleDragStart}
+                              isDragging={dragState.isDragging && dragState.cardId === card.id}
+                            />
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </div>
 
                   {stageCards.length === 0 && (
-                    <div className="h-24 border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center group/empty">
-                      <p className="text-[10px] text-zinc-700 font-medium group-hover/empty:text-zinc-600 transition-colors">Sem cards nesta etapa</p>
+                    <div className={cn(
+                      "h-24 border-2 border-dashed rounded-xl flex items-center justify-center transition-all",
+                      isHovered 
+                        ? "border-white/20 bg-white/5" 
+                        : "border-white/5"
+                    )}>
+                      <div className="text-center">
+                        <p className={cn(
+                          "text-[10px] font-medium uppercase tracking-tighter transition-colors",
+                          isHovered ? "text-zinc-400" : "text-zinc-600"
+                        )}>
+                          {isHovered ? "Solte aqui" : "Vazio"}
+                        </p>
+                      </div>
                     </div>
                   )}
-                </motion.div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Expanded Detail View */}
+      <AnimatePresence>
+        {dragState.isDragging && dragState.card && (
+          <DragOverlay card={dragState.card} position={{ x: dragState.currentX, y: dragState.currentY }} />
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {expandedCardId && (
           <ExpandedCard

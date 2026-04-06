@@ -7,6 +7,7 @@ let connectionPromise: Promise<boolean> | null = null;
 export interface EvolutionChat {
   remoteJid: string;
   pushName?: string;
+  name?: string; // Nome salvo na agenda do celular
   updatedAt?: string;
   profilePicUrl?: string | null;
   labels?: Array<{ id: string; name: string; color: string }>;
@@ -292,4 +293,20 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
       const bTime = b.hora_data_mensagem ? new Date(b.hora_data_mensagem).getTime() : 0;
       return aTime - bTime;
     });
+}
+
+export async function fetchEvolutionContact(remoteJid: string): Promise<EvolutionChat | null> {
+  const response = await evolutionRequest<EvolutionChat[]>(
+    `/chat/findContacts/${evolutionInstance}`,
+    {
+      method: 'POST',
+      body: {
+        where: {
+          remoteJid
+        }
+      },
+    }
+  );
+
+  return (response && response.length > 0) ? response[0] : null;
 }

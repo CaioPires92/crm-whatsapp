@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { fetchEvolutionChats, fetchEvolutionLabels, getLeadContactPhone, getLeadDisplayName, isEvolutionConfigured, isLikelyInternalWhatsAppId, isLikelyPhoneNumber, normalizeLeadId } from '../../lib/evolution';
+import { fetchEvolutionChats, fetchEvolutionContact, fetchEvolutionLabels, getLeadContactPhone, getLeadDisplayName, isEvolutionConfigured, isLikelyInternalWhatsAppId, isLikelyPhoneNumber, normalizeLeadId } from '../../lib/evolution';
 import { Search, User as UserIcon, RefreshCw, AlertTriangle, Radio, SlidersHorizontal } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -405,13 +405,28 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
         leadsWithLastMessage.forEach(async (lead) => {
           const normalized = normalizeLeadId(lead.lead_id);
           const eChat = evolutionChatByLeadId.get(normalized);
-          
+          let nameToPersist = '';
+
+          // 1. Tentar pushName
           if (eChat?.pushName && isLikelyPhoneNumber(lead.lead_nome)) {
-            // PushName found and current name is just a phone number - persist!
-            console.log(`[Sync] Atualizando nome do lead ${normalized}: ${lead.lead_nome} -> ${eChat.pushName}`);
+            nameToPersist = eChat.pushName;
+          }
+
+          // 2. Se falhar ou continuar sendo numero, tentar Busca Profunda na agenda
+          if (!nameToPersist || isLikelyPhoneNumber(nameToPersist)) {
+            const fullContact = await fetchEvolutionContact(lead.remote_jid || lead.lead_id);
+            if (fullContact?.name && !isLikelyPhoneNumber(fullContact.name)) {
+              nameToPersist = fullContact.name;
+              console.log(`[DeepSync] Nome da agenda encontrado para ${normalized}: ${fullContact.name}`);
+            }
+          }
+          
+          if (nameToPersist) {
+            // Persistir o melhor nome encontrado!
+            console.log(`[Sync] Atualizando nome do lead ${normalized}: ${lead.lead_nome} -> ${nameToPersist}`);
             await supabase
               .from('leads')
-              .update({ lead_nome: eChat.pushName })
+              .update({ lead_nome: nameToPersist })
               .eq('lead_id', lead.lead_id);
           }
         });

@@ -369,7 +369,9 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
           return {
             ...lead,
             lead_id: normalizedLeadId,
-            lead_nome: lead.lead_nome || evolutionChat?.pushName || 'Sem nome',
+            lead_nome: (!lead.lead_nome || isLikelyPhoneNumber(lead.lead_nome)) 
+              ? (evolutionChat?.pushName || lead.lead_nome || 'Sem nome') 
+              : lead.lead_nome,
             labels: Array.isArray(lead.labels) && lead.labels.length > 0 ? lead.labels : evolutionChat?.labels || [],
             last_message_at: latestMessageByLeadId.get(normalizedLeadId)?.timestamp ?? evolutionChat?.updatedAt ?? null,
             last_message_preview: latestMessageByLeadId.get(normalizedLeadId)?.preview ?? null,
@@ -379,29 +381,47 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
         });
 
         const existingLeadIds = new Set(leadsWithLastMessage.map((lead) => lead.lead_id));
-        const shouldUseEvolutionOnlyFallback = (leadsData || []).length === 0;
-        const leadsFromEvolutionOnly: Lead[] = shouldUseEvolutionOnlyFallback
-          ? evolutionChats
-              .filter((chat) => !existingLeadIds.has(normalizeLeadId(chat.remoteJid)))
-              .map((chat, index) => ({
-                id: -1 - index,
-                lead_id: normalizeLeadId(chat.remoteJid),
-                lead_nome: chat.pushName || 'Sem nome',
-                created_at: chat.updatedAt || new Date(0).toISOString(),
-                labels: chat.labels || [],
-                last_message_at: chat.updatedAt || null,
-                last_message_preview: null,
-                remote_jid: chat.remoteJid,
-                avatar_url: chat.profilePicUrl || null,
-              }))
-          : [];
+        const leadsFromEvolutionOnly: Lead[] = evolutionChats
+          .filter((chat) => !existingLeadIds.has(normalizeLeadId(chat.remoteJid)))
+          .map((chat, index) => ({
+            id: -1 - index,
+            lead_id: normalizeLeadId(chat.remoteJid),
+            lead_nome: chat.pushName || 'Sem nome',
+            created_at: chat.updatedAt || new Date(0).toISOString(),
+            labels: chat.labels || [],
+            last_message_at: chat.updatedAt || null,
+            last_message_preview: null,
+            remote_jid: chat.remoteJid,
+            avatar_url: chat.profilePicUrl || null,
+          }));
+
+        const allLeads = [...leadsWithLastMessage, ...leadsFromEvolutionOnly].sort((a, b) => {
+          const timeA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
+          const timeB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+          return timeB - timeA;
+        });
+
+        // Sync names in background if needed (no "gambiarra" sync)
+        leadsWithLastMessage.forEach(async (lead) => {
+          const normalized = normalizeLeadId(lead.lead_id);
+          const eChat = evolutionChatByLeadId.get(normalized);
+          
+          if (eChat?.pushName && isLikelyPhoneNumber(lead.lead_nome)) {
+            // PushName found and current name is just a phone number - persist!
+            console.log(`[Sync] Atualizando nome do lead ${normalized}: ${lead.lead_nome} -> ${eChat.pushName}`);
+            await supabase
+              .from('leads')
+              .update({ lead_nome: eChat.pushName })
+              .eq('lead_id', lead.lead_id);
+          }
+        });
 
         if (mounted) {
-          setLeads([...leadsWithLastMessage, ...leadsFromEvolutionOnly]);
+          setLeads(allLeads);
           setAvailableLabels((evolutionLabels || []).filter((label) => label?.id));
           setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
           setSyncState((current) => (current === 'error' ? 'polling' : current));
-          setSyncMessage('Lista sincronizada com Supabase e fallback da Evolution.');
+          setSyncMessage('Lista sincronizada com Supabase e Evolution API.');
         }
       }
       if (mounted) {

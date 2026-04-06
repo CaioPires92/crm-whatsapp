@@ -9,7 +9,8 @@ import {
   ChevronRight,
   Kanban,
   Megaphone,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { clsx } from 'clsx';
@@ -17,6 +18,7 @@ import { twMerge } from 'tailwind-merge';
 
 const navItems = [
   { to: '/kanban', icon: Kanban, label: 'Kanban' },
+  { to: '/conversas', icon: MessageSquare, label: 'Conversas' },
   { to: '/contatos', icon: Users, label: 'Contatos' },
   { to: '/campanhas', icon: Megaphone, label: 'Campanhas' },
   { to: '/settings', icon: Settings, label: 'Configurações' },

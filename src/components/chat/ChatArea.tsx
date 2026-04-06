@@ -15,10 +15,11 @@ interface Message {
   id: number | string;
   session_id: string;
   message: {
-    type: 'human' | 'ai';
+    type: 'human' | 'ai' | 'sent' | 'received';
     content: string;
   };
   hora_data_mensagem: string | null;
+  status?: 'sending' | 'error' | 'sent';
 }
 
 interface ChatAreaProps {
@@ -65,76 +66,104 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
 
     let mounted = true;
     let isCleaningUp = false;
-    const normalizedLeadId = normalizeLeadId(lead.lead_id);
+    const currentLeadId = normalizeLeadId(lead.lead_id);
     const possibleRemoteJids = Array.from(
       new Set(
         [
           lead.remote_jid,
           lead.lead_id,
-          `${normalizedLeadId}@s.whatsapp.net`,
-          `${normalizedLeadId}@lid`,
-          `${normalizedLeadId}@c.us`,
+          `${currentLeadId}@s.whatsapp.net`,
+          `${currentLeadId}@lid`,
+          `${currentLeadId}@c.us`,
         ].filter(Boolean) as string[]
       )
     );
 
-    const fetchMessages = async () => {
-      const { data, error } = await supabase
+    const fetchMessages = async (forceFull = false) => {
+      // Se já temos mensagens e não é um carregamento forçado, 
+      // podemos opcionalmente pular a busca pesada da Evolution API se o tempo de resposta do Supabase for bom.
+      // Por enquanto, manteremos a busca unificada mas com tratamento para evitar flickering.
+      
+      const supabaseQuery = supabase
         .from('n8n_chat_histories')
         .select('*')
         .or(possibleRemoteJids.map((jid) => `session_id.eq.${jid}`).join(','))
-        .order('id', { ascending: true });
+        .order('hora_data_mensagem', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching messages:', error);
+      const evolutionPromises = forceFull ? possibleRemoteJids.map(jid => 
+        fetchEvolutionMessages(jid).catch((err) => {
+          console.debug(`Falha silenciosa ao buscar Evolution for ${jid}:`, err);
+          return [] as Message[];
+        })
+      ) : [];
+
+      const [supabaseRes, ...evolutionResults] = await Promise.all([
+        supabaseQuery,
+        ...evolutionPromises
+      ]);
+
+      if (supabaseRes.error) {
+        console.error('Error fetching messages from Supabase:', supabaseRes.error);
         if (mounted) {
           setSyncState('error');
-          setSyncMessage('Nao foi possivel carregar mensagens novas. Confira sua sessao ou as politicas do Supabase.');
+          setSyncMessage('Nao foi possivel carregar o historico do banco.');
         }
       } else if (mounted) {
-        const supabaseMessages = data || [];
+        const supabaseMessages = (supabaseRes.data || []) as Message[];
+        const evolutionMessages = evolutionResults.flat() as Message[];
 
-        if (supabaseMessages.length > 0) {
-          setMessages(supabaseMessages);
-          setSyncMessage('Historico sincronizado pelo Supabase.');
-        } else {
-          let evolutionMessages: Message[] = [];
+        // Função auxiliar para assinatura tolerante a tempo (precisão de 1 minuto)
+        const getMsgSig = (m: Message) => {
+          const dateStr = m.hora_data_mensagem ? format(new Date(m.hora_data_mensagem), 'yyyy-MM-dd HH:mm') : 'no-date';
+          return `${m.message.content}-${m.message.type}-${dateStr}`;
+        };
 
-          for (const remoteJid of possibleRemoteJids) {
-            try {
-              evolutionMessages = await fetchEvolutionMessages(remoteJid);
-              if (evolutionMessages.length > 0) {
-                break;
-              }
-            } catch (evolutionError) {
-              console.error(`Error fetching messages from Evolution for ${remoteJid}:`, evolutionError);
+        setMessages(prev => {
+          // Unificar e De-duplicar mantendo as mensagens 'sending'/'sent' locais
+          const seen = new Set<string>();
+          
+          // Filtramos mensagens otimistas que ainda não foram substituídas por registros de rídigo (banco)
+          const localMessages = prev.filter(m => m.status === 'sending' || m.status === 'sent');
+          
+          const combined = [...supabaseMessages, ...evolutionMessages, ...localMessages].reduce((acc, msg) => {
+            const signature = getMsgSig(msg);
+            
+            // Se já temos a mensagem confirmada vinda do banco ou evolution, 
+            // e ela bate com a assinatura de uma local, priorizamos a do banco
+            if (!seen.has(signature)) {
+              seen.add(signature);
+              acc.push(msg);
             }
-          }
+            return acc;
+          }, [] as Message[]).sort((a, b) => {
+            const timeA = a.hora_data_mensagem ? new Date(a.hora_data_mensagem).getTime() : 0;
+            const timeB = b.hora_data_mensagem ? new Date(b.hora_data_mensagem).getTime() : 0;
+            return timeA - timeB;
+          });
+          
+          return combined;
+        });
 
-          setMessages(evolutionMessages);
-          setSyncMessage(
-            evolutionMessages.length > 0
-              ? 'Historico carregado via Evolution API.'
-              : 'Nenhuma mensagem encontrada para esta conversa.'
-          );
-        }
+        setSyncMessage(
+          supabaseRes.data?.length ? 'Mensagens sincronizadas.' : 'Nenhuma mensagem encontrada.'
+        );
 
         setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
         setSyncState((current) => (current === 'error' ? 'polling' : current));
       }
-
       if (mounted) {
         setLoading(false);
       }
     };
 
-    setSyncState('connecting');
-    setSyncMessage('Conectando com a conversa...');
-    setLoading(true);
-    fetchMessages();
+    // Carregamento inicial reforçado (Full Sync)
+    fetchMessages(true);
+    
+    // Polling de segurança (mais espaçado agora que o realtime está otimizado)
+    const intervalId = window.setInterval(() => fetchMessages(false), 30000);
 
     const channel = supabase
-      .channel(`chat-${normalizedLeadId}`)
+      .channel(`chat-${currentLeadId}`)
       .on(
         'postgres_changes',
         {
@@ -142,25 +171,55 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
           schema: 'public',
           table: 'n8n_chat_histories',
         },
-        (payload) => {
-          const payloadSessionId = normalizeLeadId((payload.new as Message | undefined)?.session_id || (payload.old as Message | undefined)?.session_id);
-          if (payloadSessionId === normalizedLeadId) {
+        (payload: any) => {
+          const newMsg = payload.new as Message;
+          const payloadSessionId = normalizeLeadId(newMsg?.session_id);
+          
+          if (payloadSessionId === currentLeadId && payload.eventType === 'INSERT') {
+            setMessages(prev => {
+              // Função de assinatura interna para o listener
+              const getSig = (m: Message) => {
+                const dateStr = m.hora_data_mensagem ? format(new Date(m.hora_data_mensagem), 'yyyy-MM-dd HH:mm') : 'no-date';
+                return `${m.message.content}-${m.message.type}-${dateStr}`;
+              };
+              
+              const newMsgSig = getSig(newMsg);
+              const alreadyExists = prev.some(m => !m.status && getSig(m) === newMsgSig);
+              
+              if (alreadyExists) return prev;
+              
+              // Substituição cirúrgica: Removemos APENAS uma mensagem local pendente que combine
+              let replaced = false;
+              const nextMessages = prev.filter(m => {
+                if (!replaced && (m.status === 'sending' || m.status === 'sent') && getSig(m) === newMsgSig) {
+                  replaced = true;
+                  return false;
+                }
+                return true;
+              });
+
+              return [...nextMessages, newMsg].sort((a, b) => {
+                const tA = a.hora_data_mensagem ? new Date(a.hora_data_mensagem).getTime() : 0;
+                const tB = b.hora_data_mensagem ? new Date(b.hora_data_mensagem).getTime() : 0;
+                return tA - tB;
+              });
+            });
+            setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+          } else if (payloadSessionId === currentLeadId) {
             fetchMessages();
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
           setSyncState('realtime');
           setSyncMessage('Mensagens chegando em tempo real.');
         } else if (!isCleaningUp && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) {
           console.error(`Chat realtime channel failed for ${lead.lead_id}. Falling back to polling.`);
           setSyncState('polling');
-          setSyncMessage('Realtime indisponivel. Consultando novas mensagens periodicamente.');
+          setSyncMessage('Realtime indisponível. Consultando novas mensagens periodicamente.');
         }
       });
-
-    const intervalId = window.setInterval(fetchMessages, 15000);
 
     const handleWindowRefresh = () => {
       if (document.visibilityState === 'visible') {
@@ -270,25 +329,28 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
             </p>
           </div>
         </div>
-        <div className={cn("max-w-[320px] rounded-xl border px-3 py-2 text-[11px]", syncTone)}>
-          <div className="flex items-center gap-2">
-            <SyncIcon className={cn("h-3.5 w-3.5 shrink-0", syncState === 'polling' || syncState === 'connecting' ? 'animate-spin' : '')} />
-            <span className="truncate">{syncMessage}</span>
+        <div className="flex items-center gap-3">
+          {/* Sync Status Badge (Discreet) */}
+          <div 
+            className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full border text-[10px] font-medium transition-all duration-300", syncTone.replace('px-3 py-2 text-[11px]', ''))}
+            title={`${syncMessage} (Última: ${lastUpdatedAt})`}
+          >
+            <SyncIcon className={cn("h-3 w-3", syncState === 'polling' || syncState === 'connecting' ? 'animate-spin' : '')} />
+            <span className="hidden md:inline opacity-80 uppercase tracking-tighter">Sincronizado</span>
           </div>
-          <div className="mt-1 text-[10px] opacity-80">Ultima atualizacao: {lastUpdatedAt}</div>
-        </div>
-        <div className="flex items-center gap-2">
+
+          {/* Pilot Mode Badge (Discreet) */}
           <div
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all border",
+              "flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all border",
               isChatbotAtivo
-                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                ? "border-sky-500/10 text-sky-500/80"
+                : "border-amber-500/10 text-amber-500/80"
             )}
-            title={isChatbotAtivo ? "Piloto automatico ativo" : "Modo manual ativo"}
+            title={isChatbotAtivo ? "Piloto automático ativo" : "Modo manual ativo"}
           >
-            {isChatbotAtivo ? <Bot className="w-3.5 h-3.5" /> : <BotOff className="w-3.5 h-3.5" />}
-            {isChatbotAtivo ? "Piloto Automatico" : "Modo Manual"}
+            {isChatbotAtivo ? <Bot className="w-3 h-3" /> : <BotOff className="w-3 h-3" />}
+            <span>{isChatbotAtivo ? "Auto" : "Manual"}</span>
           </div>
         </div>
       </div>
@@ -316,25 +378,40 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
                     key={msg.id}
                     className={cn(
                       "flex flex-col group transition-all duration-300 transform",
-                      msg.message.type === 'human' ? "items-end ml-12" : "items-start mr-12"
+                      (msg.message.type === 'sent' || msg.message.type === 'human') ? "items-end ml-12" : "items-start mr-12"
                     )}
                   >
                     <div
                       className={cn(
                         "relative px-4 py-3 text-sm shadow-xl transition-all duration-300 group-hover:scale-[1.01]",
-                        msg.message.type === 'human'
+                        (msg.message.type === 'sent' || msg.message.type === 'human')
                           ? "bg-[#1d1d1f] text-zinc-100 rounded-2xl rounded-tr-[2px] ring-1 ring-white/10"
-                          : "bg-white/5 text-zinc-300 rounded-2xl rounded-tl-[2px] border border-white/5 backdrop-blur-sm"
+                          : "bg-white/5 text-zinc-300 rounded-2xl rounded-tl-[2px] border border-white/5 backdrop-blur-sm",
+                        msg.status === 'sending' && "opacity-50 blur-[0.5px]",
+                        msg.status === 'error' && "ring-1 ring-red-500/50 bg-red-500/5 text-red-200"
                       )}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">
                         {msg.message.content || 'Mensagem sem conteúdo'}
                       </p>
+                      
+                      {msg.status === 'sending' && (
+                        <div className="absolute -bottom-4 right-0 flex items-center gap-1 text-[8px] text-zinc-500 uppercase tracking-tighter font-bold animate-pulse">
+                          <span>Sincronizando</span>
+                          <RefreshCw className="w-2 h-2 animate-spin" />
+                        </div>
+                      )}
+
+                      {msg.status === 'error' && (
+                        <div className="absolute -bottom-4 right-0 text-[8px] text-red-500 uppercase tracking-tighter font-bold">
+                          Erro no envio
+                        </div>
+                      )}
                     </div>
 
                     <div className={cn(
                       "mt-1.5 flex items-center gap-2 text-[10px] text-zinc-600 transition-opacity",
-                      msg.message.type === 'human' ? "flex-row-reverse" : "flex-row"
+                      (msg.message.type === 'sent' || msg.message.type === 'human') ? "flex-row-reverse" : "flex-row"
                     )}>
                       {msg.hora_data_mensagem && (
                         <span>
@@ -356,9 +433,26 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
             e.preventDefault();
             if (!newMessage.trim() || sending) return;
 
-            setSending(true);
             const messageText = newMessage.trim();
             setNewMessage('');
+            
+            // --- OPTIMISTIC UI START ---
+            const tempId = `temp-${Date.now()}`;
+            const tempMessage: Message = {
+              id: tempId,
+              session_id: lead.lead_id,
+              message: {
+                type: 'sent',
+                content: messageText
+              },
+              hora_data_mensagem: new Date().toISOString(),
+              status: 'sending'
+            };
+            
+            setMessages(prev => [...prev, tempMessage]);
+            // --- OPTIMISTIC UI END ---
+
+            setSending(true);
 
             try {
               const res = await fetch(`${import.meta.env.VITE_EVOLUTION_URL}/message/sendText/${import.meta.env.VITE_EVOLUTION_INSTANCE}`, {
@@ -376,19 +470,26 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
 
               if (!res.ok) throw new Error('Falha ao enviar mensagem');
 
-              // Optamos por salvar no histórico imediatamente para melhorar UX
               await supabase.from('n8n_chat_histories').insert({
                 session_id: lead.lead_id,
                 message: {
-                  type: 'human',
+                  type: 'sent',
                   content: messageText
                 },
                 hora_data_mensagem: new Date().toISOString()
               });
 
+              // --- INSTANT CONFIRMATION ---
+              // Assim que o insert termina, marcamos como sent localmente para sumir o 'Sincronizando'
+              setMessages(prev => prev.map(m => m.id === tempId ? { ...m, status: 'sent' } : m));
+              // Removemos o status 'sent' após 2 segundos (ou deixamos para o Realtime limpar)
+              // Por segurança, o Realtime cuidará da limpeza final.
+
             } catch (err) {
               console.error('Erro no envio manual:', err);
-              alert('Erro ao enviar mensagem. Verifique a conexao.');
+              // Marcar mensagem como erro
+              setMessages(prev => prev.map(m => m.id === tempId ? { ...m, status: 'error' } : m));
+              alert('Erro ao enviar mensagem. Recarregue a pagina ou tente novamente.');
             } finally {
               setSending(false);
             }
@@ -411,9 +512,10 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>
-        <div className="mt-3 flex items-center justify-center gap-2 text-[9px] text-zinc-600 bg-white/5 py-1.5 rounded-lg border border-white/5 italic">
-          <AlertCircle className="w-2.5 h-2.5" />
-          <span>{isChatbotAtivo ? "O chatbot responderá automaticamente as novas mensagens." : "O chatbot está pausado para este lead. Responda manualmente."}</span>
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[8px] text-zinc-700 uppercase tracking-widest font-bold">
+          <span>{isChatbotAtivo ? "IA Ativa" : "IA Pausada"}</span>
+          <span className="w-1 h-1 rounded-full bg-zinc-800" />
+          <span>{isChatbotAtivo ? "Resposta automática ligada" : "Responda manualmente por aqui"}</span>
         </div>
       </div>
     </div>

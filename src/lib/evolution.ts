@@ -33,7 +33,7 @@ export interface EvolutionMessage {
   id: string;
   session_id: string;
   message: {
-    type: 'human' | 'ai';
+    type: 'sent' | 'received' | 'human' | 'ai';
     content: string;
   };
   hora_data_mensagem: string | null;
@@ -52,21 +52,26 @@ async function ensureConnection(): Promise<boolean> {
   connectionPromise = (async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1000);
+      const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s para ser seguro
 
-      // Tenta um simples fetch no root ou em um endpoint leve
-      await fetch(`${evolutionBaseUrl}/instance/instanceStatus/${evolutionInstance}`, {
+      // Tenta o endpoint de status da conexão (conforme documentação v1/v2)
+      const response = await fetch(`${evolutionBaseUrl}/instance/connectionState/${evolutionInstance}`, {
         method: 'GET',
         headers: { apikey: evolutionApiKey! },
         signal: controller.signal
       });
       
       clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error ${response.status}`);
+      }
+
       connectionState = 'available';
       return true;
     } catch (err) {
       connectionState = 'unavailable';
-      console.info(`Evolution API offline em ${evolutionBaseUrl}. Entrando em modo silencioso.`);
+      console.info(`Evolution API indisponível (${evolutionBaseUrl}). Entrando em modo silencioso.`);
       return false;
     }
   })();
@@ -147,7 +152,11 @@ export function getLeadDisplayName(
 ) {
   const normalizedName = (leadNome || '').trim();
 
-  if (!normalizedName || normalizedName === '.' || normalizedName.toLowerCase() === 'sem nome') {
+  // Se nao tiver nome, ou for ponto, ou "sem nome", ou se for APENAS um número de telefone
+  if (!normalizedName || 
+      normalizedName === '.' || 
+      normalizedName.toLowerCase() === 'sem nome' || 
+      isLikelyPhoneNumber(normalizedName)) {
     return getLeadContactPhone(leadId, remoteJid) || 'Sem telefone identificado';
   }
 
@@ -194,15 +203,25 @@ function extractMessageContent(message?: Record<string, any>) {
     return 'Mensagem sem conteudo';
   }
 
-  return (
-    message.conversation ||
-    message.extendedTextMessage?.text ||
-    message.imageMessage?.caption ||
-    message.videoMessage?.caption ||
-    message.buttonsResponseMessage?.selectedDisplayText ||
-    message.listResponseMessage?.title ||
-    'Mensagem sem conteudo'
-  );
+  // Lida com mensagens aninhadas (viewOnce, ephemeral, etc)
+  const msg = message.viewOnceMessageV2?.message || 
+              message.viewOnceMessage?.message || 
+              message.ephemeralMessage?.message || 
+              message;
+
+  if (msg.conversation) return msg.conversation;
+  if (msg.extendedTextMessage?.text) return msg.extendedTextMessage.text;
+  
+  if (msg.imageMessage) return msg.imageMessage.caption || '[📷 Imagem]';
+  if (msg.videoMessage) return msg.videoMessage.caption || '[🎥 Vídeo]';
+  if (msg.audioMessage) return '[🎵 Áudio]';
+  if (msg.stickerMessage) return '[🎨 Figurinha]';
+  if (msg.documentMessage) return msg.documentMessage.title || msg.documentMessage.fileName || '[📄 Documento]';
+  if (msg.locationMessage) return '[📍 Localização]';
+  if (msg.contactMessage) return '[👤 Contato]';
+  if (msg.pollCreationMessage) return `[📊 Enquete: ${msg.pollCreationMessage.name}]`;
+  
+  return 'Mensagem sem conteudo';
 }
 
 export async function fetchEvolutionChats(take = 100) {
@@ -248,6 +267,10 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
             remoteJid,
           },
         },
+        take: 100,
+        orderBy: {
+          messageTimestamp: 'desc'
+        }
       },
     }
   );
@@ -259,7 +282,7 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
       id: `${record.id || remoteJid}-${index}`,
       session_id: record.key?.remoteJid || remoteJid,
       message: {
-        type: record.key?.fromMe ? 'ai' : 'human',
+        type: record.key?.fromMe ? 'sent' : 'received',
         content: extractMessageContent(record.message),
       },
       hora_data_mensagem: record.messageTimestamp ? new Date(record.messageTimestamp * 1000).toISOString() : null,

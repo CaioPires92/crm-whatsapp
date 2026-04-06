@@ -4,7 +4,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Kanban from './pages/Kanban';
-import Contatos from './pages/Contatos';
+import Conversas from './pages/Conversas';
+import Agenda from './pages/Agenda';
 import Campanhas from './pages/Campanhas';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
@@ -23,7 +24,8 @@ function App() {
               <Route element={<Dashboard />}>
                 <Route index element={<Navigate to="/kanban" replace />} />
                 <Route path="kanban" element={<Kanban />} />
-                <Route path="contatos" element={<Contatos />} />
+                <Route path="conversas" element={<Conversas />} />
+                <Route path="contatos" element={<Agenda />} />
                 <Route path="campanhas" element={<Campanhas />} />
                 <Route path="settings" element={<Settings />} />
               </Route>

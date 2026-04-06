@@ -136,11 +136,16 @@ function getLeadNameTokens(value: string | null | undefined) {
 
 function getLeadMergeKeys(lead: Lead) {
   const normalizedLeadId = normalizeLeadId(lead.lead_id);
+  // Canonical ID: remover sufixos e o 9º dígito para BR
   const digits = normalizedLeadId.replace(/\D/g, '');
+  const canonicalDigits = (digits.startsWith('55') && digits.length === 13)
+    ? digits.slice(0, 4) + digits.slice(5) // Remove o 5º dígito (o 9)
+    : digits;
+
   const keys = new Set<string>();
 
   if (isLikelyPhoneNumber(normalizedLeadId)) {
-    keys.add(`phone:${digits}`);
+    keys.add(`phone:${canonicalDigits}`);
   }
 
   const avatarKey = normalizeAvatarKey(lead.avatar_url);
@@ -158,6 +163,7 @@ function getLeadMergeKeys(lead: Lead) {
   }
 
   keys.add(`id:${normalizedLeadId}`);
+  keys.add(`canonical:${canonicalDigits}`);
   return Array.from(keys);
 }
 
@@ -529,8 +535,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
   }, []);
 
   const dedupedLeads = Array.from(
-    Array.from(
-      leads.reduce((acc, lead) => {
+    leads.reduce((acc, lead) => {
       const normalizedLeadId = normalizeLeadId(lead.lead_id);
       const mergeKeys = getLeadMergeKeys(lead);
 
@@ -539,14 +544,16 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
       }
 
       const normalizedLead = { ...lead, lead_id: normalizedLeadId };
-      const existingLead = mergeKeys
-        .map((key) => acc.get(key))
-        .find((candidateLead): candidateLead is Lead => Boolean(candidateLead));
+      
+      // Encontrar registro existente por QUALQUER uma das chaves de unificação
+      const existingKey = mergeKeys.find(key => acc.has(key));
+      const existingLead = existingKey ? acc.get(existingKey) : null;
 
       const preferredLead = existingLead
         ? mergeLeadData(existingLead, normalizedLead)
         : normalizedLead;
 
+      // Atualizar TODAS as chaves para apontar para o objeto unificado
       if (existingLead) {
         getLeadMergeKeys(existingLead).forEach((key) => {
           acc.set(key, preferredLead);
@@ -559,15 +566,24 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
 
       return acc;
     }, new Map<string, Lead>()).values()
-    ).reduce((acc, lead) => {
-      const uniqueKey = `${lead.id}:${normalizeLeadId(lead.lead_id)}`;
+  ).reduce((acc, lead) => {
+    // Garante unificação final por ID normalizado caso ainda restem duplicatas em memória
+    const canonicalKey = normalizeLeadId(lead.lead_id).replace(/\D/g, '');
+    const finalKey = (canonicalKey.startsWith('55') && canonicalKey.length === 13) 
+      ? canonicalKey.slice(0, 4) + canonicalKey.slice(5) 
+      : canonicalKey;
 
-      if (!acc.has(uniqueKey)) {
-        acc.set(uniqueKey, lead);
+    if (!acc.has(finalKey)) {
+      acc.set(finalKey, lead);
+    } else {
+      // Se jah existe, dar preferencia ao que tem nome
+      const existing = acc.get(finalKey)!;
+      if (!hasUsefulLeadName(existing.lead_nome) && hasUsefulLeadName(lead.lead_nome)) {
+        acc.set(finalKey, lead);
       }
-
-      return acc;
-    }, new Map<string, Lead>()).values()
+    }
+    return acc;
+  }, new Map<string, Lead>()).values()
   )
     .filter((lead) => hasUsefulLeadName(lead.lead_nome) || Boolean(getLeadContactPhone(lead.lead_id, lead.remote_jid)))
     .sort((a, b) => {

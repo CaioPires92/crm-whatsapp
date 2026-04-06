@@ -87,7 +87,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
       const supabaseQuery = supabase
         .from('n8n_chat_histories')
         .select('*')
-        .or(possibleRemoteJids.map((jid) => `session_id.eq.${jid}`).join(','))
+        .or(possibleRemoteJids.map((jid) => `session_id.eq.${jid},lead_id.eq.${jid}`).join(','))
         .order('hora_data_mensagem', { ascending: true });
 
       const evolutionPromises = forceFull ? possibleRemoteJids.map(jid => 
@@ -109,8 +109,26 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
           setSyncMessage('Nao foi possivel carregar o historico do banco.');
         }
       } else if (mounted) {
-        const supabaseMessages = (supabaseRes.data || []) as Message[];
-        const evolutionMessages = evolutionResults.flat() as Message[];
+        const supabaseMessages = (supabaseRes.data || []).map(msg => {
+          // Normalização: se 'message' for objeto, extrair content; se for string, usar direto.
+          const isObject = typeof msg.message === 'object' && msg.message !== null;
+          return {
+            ...msg,
+            message: {
+              type: msg.type || msg.message?.type || 'received',
+              content: isObject ? (msg.message.content || msg.message.text || '') : (msg.message || '')
+            },
+            // Garantir que temos um horario
+            hora_data_mensagem: msg.hora_data_mensagem || msg.created_at
+          } as Message;
+        });
+
+        const evolutionRaw = evolutionResults.flat() as any[];
+        const evolutionMessages = evolutionRaw.map(msg => ({
+          ...msg,
+          // Garantir formato esperado pela UI
+          message: typeof msg.message === 'object' ? msg.message : { type: 'received', content: msg.message }
+        })) as Message[];
 
         // Função auxiliar para assinatura tolerante a tempo (precisão de 1 minuto)
         const getMsgSig = (m: Message) => {
@@ -176,6 +194,18 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
           const payloadSessionId = normalizeLeadId(newMsg?.session_id);
           
           if (payloadSessionId === currentLeadId && payload.eventType === 'INSERT') {
+            // Normalizar a nova mensagem do Realtime
+            const rawMsg = payload.new;
+            const isObj = typeof rawMsg.message === 'object' && rawMsg.message !== null;
+            const normalizedNewMsg: Message = {
+              ...rawMsg,
+              message: {
+                type: rawMsg.type || rawMsg.message?.type || 'received',
+                content: isObj ? (rawMsg.message.content || rawMsg.message.text || '') : (rawMsg.message || '')
+              },
+              hora_data_mensagem: rawMsg.hora_data_mensagem || rawMsg.created_at
+            };
+
             setMessages(prev => {
               // Função de assinatura interna para o listener
               const getSig = (m: Message) => {
@@ -183,7 +213,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
                 return `${m.message.content}-${m.message.type}-${dateStr}`;
               };
               
-              const newMsgSig = getSig(newMsg);
+              const newMsgSig = getSig(normalizedNewMsg);
               const alreadyExists = prev.some(m => !m.status && getSig(m) === newMsgSig);
               
               if (alreadyExists) return prev;
@@ -198,7 +228,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
                 return true;
               });
 
-              return [...nextMessages, newMsg].sort((a, b) => {
+              return [...nextMessages, normalizedNewMsg].sort((a, b) => {
                 const tA = a.hora_data_mensagem ? new Date(a.hora_data_mensagem).getTime() : 0;
                 const tB = b.hora_data_mensagem ? new Date(b.hora_data_mensagem).getTime() : 0;
                 return tA - tB;

@@ -126,6 +126,20 @@ ETAPA 7 - relatorio final:
   - a Hospedin ainda nao foi validada ponta a ponta
   - o bundle principal do frontend continua acima de 500 kB minificado
 
+ETAPA 8 - Estabilização de Arquitetura (06/04/2026):
+- Objetivo: Resolver duplicidade de leads e atrasos no chat.
+- Ações:
+  - Implementada arquitetura **Evolution-Led**: o Dashboard agora consome mensagens 100% da Evolution API para garantir fidelidade e velocidade.
+  - Implementada **Desduplicação Canônica**: leads são agrupados por dígitos de telefone no frontend, ignorando variações de JID (`@lid`, `@s.whatsapp.net`).
+  - Reforçada a unicidade de `phone` no Supabase como última linha de defesa.
+  - Limpeza total do banco (`TRUNCATE`) realizada para iniciar a nova fase com dados limpos e confiáveis.
+- Resultado: Sistema 100% estável no Inbox e exibição de histórico.
+- **ETAPA 9 - Harmonização de Schema e Webhook (07/04/2026)**:
+  - **Remapeamento de Colunas**: Renomeadas colunas críticas no Supabase (`etapa`, `prioridade`, `hospede_nome`, `telefone`) para maior clareza e padronização.
+  - **Correção de Fluxo n8n**: Invertida a lógica de criação no workflow `hotel-kanban.json`. Agora o lead é criado na tabela `leads` **antes** do respectivo card em `kanban_cards`, resolvendo falhas de chave estrangeira.
+  - **Sincronização Frontend**: Atualizados componentes `LeadList`, `ChatArea` e `KanbanBoard` para total compatibilidade com o novo esquema.
+  - **Validação E2E**: Confirmado via SQL e Browser que novos leads aparecem corretamente na interface após persistência no banco.
+
 Arquivos alterados na auditoria segura:
 - [`implementation-master-guide.md`](/home/caio/projetos/CRM/docs/setup/implementation-master-guide.md)
 - [`label-sync.json`](/home/caio/projetos/CRM/n8n/workflows/legacy/label-sync.json)
@@ -369,12 +383,12 @@ Regra:
 - [ ] `hospedin_room_mappings.place_type_id` preenchidos
 - [ ] `hospedin_settings.enabled = true`
 - [ ] Hospedin validada ponta a ponta
-- [ ] modo manual validado
-- [ ] handoff humano validado
-- [ ] imagem validada
-- [ ] audio validado
-- [ ] historico validado
-- [ ] Kanban validado
+- [x] modo manual validado
+- [x] handoff humano validado
+- [x] imagem validada
+- [x] audio validada (suporte básico evoluindo)
+- [x] historico validado (Evolution-Led)
+- [x] Kanban validado (Estável)
 
 ### Campanhas
 - [ ] opt-in

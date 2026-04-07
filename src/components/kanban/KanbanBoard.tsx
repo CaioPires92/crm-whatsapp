@@ -34,12 +34,12 @@ type UrgenciaCor = 'Verde' | 'Amarelo' | 'Vermelho';
 interface KanbanCardRow {
   id: number;
   lead_id: string;
-  stage: string;
+  stage: string; // This comes from DB as 'etapa' after rename, but keep internal prop as stage if preferred or rename to etapa
   resumo_solicitacao: string | null;
   prioridade: string | null;
   ultima_interacao: string;
   leads?: {
-    lead_nome: string | null;
+    hospede_nome: string | null;
   } | null;
 }
 
@@ -444,7 +444,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   const fetchCards = useCallback(async () => {
     const { data, error } = await supabase
       .from('kanban_cards')
-      .select('*, leads(lead_nome)')
+      .select('*, leads(hospede_nome)')
       .order('id', { ascending: false });
 
     if (error) {
@@ -452,15 +452,15 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       return;
     }
 
-    const typedCards = ((data || []) as unknown as KanbanCardRow[])
-      .filter((card) => isKanbanStage(card.stage))
+    const typedCards = ((data || []) as unknown as any[])
+      .filter((card) => isKanbanStage(card.etapa))
       .map((card) => ({
         id: card.id,
         lead_id: card.lead_id,
-        hospede_nome: card.leads?.lead_nome || null,
+        hospede_nome: card.leads?.hospede_nome || null,
         hospede_foto_url: null,
         origem: 'WhatsApp',
-        etapa: card.stage as KanbanStage,
+        etapa: card.etapa as KanbanStage,
         resumo_solicitacao: card.resumo_solicitacao,
         prioridade: isKanbanPriority(card.prioridade) ? card.prioridade : 'media',
         ultima_interacao: card.ultima_interacao,
@@ -497,7 +497,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
     const { error } = await supabase
       .from('kanban_cards')
       .update({
-        stage: newStage,
+        etapa: newStage,
         ultima_interacao: new Date().toISOString()
       })
       .eq('id', id);

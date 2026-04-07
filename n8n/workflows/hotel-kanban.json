@@ -735,16 +735,20 @@
     },
     {
       "parameters": {
-        "tableId": "Leads",
+        "tableId": "leads",
         "fieldsUi": {
           "fieldValues": [
             {
-              "fieldId": "lead_nome",
-              "fieldValue": "={{ $('Normalizar Lead').first().json.pushName }}"
+              "fieldId": "hospede_nome",
+              "fieldValue": "={{ $(\"Normalizar Lead\").first().json.pushName }}"
             },
             {
               "fieldId": "lead_id",
-              "fieldValue": "={{ $('Normalizar Lead').first().json.waNumber }}"
+              "fieldValue": "={{ $(\"Normalizar Lead\").first().json.remoteJid }}"
+            },
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{ $(\"Normalizar Lead\").first().json.waNumber }}"
             }
           ]
         }
@@ -1277,6 +1281,17 @@
         ],
         [
           {
+            "node": "Supabase - Create Lead Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Create Lead Master": {
+      "main": [
+        [
+          {
             "node": "Supabase - Create Lead",
             "type": "main",
             "index": 0
@@ -1288,9 +1303,9 @@
       "main": [
         [
           {
-            "node": "Supabase - Create Lead Master",
+            "node": "Merge Lead",
             "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -1470,17 +1485,6 @@
             "node": "Supabase - Get Lead Stage",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Supabase - Create Lead Master": {
-      "main": [
-        [
-          {
-            "node": "Merge Lead",
-            "type": "main",
-            "index": 1
           }
         ]
       ]

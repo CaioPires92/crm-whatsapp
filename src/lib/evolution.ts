@@ -93,6 +93,10 @@ export function normalizeLeadId(value: string | null | undefined) {
   return base;
 }
 
+export function getCanonicalKey(value: string | null | undefined) {
+  return normalizeLeadId(value);
+}
+
 export function isLikelyPhoneNumber(value: string | null | undefined) {
   const digits = normalizeLeadId(value).replace(/\D/g, '');
 
@@ -156,21 +160,37 @@ export function getLeadContactPhone(
 }
 
 export function getLeadDisplayName(
-  leadNome: string | null | undefined,
-  leadId: string | null | undefined,
-  remoteJid?: string | null | undefined
+  lead: { 
+    whatsapp_name?: string | null; 
+    contact_name?: string | null; 
+    telefone?: string | null;
+    hospede_nome?: string | null;
+    lead_id?: string | null;
+    remote_jid?: string | null;
+  }
 ) {
-  const normalizedName = (leadNome || '').trim();
-
-  // Se nao tiver nome, ou for ponto, ou "sem nome", ou se for APENAS um número de telefone
-  if (!normalizedName || 
-      normalizedName === '.' || 
-      normalizedName.toLowerCase() === 'sem nome' || 
-      isLikelyPhoneNumber(normalizedName)) {
-    return getLeadContactPhone(leadId, remoteJid) || 'Sem telefone identificado';
+  // 1. Nome do WhatsApp (pushName)
+  if (lead.whatsapp_name && lead.whatsapp_name.trim() && lead.whatsapp_name !== '.' && lead.whatsapp_name.toLowerCase() !== 'sem nome') {
+    return lead.whatsapp_name.trim();
   }
 
-  return normalizedName;
+  // 2. Nome da Agenda (contactName)
+  if (lead.contact_name && lead.contact_name.trim() && lead.contact_name !== '.' && lead.contact_name.toLowerCase() !== 'sem nome') {
+    return lead.contact_name.trim();
+  }
+
+  // 3. Fallback para legacy hospede_nome (n8n compat) se for útil
+  if (lead.hospede_nome && !isLikelyPhoneNumber(lead.hospede_nome) && lead.hospede_nome !== '.' && lead.hospede_nome.toLowerCase() !== 'sem nome') {
+    return lead.hospede_nome.trim();
+  }
+
+  // 4. Telefone formatado
+  if (lead.telefone) {
+    return lead.telefone;
+  }
+
+  // 5. Fallback final: extrair do ID ou JID
+  return getLeadContactPhone(lead.lead_id, lead.remote_jid) || 'Sem telefone';
 }
 
 async function evolutionRequest<T>(path: string, options?: { method?: 'GET' | 'POST'; body?: Record<string, any> }) {
@@ -278,7 +298,7 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
             remoteJid,
           },
         },
-        take: 100,
+        take: 150,
         orderBy: {
           messageTimestamp: 'desc'
         }
@@ -286,7 +306,15 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
     }
   );
 
-  const records = response.messages?.records || [];
+  // Evoltuion v2 pode retornar os registros em 'records' ou diretamente em 'messages'
+  let records: EvolutionMessageRecord[] = [];
+  if (Array.isArray(response.messages)) {
+    records = response.messages;
+  } else if (response.messages?.records && Array.isArray(response.messages.records)) {
+    records = response.messages.records;
+  } else if (Array.isArray(response)) {
+    records = response;
+  }
 
   return records
     .map((record, index): EvolutionMessage => ({

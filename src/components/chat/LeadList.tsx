@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { fetchEvolutionChats, fetchEvolutionContact, fetchEvolutionLabels, getLeadContactPhone, getLeadDisplayName, isEvolutionConfigured, isLikelyInternalWhatsAppId, isLikelyPhoneNumber, normalizeLeadId } from '../../lib/evolution';
+import { fetchEvolutionChats, fetchEvolutionLabels, getLeadContactPhone, getLeadDisplayName, isEvolutionConfigured, normalizeLeadId, getCanonicalKey } from '../../lib/evolution';
 import { Search, User as UserIcon, RefreshCw, AlertTriangle, Radio, SlidersHorizontal } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -17,14 +17,18 @@ interface Label {
 
 interface Lead {
   id: number;
-  lead_nome: string;
+  hospede_nome: string;
   lead_id: string;
+  whatsapp_name?: string | null;
+  contact_name?: string | null;
+  telefone?: string | null;
   created_at: string;
   labels?: Label[];
   last_message_at?: string | null;
   last_message_preview?: string | null;
   remote_jid?: string;
   avatar_url?: string | null;
+  etapa?: string;
 }
 
 interface LeadListProps {
@@ -32,263 +36,65 @@ interface LeadListProps {
   selectedLeadId?: string;
 }
 
-type SyncState = 'connecting' | 'realtime' | 'polling' | 'error';
-
-function getLeadPriority(lead: Lead) {
-  const hasUsefulName = !!lead.lead_nome && lead.lead_nome !== '.' && lead.lead_nome.toLowerCase() !== 'sem nome';
-  const createdAt = lead.created_at ? new Date(lead.created_at).getTime() : 0;
-  const lastMessageAt = lead.last_message_at ? new Date(lead.last_message_at).getTime() : 0;
-
-  return {
-    hasUsefulName,
-    lastMessageAt,
-    createdAt,
-    id: lead.id,
-  };
-}
-
-function normalizeAvatarKey(value: string | null | undefined) {
-  if (!value) {
-    return '';
-  }
-
-  try {
-    const parsed = new URL(value);
-    return `${parsed.origin}${parsed.pathname}`;
-  } catch {
-    return value.split('?')[0];
-  }
-}
-
-function mergeLeadData(base: Lead, incoming: Lead) {
-  const preferred = choosePreferredLead(base, incoming);
-  const fallback = preferred === base ? incoming : base;
-  const preferredIsPhone = isLikelyPhoneNumber(preferred.lead_id);
-  const fallbackIsPhone = isLikelyPhoneNumber(fallback.lead_id);
-
-  return {
-    ...preferred,
-    lead_id: preferredIsPhone ? preferred.lead_id : fallbackIsPhone ? normalizeLeadId(fallback.lead_id) : preferred.lead_id,
-    lead_nome: hasUsefulLeadName(preferred.lead_nome)
-      ? preferred.lead_nome
-      : hasUsefulLeadName(fallback.lead_nome)
-        ? fallback.lead_nome
-        : preferred.lead_nome,
-    labels: Array.isArray(preferred.labels) && preferred.labels.length > 0
-      ? preferred.labels
-      : fallback.labels,
-    last_message_preview: preferred.last_message_preview || fallback.last_message_preview || null,
-    last_message_at: (preferred.last_message_at && fallback.last_message_at) 
-      ? (new Date(preferred.last_message_at) > new Date(fallback.last_message_at) ? preferred.last_message_at : fallback.last_message_at)
-      : (preferred.last_message_at || fallback.last_message_at),
-    remote_jid: preferred.remote_jid || fallback.remote_jid,
-    avatar_url: preferred.avatar_url || fallback.avatar_url || null,
-  };
-}
-
-function choosePreferredLead(current: Lead, candidate: Lead) {
-  const currentPriority = getLeadPriority(current);
-  const candidatePriority = getLeadPriority(candidate);
-  const currentIsPhone = isLikelyPhoneNumber(current.lead_id);
-  const candidateIsPhone = isLikelyPhoneNumber(candidate.lead_id);
-
-  if (candidatePriority.hasUsefulName && !currentPriority.hasUsefulName) {
-    return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-  }
-
-  if (candidateIsPhone && !currentIsPhone) {
-    return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-  }
-
-  if (candidatePriority.hasUsefulName === currentPriority.hasUsefulName) {
-    if (candidatePriority.lastMessageAt > currentPriority.lastMessageAt) {
-      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-    }
-
-    if (candidatePriority.lastMessageAt === currentPriority.lastMessageAt && candidatePriority.createdAt > currentPriority.createdAt) {
-      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-    }
-
-    if (candidatePriority.createdAt > currentPriority.createdAt) {
-      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-    }
-
-    if (candidatePriority.createdAt === currentPriority.createdAt && candidatePriority.id > currentPriority.id) {
-      return { ...candidate, lead_id: normalizeLeadId(candidate.lead_id) };
-    }
-  }
-
-  return current;
-}
-
-function getNormalizedLeadName(value: string | null | undefined) {
-  return (value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function getLeadNameTokens(value: string | null | undefined) {
-  return getNormalizedLeadName(value)
-    .split(' ')
-    .filter((token) => token.length >= 3);
-}
-
-function getCanonicalKey(leadId: string | null | undefined) {
-  if (!leadId) return '';
-  const digits = leadId.replace(/\D/g, '');
-  let canonicalKey = digits.replace(/^0+/, '');
-  if (canonicalKey.startsWith('55')) {
-    canonicalKey = canonicalKey.slice(2).replace(/^0+/, '');
-  }
-  if (canonicalKey.length === 11) {
-    canonicalKey = canonicalKey.slice(0, 2) + canonicalKey.slice(3);
-  }
-  return canonicalKey;
-}
-
-function getLeadMergeKeys(lead: Lead) {
-  const normalizedLeadId = normalizeLeadId(lead.lead_id);
-  // Canonical ID: remover sufixos e o 9º dígito para BR
-  const digits = normalizedLeadId.replace(/\D/g, '');
-  const canonicalDigits = (digits.startsWith('55') && digits.length === 13)
-    ? digits.slice(0, 4) + digits.slice(5) // Remove o 5º dígito (o 9)
-    : digits;
-
-  const keys = new Set<string>();
-
-  if (isLikelyPhoneNumber(normalizedLeadId)) {
-    keys.add(`phone:${canonicalDigits}`);
-  }
-
-  const avatarKey = normalizeAvatarKey(lead.avatar_url);
-  if (avatarKey) {
-    keys.add(`avatar:${avatarKey}`);
-
-    const nameTokens = getLeadNameTokens(lead.lead_nome);
-    if (nameTokens.length > 0) {
-      keys.add(`avatar-name:${avatarKey}:${nameTokens[0]}`);
-    }
-  }
-
-  if (hasUsefulLeadName(lead.lead_nome)) {
-    keys.add(`name:${getNormalizedLeadName(lead.lead_nome)}`);
-  }
-
-  keys.add(`id:${normalizedLeadId}`);
-  keys.add(`canonical:${canonicalDigits}`);
-  return Array.from(keys);
-}
-
-function getLeadFallbackText(lead: Lead) {
-  if (lead.last_message_preview) {
-    return lead.last_message_preview;
-  }
-
-  if (!hasUsefulLeadName(lead.lead_nome)) {
-    const phone = getLeadContactPhone(lead.lead_id, lead.remote_jid);
-    if (phone) {
-      return phone;
-    }
-
-    if (isLikelyInternalWhatsAppId(lead.remote_jid || lead.lead_id)) {
-      return 'Sem telefone identificado';
-    }
-  }
-
-  return 'Toque para abrir a conversa';
-}
+type SyncState = 'connecting' | 'realtime' | 'polling' | 'error' | 'idle';
 
 function formatLeadTime(value: string | null | undefined) {
-  if (!value) {
-    return '';
-  }
-
+  if (!value) return '';
   const date = new Date(value);
   const now = new Date();
-
-  if (Number.isNaN(date.getTime())) {
-    return '';
-  }
+  if (isNaN(date.getTime())) return '';
 
   const sameDay = date.toDateString() === now.toDateString();
-  if (sameDay) {
-    return date.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
+  if (sameDay) return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
-  if (date.toDateString() === yesterday.toDateString()) {
-    return 'Ontem';
-  }
-
-  const startOfWeek = new Date(now);
-  startOfWeek.setHours(0, 0, 0, 0);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-
-  if (date >= startOfWeek) {
-    return date.toLocaleDateString('pt-BR', { weekday: 'long' });
-  }
+  if (date.toDateString() === yesterday.toDateString()) return 'Ontem';
 
   return date.toLocaleDateString('pt-BR');
 }
 
 function getLabelHue(value: string | null | undefined) {
-  const parsed = Number.parseInt(value || '0', 10);
-  return Number.isNaN(parsed) ? 150 : parsed * 40;
+  const parsed = parseInt(value || '0', 10);
+  return isNaN(parsed) ? 150 : parsed * 40;
 }
 
 function getLabelTheme(value: string | null | undefined, active = false) {
   const hue = getLabelHue(value);
-
   return active
     ? {
-        backgroundColor: `hsla(${hue}, 62%, 54%, 0.16)`,
-        borderColor: `hsla(${hue}, 68%, 62%, 0.30)`,
-        color: `hsl(${hue}, 80%, 86%)`,
-        boxShadow: `inset 0 0 0 1px hsla(${hue}, 60%, 65%, 0.05)`,
-      }
+      backgroundColor: `hsla(${hue}, 62%, 54%, 0.16)`,
+      borderColor: `hsla(${hue}, 68%, 62%, 0.30)`,
+      color: `hsl(${hue}, 80%, 86%)`,
+    }
     : {
-        backgroundColor: `hsla(${hue}, 38%, 42%, 0.10)`,
-        borderColor: `hsla(${hue}, 44%, 58%, 0.18)`,
-        color: `hsl(${hue}, 62%, 78%)`,
-      };
+      backgroundColor: `hsla(${hue}, 38%, 42%, 0.10)`,
+      borderColor: `hsla(${hue}, 44%, 58%, 0.18)`,
+      color: `hsl(${hue}, 62%, 78%)`,
+    };
 }
 
 function getLabelDotStyle(value: string | null | undefined) {
   const hue = getLabelHue(value);
   return {
     backgroundColor: `hsl(${hue}, 68%, 58%)`,
-    boxShadow: `0 0 0 1px hsla(${hue}, 30%, 18%, 0.55)`,
   };
 }
 
-function hasUsefulLeadName(value: string | null | undefined) {
-  const normalizedName = (value || '').trim().toLowerCase();
-  return Boolean(normalizedName && normalizedName !== '.' && normalizedName !== 'sem nome');
+function getLeadFallbackText(lead: Lead) {
+  if (lead.last_message_preview) return lead.last_message_preview;
+  const phone = lead.telefone || getLeadContactPhone(lead.lead_id, lead.remote_jid);
+  if (phone) return phone;
+  return 'Toque para abrir a conversa';
 }
 
-function getPreviewFromHistoryMessage(message: unknown) {
-  if (!message) return null;
-
-  // Se for objeto (Dashboard format)
-  if (typeof message === 'object') {
-    const candidate = (message as { content?: unknown }).content || (message as { text?: unknown }).text;
-    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+function getPicHash(url?: string | null) {
+  if (!url) return null;
+  try {
+    return new URL(url).pathname;
+  } catch (e) {
+    return url.split('?')[0];
   }
-
-  // Se for string (N8N/Texto puro format)
-  if (typeof message === 'string' && message.trim()) {
-    return message.trim();
-  }
-
-  return null;
 }
 
 export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps) {
@@ -298,367 +104,177 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
   const [availableLabels, setAvailableLabels] = useState<Label[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncState, setSyncState] = useState<SyncState>('connecting');
-  const [syncMessage, setSyncMessage] = useState('Conectando com o Supabase...');
+  const [syncMessage, setSyncMessage] = useState('Sincronizando...');
   const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const filtersScrollRef = useRef<HTMLDivElement>(null);
   const dragStateRef = useRef<{ isDragging: boolean; startX: number; startScrollLeft: number }>({
-    isDragging: false,
-    startX: 0,
-    startScrollLeft: 0,
+    isDragging: false, startX: 0, startScrollLeft: 0,
   });
 
-  useEffect(() => {
-    let mounted = true;
-    let isCleaningUp = false;
-
-    async function fetchLeads() {
-      const evolutionChatsPromise = isEvolutionConfigured()
-        ? fetchEvolutionChats(200).catch((error) => {
-            console.debug('Evolution Chats offline:', error.message);
-            return [];
-          })
-        : Promise.resolve([]);
-
-      const evolutionLabelsPromise = isEvolutionConfigured()
-        ? fetchEvolutionLabels().catch((error) => {
-            console.debug('Evolution Labels offline:', error.message);
-            return [];
-          })
-        : Promise.resolve([]);
-
-      const [
-        { data: leadsData, error: leadsError },
-        { data: historyData, error: historyError },
-        evolutionChats,
-        evolutionLabels,
-      ] = await Promise.all([
-        supabase
-          .from('leads')
-          .select('*')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('n8n_chat_histories')
-          .select('session_id, hora_data_mensagem, id, message')
-          .order('hora_data_mensagem', { ascending: false, nullsFirst: false })
-          .order('id', { ascending: false })
-          .limit(2000),
-        evolutionChatsPromise,
-        evolutionLabelsPromise,
-      ]);
-
-      if (leadsError || historyError) {
-        console.error('Error fetching leads or latest messages:', leadsError || historyError);
-        if (mounted) {
-          setSyncState('error');
-          setSyncMessage('Nao foi possivel atualizar os contatos. Verifique a sessao do Supabase.');
-        }
-      } else {
-        const latestMessageByLeadId = (historyData || []).reduce((acc, item) => {
-          const canonicalId = getCanonicalKey(item.session_id);
-
-          if (!canonicalId) {
-            return acc;
-          }
-
-          const existingEntry = acc.get(canonicalId);
-          const candidateTimestamp = item.hora_data_mensagem;
-          const candidateTime = candidateTimestamp ? new Date(candidateTimestamp).getTime() : 0;
-          const existingTime = existingEntry?.timestamp ? new Date(existingEntry.timestamp).getTime() : 0;
-
-          if (!existingEntry || candidateTime >= existingTime) {
-            acc.set(canonicalId, {
-              timestamp: candidateTimestamp,
-              preview: getPreviewFromHistoryMessage(item.message),
-            });
-          }
-
-          return acc;
-        }, new Map<string, { timestamp: string | null; preview: string | null }>());
-
-        const evolutionChatByLeadId = evolutionChats.reduce((acc, chat) => {
-          const canonicalId = getCanonicalKey(chat.remoteJid);
-
-          if (!canonicalId) {
-            return acc;
-          }
-
-          const existing = acc.get(canonicalId);
-          const candidateTimestamp = chat.updatedAt ? new Date(chat.updatedAt).getTime() : 0;
-          const existingTimestamp = existing?.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
-
-          if (!existing || candidateTimestamp >= existingTimestamp) {
-            acc.set(canonicalId, chat);
-          }
-
-          return acc;
-        }, new Map<string, (typeof evolutionChats)[number]>());
-
-        const leadsWithLastMessage = (leadsData || []).map((lead) => {
-          const normalizedLeadId = normalizeLeadId(lead.lead_id);
-          const canonicalId = getCanonicalKey(lead.lead_id);
-          
-          const evolutionChat = evolutionChatByLeadId.get(canonicalId);
-          const historyMessage = latestMessageByLeadId.get(canonicalId);
-
-          return {
-            ...lead,
-            lead_id: normalizedLeadId,
-            lead_nome: (!lead.lead_nome || isLikelyPhoneNumber(lead.lead_nome)) 
-              ? (evolutionChat?.pushName || lead.lead_nome || 'Sem nome') 
-              : lead.lead_nome,
-            labels: Array.isArray(lead.labels) && lead.labels.length > 0 ? lead.labels : evolutionChat?.labels || [],
-            last_message_at: historyMessage?.timestamp ?? evolutionChat?.updatedAt ?? lead.created_at,
-            last_message_preview: historyMessage?.preview ?? null,
-            remote_jid: evolutionChat?.remoteJid || lead.lead_id,
-            avatar_url: evolutionChat?.profilePicUrl || null,
-          };
-        });
-
-        const existingLeadIds = new Set(leadsWithLastMessage.map((lead) => getCanonicalKey(lead.lead_id)));
-        const leadsFromEvolutionOnly: Lead[] = evolutionChats
-          .filter((chat) => !existingLeadIds.has(getCanonicalKey(chat.remoteJid)))
-          .map((chat, index) => ({
-            id: -1 - index,
-            lead_id: normalizeLeadId(chat.remoteJid),
-            lead_nome: chat.pushName || 'Sem nome',
-            created_at: chat.updatedAt || new Date(0).toISOString(),
-            labels: chat.labels || [],
-            last_message_at: chat.updatedAt || null,
-            last_message_preview: null,
-            remote_jid: chat.remoteJid,
-            avatar_url: chat.profilePicUrl || null,
-          }));
-
-        const allLeads = [...leadsWithLastMessage, ...leadsFromEvolutionOnly].sort((a, b) => {
-          const timeA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
-          const timeB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
-          return timeB - timeA;
-        });
-
-        // Sync names in background if needed (no "gambiarra" sync)
-        leadsWithLastMessage.forEach(async (lead) => {
-          const normalized = normalizeLeadId(lead.lead_id);
-          const eChat = evolutionChatByLeadId.get(normalized);
-          let nameToPersist = '';
-
-          // 1. Tentar pushName
-          if (eChat?.pushName && isLikelyPhoneNumber(lead.lead_nome)) {
-            nameToPersist = eChat.pushName;
-          }
-
-          // 2. Se falhar ou continuar sendo numero, tentar Busca Profunda na agenda
-          if (!nameToPersist || isLikelyPhoneNumber(nameToPersist)) {
-            const fullContact = await fetchEvolutionContact(lead.remote_jid || lead.lead_id);
-            if (fullContact?.name && !isLikelyPhoneNumber(fullContact.name)) {
-              nameToPersist = fullContact.name;
-              console.log(`[DeepSync] Nome da agenda encontrado para ${normalized}: ${fullContact.name}`);
-            }
-          }
-          
-          if (nameToPersist) {
-            // Persistir o melhor nome encontrado!
-            console.log(`[Sync] Atualizando nome do lead ${normalized}: ${lead.lead_nome} -> ${nameToPersist}`);
-            await supabase
-              .from('leads')
-              .update({ lead_nome: nameToPersist })
-              .eq('lead_id', lead.lead_id);
-          }
-        });
-
-        if (mounted) {
-          setLeads(allLeads);
-          setAvailableLabels((evolutionLabels || []).filter((label) => label?.id));
-          setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
-          setSyncState((current) => (current === 'error' ? 'polling' : current));
-          setSyncMessage('Lista sincronizada com Supabase e Evolution API.');
-        }
-      }
-      if (mounted) {
-        setLoading(false);
-      }
+  const fetchLeads = async (mounted = true) => {
+    if (!isEvolutionConfigured()) {
+      setSyncState('error');
+      setSyncMessage('Evolution API nao configurada.');
+      setLoading(false);
+      return;
     }
 
-    fetchLeads();
+    try {
+      const [
+        { data: leadsData, error: leadsError },
+        evolutionChats,
+        evolutionLabels
+      ] = await Promise.all([
+        supabase.from('leads').select('*'),
+        fetchEvolutionChats(200).catch(() => []),
+        fetchEvolutionLabels().catch(() => [])
+      ]);
 
-    const channel = supabase
-      .channel('leads-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'leads' },
-        () => {
-          fetchLeads();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'n8n_chat_histories' },
-        () => {
-          fetchLeads();
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          setSyncState('realtime');
-          setSyncMessage('Contatos e conversas atualizando em tempo real.');
-        } else if (!isCleaningUp && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) {
-          console.error('Lead realtime channel failed. Falling back to polling.');
-          setSyncState('polling');
-          setSyncMessage('Realtime indisponivel. Atualizando contatos por verificacao periodica.');
+      if (leadsError) throw leadsError;
+
+      // Desduplica contatos vindos da Evolution API (ex: @lid vs @s.whatsapp.net)
+      const uniqueEvolutionChats = new Map<string, typeof evolutionChats[0]>();
+
+      const allChats = evolutionChats || [];
+      const stdChats = allChats.filter(c => !c.remoteJid.includes('@lid'));
+      const lidChats = allChats.filter(c => c.remoteJid.includes('@lid'));
+
+      // Prioriza salvar os contatos padrões
+      stdChats.forEach(chat => {
+        const canonical = getCanonicalKey(chat.remoteJid) || chat.remoteJid;
+        uniqueEvolutionChats.set(canonical, chat);
+      });
+
+      // Tenta fazer o merge dos chats de @lid (geralmente trazem o nome salvo/perfil) com os contatos padrões
+      lidChats.forEach(lidChat => {
+        const lidPic = getPicHash(lidChat.profilePicUrl);
+
+        const matchedStdCanonical = stdChats.find(std => {
+          const stdPic = getPicHash(std.profilePicUrl);
+          const samePic = stdPic && lidPic && stdPic === lidPic;
+
+          // Timestamp rígido de 5 segundos se não houver foto. Mas se tiver mesma foto, é a mesma pessoa.
+          const sameTime = std.updatedAt && lidChat.updatedAt && Math.abs(new Date(std.updatedAt).getTime() - new Date(lidChat.updatedAt).getTime()) < 5000;
+
+          return samePic || sameTime;
+        });
+
+        if (matchedStdCanonical) {
+          // Funde as propriedades ricas do LID para o STD correspondente já salvo
+          const canonical = getCanonicalKey(matchedStdCanonical.remoteJid) || matchedStdCanonical.remoteJid;
+          const existing = uniqueEvolutionChats.get(canonical)!;
+          existing.pushName = existing.pushName || lidChat.pushName;
+          existing.name = existing.name || lidChat.name;
+          uniqueEvolutionChats.set(canonical, existing);
+        } else {
+          // Se for um contato puramente @lid (CTWA) sem versão STD, salva ele sozinho
+          uniqueEvolutionChats.set(lidChat.remoteJid, lidChat);
         }
       });
 
-    const intervalId = window.setInterval(fetchLeads, 30000);
+      const deduplicatedEvolutionChats = Array.from(uniqueEvolutionChats.values());
 
-    const handleWindowRefresh = () => {
-      if (document.visibilityState === 'visible') {
-        fetchLeads();
+      // Fonte de Verdade: Evolution API (Chats ativos)
+      const merged = deduplicatedEvolutionChats.map((chat): Lead => {
+        const canonicalId = getCanonicalKey(chat.remoteJid);
+        // O DB match existe apenas para pegar a etapa do Kanban (funil) e labels se preciso
+        const dbMatch = (leadsData || []).find(l =>
+          getCanonicalKey(l.lead_id) === canonicalId ||
+          (l.telefone && chat.remoteJid.includes(l.telefone))
+        );
+
+        const lead: Lead = {
+          id: dbMatch?.id || -Math.floor(Math.random() * 1000000),
+          lead_id: normalizeLeadId(chat.remoteJid),
+          whatsapp_name: chat.pushName || null,   // 100% Evolution
+          contact_name: chat.name || null,        // 100% Evolution
+          telefone: getLeadContactPhone(chat.remoteJid) || null, // 100% Evolution
+          remote_jid: chat.remoteJid,
+          labels: chat.labels && chat.labels.length > 0 ? chat.labels : (dbMatch?.labels || []),
+          etapa: dbMatch?.etapa || 'Inbox', // Kanban vem do BD
+          created_at: chat.updatedAt || new Date().toISOString(), // 100% Evolution
+          last_message_at: chat.updatedAt || null, // 100% Evolution
+          avatar_url: chat.profilePicUrl || null, // 100% Evolution
+          hospede_nome: '' // Placeholder
+        };
+
+        // Calcula o nome de exibição baseado na hierarquia: Agenda > WhatsApp > Fone
+        lead.hospede_nome = getLeadDisplayName(lead);
+        return lead;
+      });
+
+      if (mounted) {
+        setLeads(merged);
+        setAvailableLabels((evolutionLabels || []).filter((l: any) => l?.id));
+        setLastUpdatedAt(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        setSyncState('idle');
+        setSyncMessage('Inbox atualizada via Evolution API.');
       }
-    };
+    } catch (err) {
+      console.error('Error fetching leads:', err);
+      if (mounted) {
+        setSyncState('error');
+        setSyncMessage('Erro na sincronização.');
+      }
+    } finally {
+      if (mounted) setLoading(false);
+    }
+  };
 
-    window.addEventListener('focus', handleWindowRefresh);
-    document.addEventListener('visibilitychange', handleWindowRefresh);
+  useEffect(() => {
+    let mounted = true;
+
+    fetchLeads(mounted);
+
+    const channel = supabase.channel('leads-inbox')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads(mounted))
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') setSyncState('realtime');
+      });
+
+    const intervalId = window.setInterval(() => fetchLeads(mounted), 45000);
 
     return () => {
       mounted = false;
-      isCleaningUp = true;
       window.clearInterval(intervalId);
-      window.removeEventListener('focus', handleWindowRefresh);
-      document.removeEventListener('visibilitychange', handleWindowRefresh);
       supabase.removeChannel(channel);
     };
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const container = filtersScrollRef.current;
-      const dragState = dragStateRef.current;
+  // Filtros UI
+  const filteredLeads = leads.filter(lead => {
+    const term = search.toLowerCase();
+    const matchesSearch =
+      lead.hospede_nome.toLowerCase().includes(term) ||
+      (lead.telefone && lead.telefone.includes(search)) ||
+      lead.lead_id.includes(term);
 
-      if (!container || !dragState.isDragging) {
-        return;
-      }
+    const labels = lead.labels || [];
+    const matchesLabel = selectedLabel === 'all' || labels.some(l => l.id === selectedLabel);
 
-      const deltaX = event.clientX - dragState.startX;
-      container.scrollLeft = dragState.startScrollLeft - deltaX;
-    };
-
-    const stopDragging = () => {
-      dragStateRef.current.isDragging = false;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDragging);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDragging);
-    };
-  }, []);
-
-  // -------------------------------------------------------------
-  // DESDUPLICAÇÃO AVANÇADA (Merge por Chaves Cruzadas)
-  // Permite unificar leads que vêm com @lid (N8N) e @s.whatsapp.net (Evolution)
-  // unindo-os através do Avatar ID, do Canonical ID, ou do Nome.
-  // -------------------------------------------------------------
-  // -------------------------------------------------------------
-  // DESDUPLICAÇÃO AVANÇADA (Merge Transitivo por Grafos)
-  // -------------------------------------------------------------
-  const dedupedLeads = Array.from(
-    (() => {
-      const masterMap = new Map<string, Lead>();
-
-      leads.forEach((lead) => {
-        const normalizedLeadId = normalizeLeadId(lead.lead_id);
-        const normalizedLead = { ...lead, lead_id: normalizedLeadId };
-        const mergeKeys = getLeadMergeKeys(normalizedLead);
-
-        // Coletar todos os grupos (leads existentes) que intersectam com este novo lead
-        const existingToMerge = new Set<Lead>();
-        mergeKeys.forEach(k => {
-          const match = masterMap.get(k);
-          if (match) existingToMerge.add(match);
-        });
-
-        if (existingToMerge.size > 0) {
-          // Fundir todos os grupos encontrados + o novo lead em um só
-          let merged = normalizedLead;
-          const allKeys = new Set(mergeKeys);
-
-          existingToMerge.forEach(alreadyInMap => {
-            merged = mergeLeadData(merged, alreadyInMap);
-            getLeadMergeKeys(alreadyInMap).forEach(k => allKeys.add(k));
-          });
-
-          // Re-mapear todas as chaves de todos os envolvidos para a nova versão fundida
-          allKeys.forEach(k => masterMap.set(k, merged));
-        } else {
-          // Totalmente novo, mapear sob suas chaves
-          mergeKeys.forEach(k => masterMap.set(k, normalizedLead));
-        }
-      });
-
-      // Extrair valores únicos usando canonicalId como chave de de-dup final (segurança extra)
-      const uniqueLeadsObj: Record<string, Lead> = {};
-      Array.from(masterMap.values()).forEach((l) => {
-        const cid = getCanonicalKey(l.lead_id) || l.lead_id;
-        uniqueLeadsObj[cid] = l;
-      });
-
-      return Object.values(uniqueLeadsObj);
-    })()
-  )
-    .filter((lead) => hasUsefulLeadName(lead.lead_nome) || Boolean(getLeadContactPhone(lead.lead_id, lead.remote_jid)))
-    .sort((a, b) => {
-    const aLastActivity = a.last_message_at ? new Date(a.last_message_at).getTime() : new Date(a.created_at).getTime();
-    const bLastActivity = b.last_message_at ? new Date(b.last_message_at).getTime() : new Date(b.created_at).getTime();
-
-    if (bLastActivity !== aLastActivity) {
-      return bLastActivity - aLastActivity;
-    }
-
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-
-  const filteredLeads = dedupedLeads.filter(lead => {
-    const matchesSearch = lead.lead_nome?.toLowerCase().includes(search.toLowerCase()) ||
-                         lead.lead_id?.includes(search);
-    
-    const labels = Array.isArray(lead.labels) ? lead.labels : [];
-    const matchesLabel = selectedLabel === 'all' || 
-                        labels.some((l: any) => l.id === selectedLabel);
-    
     return matchesSearch && matchesLabel;
+  }).sort((a, b) => {
+    const timeA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
+    const timeB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+    return timeB - timeA;
   });
 
   const allLabels = Array.from(
-    [...availableLabels, ...dedupedLeads.flatMap((lead) => (Array.isArray(lead.labels) ? lead.labels : []))].reduce((acc, label) => {
-      if (label && label.id && !acc.has(label.id)) {
-        acc.set(label.id, label);
-      }
+    [...availableLabels, ...leads.flatMap(l => l.labels || [])].reduce((acc, label) => {
+      if (label?.id && !acc.has(label.id)) acc.set(label.id, label);
       return acc;
     }, new Map<string, Label>()).values()
-  ).sort((a, b) => a.name.localeCompare(b.name));
+  );
 
-  const labelCounts = dedupedLeads.reduce((acc, lead) => {
-    const labels = Array.isArray(lead.labels) ? lead.labels : [];
-    labels.forEach((label: any) => {
-      if (label?.id) {
-        acc.set(label.id, (acc.get(label.id) || 0) + 1);
-      }
+  const labelCounts = leads.reduce((acc, lead) => {
+    (lead.labels || []).forEach(l => {
+      if (l.id) acc.set(l.id, (acc.get(l.id) || 0) + 1);
     });
     return acc;
   }, new Map<string, number>());
 
-  const syncTone =
-    syncState === 'realtime'
-      ? 'text-emerald-300'
-      : syncState === 'polling'
-        ? 'text-amber-200'
-        : syncState === 'error'
-          ? 'text-red-300'
-          : 'text-zinc-400';
-
-  const SyncIcon =
-    syncState === 'realtime' ? Radio : syncState === 'error' ? AlertTriangle : RefreshCw;
+  const syncTone = syncState === 'realtime' ? 'text-emerald-400' : syncState === 'error' ? 'text-red-400' : 'text-zinc-400';
+  const SyncIcon = syncState === 'error' ? AlertTriangle : syncState === 'realtime' ? Radio : RefreshCw;
 
   return (
     <div className="w-[460px] h-full border-r border-[#1f1f1f] flex flex-col shrink-0 bg-[#0f0f0f]">
@@ -668,7 +284,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Inbox</p>
             <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-white">Conversas</h2>
             <div className={cn("mt-2 flex items-center gap-2 text-[11px]", syncTone)}>
-              <SyncIcon className={cn("h-3 w-3 shrink-0", syncState === 'polling' || syncState === 'connecting' ? 'animate-spin' : '')} />
+              <SyncIcon className={cn("h-3 w-3 shrink-0", syncState === 'connecting' ? 'animate-spin' : '')} />
               <span className="truncate">{syncMessage}</span>
               {lastUpdatedAt && <span className="text-zinc-500">· {lastUpdatedAt}</span>}
             </div>
@@ -683,7 +299,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
           <input
             type="text"
             placeholder="Buscar contato..."
-            className="w-full rounded-full border border-[#1f1f1f] bg-white/5 pl-11 pr-4 py-3 text-[13px] text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-700 focus:border-zinc-700 transition-all"
+            className="w-full rounded-full border border-[#1f1f1f] bg-white/5 pl-11 pr-4 py-3 text-[13px] text-white focus:outline-none focus:ring-1 focus:ring-zinc-700 transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -691,87 +307,51 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
 
         {allLabels.length > 0 && (
           <div className="mt-4">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-500">Filtros</span>
-              <span className="text-[11px] text-zinc-500">{filteredLeads.length} visiveis</span>
-            </div>
-
-            <div
+            <div 
               ref={filtersScrollRef}
-              className="-mx-1 cursor-grab overflow-x-auto overflow-y-hidden px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing"
-              onWheel={(event) => {
-                const container = filtersScrollRef.current;
-
-                if (!container) {
-                  return;
-                }
-
-                if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-                  container.scrollLeft += event.deltaY;
-                  event.preventDefault();
+              onWheel={(e) => {
+                // Allows using vertical mouse wheel for horizontal scrolling
+                if (filtersScrollRef.current) {
+                  e.preventDefault();
+                  filtersScrollRef.current.scrollLeft += e.deltaY;
                 }
               }}
-              onMouseDown={(event) => {
-                const container = filtersScrollRef.current;
-
-                if (!container) {
-                  return;
-                }
-
-                dragStateRef.current = {
-                  isDragging: true,
-                  startX: event.clientX,
-                  startScrollLeft: container.scrollLeft,
-                };
-                event.preventDefault();
+              onMouseDown={(e) => {
+                dragStateRef.current = { isDragging: true, startX: e.pageX, startScrollLeft: filtersScrollRef.current?.scrollLeft || 0 };
               }}
+              onMouseUp={() => { dragStateRef.current.isDragging = false; }}
+              onMouseLeave={() => { dragStateRef.current.isDragging = false; }}
+              onMouseMove={(e) => {
+                if (!dragStateRef.current.isDragging || !filtersScrollRef.current) return;
+                e.preventDefault();
+                const x = e.pageX;
+                const walk = (x - dragStateRef.current.startX) * 2;
+                filtersScrollRef.current.scrollLeft = dragStateRef.current.startScrollLeft - walk;
+              }}
+              className="flex w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] cursor-grab active:cursor-grabbing"
             >
-              <div className="flex w-max gap-2 touch-pan-x select-none">
               <button
                 onClick={() => setSelectedLabel('all')}
                 className={cn(
-                  "group shrink-0 rounded-full border px-3 py-2 text-[12px] font-medium transition-all",
-                  selectedLabel === 'all'
-                    ? "border-white/15 bg-white/10 text-white"
-                    : "border-white/8 bg-white/[0.03] text-zinc-300 hover:border-white/15 hover:bg-white/[0.06]"
+                  "shrink-0 rounded-full border px-3 py-1.5 text-[12px] transition-all",
+                  selectedLabel === 'all' ? "border-white/20 bg-white/10 text-white" : "border-white/5 bg-white/5 text-zinc-400"
                 )}
               >
-                <span className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-white/80" />
-                  Tudo
-                  <span className={cn(
-                    "rounded-full px-1.5 py-0.5 text-[10px]",
-                    selectedLabel === 'all' ? "bg-black/20 text-white" : "bg-white/5 text-zinc-400"
-                  )}>
-                    {dedupedLeads.length}
-                  </span>
-                </span>
+                Tudo ({leads.length})
               </button>
-
-              {allLabels.map((label) => {
-                const isActive = selectedLabel === label.id;
-
-                return (
-                  <button
-                    key={label.id}
-                    onClick={() => setSelectedLabel(label.id)}
-                    className={cn(
-                      "shrink-0 rounded-full border px-3 py-2 text-[12px] font-medium transition-all",
-                      !isActive && "hover:-translate-y-0.5 hover:border-white/15"
-                    )}
-                    style={getLabelTheme(label.color, isActive)}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full" style={getLabelDotStyle(label.color)} />
-                      <span className="max-w-[140px] truncate">{label.name}</span>
-                      <span className="rounded-full bg-black/15 px-1.5 py-0.5 text-[10px] text-current/90">
-                        {labelCounts.get(label.id) || 0}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-              </div>
+              {allLabels.map(label => (
+                <button
+                  key={label.id}
+                  onClick={() => setSelectedLabel(label.id)}
+                  className={cn(
+                    "shrink-0 rounded-full border px-3 py-1.5 text-[12px] transition-all",
+                    selectedLabel === label.id ? "border-current opacity-100" : "border-white/5 opacity-60"
+                  )}
+                  style={getLabelTheme(label.color, selectedLabel === label.id)}
+                >
+                  {label.name} ({labelCounts.get(label.id) || 0})
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -779,82 +359,62 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
 
       <div className="flex-1 overflow-y-auto bg-[#0a0a0a] px-2 py-3 space-y-1.5">
         {loading ? (
-          <div className="p-4 text-center text-xs text-zinc-500">Carregando contatos...</div>
+          <div className="p-8 text-center text-xs text-zinc-500 animate-pulse">Sincronizando WhatsApp...</div>
         ) : filteredLeads.length === 0 ? (
-          <div className="p-4 text-center text-xs text-zinc-500">Nenhum contato encontrado</div>
+          <div className="p-8 text-center text-xs text-zinc-500">Nenhum retorno da Evolution API</div>
         ) : (
           filteredLeads.map((lead) => (
             <button
-              key={lead.id}
+              key={lead.remote_jid || lead.lead_id || lead.id}
               onClick={() => onSelectLead(lead)}
               className={cn(
-                "w-full flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all duration-150 text-left",
+                "w-full flex items-center gap-3 rounded-2xl border px-3 py-4 transition-all duration-150 text-left",
                 normalizeLeadId(selectedLeadId) === lead.lead_id
-                  ? "border-white/15 bg-white/10 shadow-[0_14px_34px_rgba(0,0,0,0.28)]"
-                  : "border-transparent bg-transparent hover:border-white/5 hover:bg-white/[0.03]"
+                  ? "border-white/15 bg-white/10 shadow-lg"
+                  : "border-transparent bg-transparent hover:bg-white/[0.03]"
               )}
             >
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/8 bg-gradient-to-br from-[#2a3942] to-[#1a252c] text-zinc-300">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-zinc-800">
                 {lead.avatar_url ? (
-                  <img
-                    src={lead.avatar_url}
-                    alt={getLeadDisplayName(lead.lead_nome, lead.lead_id, lead.remote_jid)}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
+                  <>
+                    <img
+                      src={lead.avatar_url}
+                      alt={lead.hospede_nome}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.classList.remove('hidden'); }}
+                    />
+                    <UserIcon className="h-5 w-5 text-zinc-600 hidden" />
+                  </>
                 ) : (
-                  <UserIcon className="h-5 w-5" />
+                  <UserIcon className="h-5 w-5 text-zinc-600" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className={cn(
-                      "truncate text-[15px] leading-5",
-                      normalizeLeadId(selectedLeadId) === lead.lead_id ? "font-semibold text-white" : "font-medium text-zinc-100"
-                    )}>
-                      {getLeadDisplayName(lead.lead_nome, lead.lead_id, lead.remote_jid)}
+                    <p className="truncate text-[15px] font-semibold text-white">
+                      {lead.hospede_nome}
                     </p>
-                    <p className="mt-1 truncate text-[13px] leading-5 text-zinc-400">
+                    <p className="mt-0.5 truncate text-[13px] text-zinc-500">
                       {getLeadFallbackText(lead)}
                     </p>
-
-                    {Array.isArray(lead.labels) && lead.labels.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {lead.labels.slice(0, 2).map((label: any) => (
-                          <span
-                            key={label.id}
-                            className="inline-flex max-w-[140px] items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-medium"
-                            style={getLabelTheme(label.color, false)}
-                            title={label.name}
-                          >
-                            <span className="h-1.5 w-1.5 rounded-full" style={getLabelDotStyle(label.color)} />
-                            <span className="truncate">{label.name}</span>
-                          </span>
-                        ))}
-
-                        {lead.labels.length > 2 && (
-                          <span className="inline-flex items-center rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[10px] font-medium text-zinc-400">
-                            +{lead.labels.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {lead.etapa && lead.etapa !== 'Inbox' && (
+                        <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[9px] font-bold text-blue-400 uppercase tracking-wider">
+                          {lead.etapa}
+                        </span>
+                      )}
+                      {lead.labels?.slice(0, 2).map(l => (
+                        <span key={l.id} className="rounded-full px-2 py-0.5 text-[9px] font-medium" style={getLabelTheme(l.color, false)}>
+                          {l.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2 pt-0.5">
-                    <span className={cn(
-                      "text-[11px] font-medium",
-                      normalizeLeadId(selectedLeadId) === lead.lead_id ? "text-white" : "text-zinc-500"
-                    )}>
-                      {formatLeadTime(lead.last_message_at)}
-                    </span>
-                    <span className={cn(
-                      "h-2.5 w-2.5 rounded-full",
-                      normalizeLeadId(selectedLeadId) === lead.lead_id
-                        ? "bg-white/80"
-                        : "bg-white/6"
-                    )} />
+                  <div className="flex shrink-0 flex-col items-end gap-2 text-[11px] text-zinc-600">
+                    {formatLeadTime(lead.last_message_at)}
+                    {lead.etapa === 'Inbox' && <Radio className="h-2 w-2 text-emerald-500 animate-pulse" />}
                   </div>
                 </div>
               </div>

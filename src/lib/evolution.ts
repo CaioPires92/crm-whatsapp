@@ -1,6 +1,36 @@
-const evolutionBaseUrl = import.meta.env.VITE_EVOLUTION_URL?.replace(/\/$/, '');
-const evolutionInstance = import.meta.env.VITE_EVOLUTION_INSTANCE;
-const evolutionApiKey = import.meta.env.VITE_EVOLUTION_API_KEY;
+// Obfuscation helpers (Base64)
+function encode(value: string) { return btoa(value); }
+function decode(value: string) { 
+  try { return atob(value); } 
+  catch { return value; } 
+}
+
+// Config retrieval prioritizing LocalStorage
+function readEvolutionConfig() {
+  const storedUrl = localStorage.getItem('evolution_url');
+  const storedInstance = localStorage.getItem('evolution_instance');
+  const storedApiKey = localStorage.getItem('evolution_apikey');
+
+  return {
+    url: (storedUrl ? decode(storedUrl) : import.meta.env.VITE_EVOLUTION_URL)?.replace(/\/$/, '') || '',
+    instance: (storedInstance ? decode(storedInstance) : import.meta.env.VITE_EVOLUTION_INSTANCE) || '',
+    apiKey: (storedApiKey ? decode(storedApiKey) : import.meta.env.VITE_EVOLUTION_API_KEY) || ''
+  };
+}
+
+export function getEvolutionConfig() {
+  return readEvolutionConfig();
+}
+
+export function saveEvolutionConfig(url: string, instance: string, apiKey: string) {
+  localStorage.setItem('evolution_url', encode(url));
+  localStorage.setItem('evolution_instance', encode(instance));
+  localStorage.setItem('evolution_apikey', encode(apiKey));
+  
+  // Reset connection state to force re-check
+  connectionState = 'unknown';
+}
+
 let connectionState: 'unknown' | 'checking' | 'available' | 'unavailable' = 'unknown';
 let connectionPromise: Promise<boolean> | null = null;
 
@@ -41,7 +71,8 @@ export interface EvolutionMessage {
 }
 
 export function isEvolutionConfigured() {
-  return Boolean(evolutionBaseUrl && evolutionInstance && evolutionApiKey && connectionState !== 'unavailable');
+  const config = readEvolutionConfig();
+  return Boolean(config.url && config.instance && config.apiKey && connectionState !== 'unavailable');
 }
 
 async function ensureConnection(): Promise<boolean> {
@@ -52,6 +83,7 @@ async function ensureConnection(): Promise<boolean> {
   connectionState = 'checking';
   connectionPromise = (async () => {
     try {
+      const { url: evolutionBaseUrl, instance: evolutionInstance, apiKey: evolutionApiKey } = readEvolutionConfig();
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s para ser seguro
 
@@ -72,7 +104,7 @@ async function ensureConnection(): Promise<boolean> {
       return true;
     } catch (err) {
       connectionState = 'unavailable';
-      console.info(`Evolution API indisponível (${evolutionBaseUrl}). Entrando em modo silencioso.`);
+      console.info(`Evolution API indisponível. Entrando em modo silencioso.`);
       return false;
     }
   })();
@@ -194,6 +226,7 @@ export function getLeadDisplayName(
 }
 
 async function evolutionRequest<T>(path: string, options?: { method?: 'GET' | 'POST'; body?: Record<string, any> }) {
+  const { url: evolutionBaseUrl, apiKey: evolutionApiKey } = readEvolutionConfig();
   const isAvailable = await ensureConnection();
   if (!isAvailable || !isEvolutionConfigured()) {
     return (options?.method === 'GET' || path.includes('find')) ? [] as unknown as T : null as unknown as T;
@@ -255,6 +288,7 @@ function extractMessageContent(message?: Record<string, any>) {
 }
 
 export async function fetchEvolutionChats(take = 100) {
+  const { instance: evolutionInstance } = readEvolutionConfig();
   const response = await evolutionRequest<EvolutionChat[]>(
     `/chat/findChats/${evolutionInstance}`,
     {
@@ -274,6 +308,7 @@ export async function fetchEvolutionChats(take = 100) {
 }
 
 export async function fetchEvolutionLabels(): Promise<EvolutionLabel[]> {
+  const { instance: evolutionInstance } = readEvolutionConfig();
   const response = await evolutionRequest<EvolutionLabel[]>(
     `/label/findLabels/${evolutionInstance}`,
     { method: 'GET' }
@@ -288,6 +323,7 @@ export async function fetchEvolutionLabels(): Promise<EvolutionLabel[]> {
 }
 
 export async function fetchEvolutionMessages(remoteJid: string): Promise<EvolutionMessage[]> {
+  const { instance: evolutionInstance } = readEvolutionConfig();
   const response = await evolutionRequest<{ messages?: { records?: EvolutionMessageRecord[] } }>(
     `/chat/findMessages/${evolutionInstance}`,
     {
@@ -334,6 +370,7 @@ export async function fetchEvolutionMessages(remoteJid: string): Promise<Evoluti
 }
 
 export async function fetchEvolutionContact(remoteJid: string): Promise<EvolutionChat | null> {
+  const { instance: evolutionInstance } = readEvolutionConfig();
   const response = await evolutionRequest<EvolutionChat[]>(
     `/chat/findContacts/${evolutionInstance}`,
     {

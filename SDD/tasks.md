@@ -32,7 +32,7 @@
 ### 1. External Integration (Hospedin)
 
 - [🔲] Resolve Hospedin API 403 (Maintenance).
-- [🔲] Map `place_type_id` and `account_id` real values.
+- [🔲] Map `place_type_id` real values and confirm `account_slug`.
 - [🔲] Activate `hospedin_settings.enabled`.
 - [🔲] End-to-end validation (Aura quoting real availability).
 
@@ -48,6 +48,8 @@
 - [🔲] Full QA cycle for all message types (Audio, Legendary Images).
 - [🔲] Manual E2E validation of the main WhatsApp -> n8n -> Supabase -> CRM flow.
   Use [`manual-whatsapp-e2e-tests.md`](/home/caio/projetos/CRM/docs/manual-whatsapp-e2e-tests.md).
+- [✅] Automated test baseline:
+  unit tests for lead/campaign helpers, Hospedin config helpers, workflow smoke, seed smoke, and sync dry-run.
 - [🔲] Confirm the main WhatsApp flow is stable across these blocks:
   first contact, follow-up without duplication, Aura auto reply, manual mode, handoff, media and fallback.
 - [🔲] Fix security vulnerability: Obfuscate `VITE_EVOLUTION_API_KEY`.

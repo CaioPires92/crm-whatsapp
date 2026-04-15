@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { fetchEvolutionChats, fetchEvolutionLabels, getLeadContactPhone, getLeadDisplayName, isEvolutionConfigured, normalizeLeadId, getCanonicalKey } from '../../lib/evolution';
+import type { LeadListItem, ChatLead } from '../../types/lead';
 import { Search, User as UserIcon, RefreshCw, AlertTriangle, Radio, SlidersHorizontal } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -15,24 +16,8 @@ interface Label {
   color: string;
 }
 
-interface Lead {
-  id: number;
-  hospede_nome: string;
-  lead_id: string;
-  whatsapp_name?: string | null;
-  contact_name?: string | null;
-  telefone?: string | null;
-  created_at: string;
-  labels?: Label[];
-  last_message_at?: string | null;
-  last_message_preview?: string | null;
-  remote_jid?: string;
-  avatar_url?: string | null;
-  etapa?: string;
-}
-
 interface LeadListProps {
-  onSelectLead: (lead: Lead) => void;
+  onSelectLead: (lead: ChatLead) => void;
   selectedLeadId?: string;
 }
 
@@ -81,7 +66,7 @@ function getLabelDotStyle(value: string | null | undefined) {
   };
 }
 
-function getLeadFallbackText(lead: Lead) {
+function getLeadFallbackText(lead: LeadListItem) {
   if (lead.last_message_preview) return lead.last_message_preview;
   const phone = lead.telefone || getLeadContactPhone(lead.lead_id, lead.remote_jid);
   if (phone) return phone;
@@ -98,7 +83,7 @@ function getPicHash(url?: string | null) {
 }
 
 export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps) {
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leads, setLeads] = useState<LeadListItem[]>([]);
   const [search, setSearch] = useState('');
   const [selectedLabel, setSelectedLabel] = useState<string | 'all'>('all');
   const [availableLabels, setAvailableLabels] = useState<Label[]>([]);
@@ -175,7 +160,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
       const deduplicatedEvolutionChats = Array.from(uniqueEvolutionChats.values());
 
       // Fonte de Verdade: Evolution API (Chats ativos)
-      const merged = deduplicatedEvolutionChats.map((chat): Lead => {
+      const merged = deduplicatedEvolutionChats.map((chat): LeadListItem => {
         const canonicalId = getCanonicalKey(chat.remoteJid);
         // O DB match existe apenas para pegar a etapa do Kanban (funil) e labels se preciso
         const dbMatch = (leadsData || []).find(l =>
@@ -183,7 +168,7 @@ export default function LeadList({ onSelectLead, selectedLeadId }: LeadListProps
           (l.telefone && chat.remoteJid.includes(l.telefone))
         );
 
-        const lead: Lead = {
+        const lead: LeadListItem = {
           id: dbMatch?.id || -Math.floor(Math.random() * 1000000),
           lead_id: normalizeLeadId(chat.remoteJid),
           whatsapp_name: chat.pushName || null,   // 100% Evolution

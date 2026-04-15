@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { fetchEvolutionMessages, getLeadContactPhone, getLeadDisplayName, normalizeLeadId, getCanonicalKey } from '../../lib/evolution';
+import { fetchEvolutionMessages, getEvolutionConfig, getLeadContactPhone, getLeadDisplayName, normalizeLeadId, getCanonicalKey } from '../../lib/evolution';
+import type { ChatLead } from '../../types/lead';
 import { format, isToday, isYesterday, isSameYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { User, MessageSquare, Radio, RefreshCw, AlertTriangle, Send, Bot, BotOff } from 'lucide-react';
@@ -23,16 +24,7 @@ interface Message {
 }
 
 interface ChatAreaProps {
-  lead?: {
-    hospede_nome: string;
-    lead_id: string;
-    id: number;
-    whatsapp_name?: string | null;
-    contact_name?: string | null;
-    telefone?: string | null;
-    remote_jid?: string;
-    avatar_url?: string | null;
-  };
+  lead?: ChatLead;
   globalAiEnabled?: boolean;
 }
 
@@ -219,6 +211,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
   }
 
   const messageGroups = groupMessagesByDate(messages);
+  const displayName = lead.hospede_nome || lead.lead_nome || 'Hóspede sem nome';
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#0a0a0a]">
@@ -230,7 +223,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
               <>
                 <img
                   src={lead.avatar_url}
-                  alt={lead.hospede_nome}
+                  alt={displayName}
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                   onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.classList.remove('hidden'); }}
@@ -242,7 +235,7 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white tracking-tight">{lead.hospede_nome}</h3>
+            <h3 className="text-sm font-semibold text-white tracking-tight">{displayName}</h3>
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
               {lead.telefone || 'WhatsApp'}
             </p>
@@ -328,9 +321,15 @@ export default function ChatArea({ lead, globalAiEnabled = true }: ChatAreaProps
             setMessages(prev => [...prev, tempMsg]);
 
             try {
-              const res = await fetch(`${import.meta.env.VITE_EVOLUTION_URL}/message/sendText/${import.meta.env.VITE_EVOLUTION_INSTANCE}`, {
+              const { url, instance, apiKey } = getEvolutionConfig();
+
+              if (!url || !instance || !apiKey) {
+                throw new Error('Evolution config is missing');
+              }
+
+              const res = await fetch(`${url}/message/sendText/${instance}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_EVOLUTION_API_KEY },
+                headers: { 'Content-Type': 'application/json', 'apikey': apiKey },
                 body: JSON.stringify({
                   number: lead.lead_id.includes('@') ? lead.lead_id : `${lead.lead_id}@s.whatsapp.net`,
                   text,

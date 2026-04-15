@@ -1,0 +1,3 @@
+Este arquivo foi criado pelo Antigravity em /Ubuntu/home/caio/projetos/CRM/CADE_O_ARQUIVO.txt para testar a sincronização da sua barra lateral. 
+
+Se você NÃO está vendo este arquivo na raiz do seu projeto CRM no VS Code, a sua barra lateral está apontando para a pasta errada.

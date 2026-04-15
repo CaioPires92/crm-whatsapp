@@ -3,20 +3,10 @@ import LeadList from '../components/chat/LeadList';
 import ChatArea from '../components/chat/ChatArea';
 import { supabase } from '../lib/supabase';
 import AuraModeControl, { type AssistantMode } from '../components/AuraModeControl';
-
-interface Lead {
-  id: number;
-  lead_nome: string;
-  lead_id: string;
-  created_at: string;
-  labels?: any[];
-  remote_jid?: string;
-  last_message_at?: string | null;
-  avatar_url?: string | null;
-}
+import type { ChatLead } from '../types/lead';
 
 export default function Contatos() {
-  const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
+  const [selectedLead, setSelectedLead] = useState<ChatLead | undefined>();
   const [assistantMode, setAssistantMode] = useState<AssistantMode>('auto');
   const [assistantEnabled, setAssistantEnabled] = useState(true);
   const [loadingAssistantMode, setLoadingAssistantMode] = useState(true);
@@ -90,11 +80,11 @@ export default function Contatos() {
       </div>
 
       <div className="flex h-full w-full min-h-0">
-      <LeadList 
-        onSelectLead={setSelectedLead} 
-        selectedLeadId={selectedLead?.lead_id} 
-      />
-      <ChatArea lead={selectedLead} globalAiEnabled={isAutoReplyActive} />
+        <LeadList
+          onSelectLead={setSelectedLead}
+          selectedLeadId={selectedLead?.lead_id}
+        />
+        <ChatArea lead={selectedLead} globalAiEnabled={isAutoReplyActive} />
       </div>
     </div>
   );

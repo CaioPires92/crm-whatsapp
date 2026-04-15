@@ -163,8 +163,8 @@ Bloqueio atual:
 - mensagem recebida novamente: `Acesso desativado para manutencao.`
 
 O que falta:
-- descobrir `account_id` real
-- consultar `/api/v2/{account_id}/place_types`
+- confirmar o `account_slug` real
+- consultar `/api/v2/{account_slug}/place_types`
 - preencher `hospedin_room_mappings.place_type_id`
 - ativar `hospedin_settings.enabled = true`
 - validar periodo com disponibilidade
@@ -174,13 +174,13 @@ O que falta:
 Como implementar:
 1. Esperar a API da Hospedin sair de manutencao.
 2. Autenticar em `/api/v2/authentication/sessions`.
-3. Descobrir o `account_id` real da pousada.
-4. Chamar `/api/v2/{account_id}/place_types`.
+3. Confirmar o `account_slug` real da pousada.
+4. Chamar `/api/v2/{account_slug}/place_types`.
 5. Atualizar `public.hospedin_room_mappings` com os `place_type_id` reais.
 6. Confirmar que o n8n tem:
    - `HOSPEDIN_API_EMAIL`
    - `HOSPEDIN_API_PASSWORD`
-7. Atualizar `public.hospedin_settings.account_id`.
+7. Atualizar `public.hospedin_settings.account_id` com o slug da conta.
 8. Mudar `public.hospedin_settings.enabled` para `true`.
 9. Testar pelo WhatsApp com datas reais.
 
@@ -199,7 +199,7 @@ Status:
 
 O que falta:
 - manter o seed local alinhado com futuras mudancas operacionais
-- preencher `account_id` e `place_type_id` reais na trilha da Hospedin quando a API voltar
+- preencher `account_slug` e `place_type_id` reais na trilha da Hospedin quando a API voltar
 
 Onde editar:
 - `public.assistant_rules`
@@ -345,7 +345,7 @@ Use esta ordem. Ela evita retrabalho.
 
 1. Fazer a rodada final de QA sem a Hospedin
 2. Esperar a API da Hospedin voltar
-3. Descobrir `account_id` e `place_type_id`
+3. Confirmar `account_slug` e `place_type_id`
 4. Ativar `hospedin_settings.enabled`
 5. Rodar QA final com disponibilidade real
 6. Se fizer sentido comercial, evoluir campanhas
@@ -369,6 +369,13 @@ Como usar:
 3. Salve o arquivo.
 4. Quando quiser, eu leio esse arquivo e sincronizo para o banco.
 
+Atalhos de ambiente:
+- a integracao da Hospedin tambem aceita overrides por `HOSPEDIN_*`
+- `HOSPEDIN_ROOM_MAPPINGS` pode ser um JSON com `room_type -> place_type_id`
+- o sync local usa o `seeds/aura-operational-data.local.json` quando existir e cai no template versionado quando nao existir
+- o cache curto de disponibilidade ficou persistido no proprio workflow do n8n, nao em uma nova tabela do Supabase
+- abaixo do threshold, o fluxo força consulta em tempo real e pode usar `replyHint` para avisar o hospede que esta verificando vagas
+
 Regra:
 - o template pode ser versionado
 - o arquivo local nao deve ir para o Git
@@ -379,7 +386,7 @@ Regra:
 ### Aura e CRM
 - [x] `assistant_rules` com dados reais
 - [x] `room_rates` com dados reais
-- [ ] `hospedin_settings.account_id` preenchido
+- [ ] `hospedin_settings.account_id` preenchido com o slug da conta
 - [ ] `hospedin_room_mappings.place_type_id` preenchidos
 - [ ] `hospedin_settings.enabled = true`
 - [ ] Hospedin validada ponta a ponta

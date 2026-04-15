@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, MessageSquare } from 'lucide-react';
 
@@ -14,6 +14,12 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!isSupabaseConfigured) {
+      setError('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env.');
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -47,6 +53,12 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
+          {!isSupabaseConfigured && (
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-xs text-amber-300 text-center">
+              O Supabase nao esta configurado ainda. A tela abre, mas o login depende das variaveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-widest">E-mail</label>
             <div className="relative group">

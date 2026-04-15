@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { flattenHospedinRoomMappings, flattenHospedinSettings } from './hospedin-config.mjs';
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
     return;
@@ -34,6 +35,60 @@ function parseArgs(argv) {
 
 function loadSeed(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function mergePlainObjects(base = {}, overlay = {}) {
+  const result = { ...base };
+
+  for (const [key, value] of Object.entries(overlay || {})) {
+    const baseValue = result[key];
+    const bothPlainObjects =
+      baseValue &&
+      value &&
+      typeof baseValue === 'object' &&
+      typeof value === 'object' &&
+      !Array.isArray(baseValue) &&
+      !Array.isArray(value);
+
+    if (bothPlainObjects) {
+      result[key] = { ...baseValue, ...value };
+      continue;
+    }
+
+    result[key] = value;
+  }
+
+  return result;
+}
+
+function loadSeedWithFallback(rootDir, localSeedPath) {
+  const templatePath = path.resolve(rootDir, 'seeds/aura-operational-data.template.json');
+  const fallbackPath = fs.existsSync(localSeedPath) ? localSeedPath : templatePath;
+  const baseSeed = loadSeed(templatePath);
+
+  if (fallbackPath === templatePath) {
+    return { seed: baseSeed, sourcePath: templatePath, usedFallback: true };
+  }
+
+  const localSeed = loadSeed(localSeedPath);
+  return {
+    seed: {
+      ...baseSeed,
+      ...localSeed,
+      assistant_rules: mergePlainObjects(baseSeed.assistant_rules || {}, localSeed.assistant_rules || {}),
+      room_rates: mergePlainObjects(baseSeed.room_rates || {}, localSeed.room_rates || {}),
+      hospedin: {
+        ...(baseSeed.hospedin || {}),
+        ...(localSeed.hospedin || {}),
+        room_mappings: {
+          ...((baseSeed.hospedin || {}).room_mappings || {}),
+          ...((localSeed.hospedin || {}).room_mappings || {}),
+        },
+      },
+    },
+    sourcePath: localSeedPath,
+    usedFallback: false,
+  };
 }
 
 function flattenAssistantRules(rules) {
@@ -94,18 +149,17 @@ async function fetchJson(url, options = {}) {
 async function main() {
   const rootDir = process.cwd();
   loadEnvFile(path.join(rootDir, '.env.local'));
+  loadEnvFile(path.join(rootDir, '.env'));
 
   const args = parseArgs(process.argv.slice(2));
   const seedPath = path.resolve(rootDir, args.file);
 
-  if (!fs.existsSync(seedPath)) {
-    throw new Error(`Seed file not found: ${seedPath}`);
-  }
-
-  const seed = loadSeed(seedPath);
+  const { seed, sourcePath, usedFallback } = loadSeedWithFallback(rootDir, seedPath);
   const assistantRules = flattenAssistantRules(seed.assistant_rules);
   const roomRates = flattenRoomRates(seed.room_rates);
   const roomTypes = [...new Set(roomRates.map((row) => row.room_type))];
+  const hospedinSettings = flattenHospedinSettings(seed.hospedin);
+  const hospedinRoomMappings = flattenHospedinRoomMappings(seed.hospedin?.room_mappings);
   const supabaseUrl = process.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
   const supabaseWriteKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey;
@@ -119,7 +173,11 @@ async function main() {
     assistantRules: assistantRules.length,
     roomRates: roomRates.length,
     roomTypes,
+    hospedinSettings: hospedinSettings ? 1 : 0,
+    hospedinRoomMappings: hospedinRoomMappings.length,
     mode: args.apply ? 'apply' : 'dry-run',
+    seedSource: sourcePath,
+    usedTemplateFallback: usedFallback,
   };
 
   if (!args.apply) {
@@ -161,6 +219,28 @@ async function main() {
       },
       body: JSON.stringify(roomRates),
     });
+
+    if (hospedinSettings) {
+      await fetchJson(`${supabaseUrl}/rest/v1/hospedin_settings?on_conflict=id`, {
+        method: 'POST',
+        headers: {
+          ...headers,
+          Prefer: 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify([hospedinSettings]),
+      });
+    }
+
+    if (hospedinRoomMappings.length > 0) {
+      await fetchJson(`${supabaseUrl}/rest/v1/hospedin_room_mappings?on_conflict=room_type`, {
+        method: 'POST',
+        headers: {
+          ...headers,
+          Prefer: 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify(hospedinRoomMappings),
+      });
+    }
 
     console.log(JSON.stringify({ ...summary, applied: true }, null, 2));
   } catch (error) {

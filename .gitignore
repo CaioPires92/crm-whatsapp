@@ -11,7 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.bak
+infra/.env
 seeds/*.local.json
 
 # Editor directories and files

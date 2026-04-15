@@ -1,4 +1,4 @@
-import { normalizeLeadId } from './evolution';
+import { getEvolutionConfig, normalizeLeadId } from './evolution';
 
 export type CampaignStatus = 'draft' | 'sending' | 'completed' | 'completed_with_failures';
 export type CampaignRecipientStatus = 'pending' | 'sent' | 'replied' | 'ignored' | 'failed' | 'blocked';
@@ -55,13 +55,19 @@ export function personalizeCampaignMessage(template: string, leadName: string | 
 }
 
 export async function sendCampaignText(phoneNumber: string, text: string) {
+  const { url, instance, apiKey } = getEvolutionConfig();
+
+  if (!url || !instance || !apiKey) {
+    throw new Error('Evolution is not configured');
+  }
+
   const response = await fetch(
-    `${import.meta.env.VITE_EVOLUTION_URL}/message/sendText/${import.meta.env.VITE_EVOLUTION_INSTANCE}`,
+    `${url}/message/sendText/${instance}`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        apikey: import.meta.env.VITE_EVOLUTION_API_KEY,
+        apikey: apiKey,
       },
       body: JSON.stringify({
         number: `${normalizeLeadId(phoneNumber)}@s.whatsapp.net`,

@@ -1589,7 +1589,7 @@
       "main": [
         [
           {
-            "node": "Supabase - Save User History",
+            "node": "Gemini - Extrair Dados Busca",
             "type": "main",
             "index": 0
           }
@@ -1601,6 +1601,17 @@
         [
           {
             "node": "Consolidar Tarifas Aura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini - Extrair Dados Busca": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save User History",
             "type": "main",
             "index": 0
           }

@@ -8,6 +8,7 @@ import Conversas from './pages/Conversas';
 import Agenda from './pages/Agenda';
 import Campanhas from './pages/Campanhas';
 import Settings from './pages/Settings';
+import Disponibilidade from './pages/Disponibilidade';
 import Login from './pages/Login';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                 <Route path="conversas" element={<Conversas />} />
                 <Route path="contatos" element={<Agenda />} />
                 <Route path="campanhas" element={<Campanhas />} />
+                <Route path="disponibilidade" element={<Disponibilidade />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>

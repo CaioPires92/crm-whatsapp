@@ -10,7 +10,8 @@ import {
   Kanban,
   Megaphone,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { clsx } from 'clsx';
@@ -21,6 +22,7 @@ const navItems = [
   { to: '/conversas', icon: MessageSquare, label: 'Conversas' },
   { to: '/contatos', icon: Users, label: 'Contatos' },
   { to: '/campanhas', icon: Megaphone, label: 'Campanhas' },
+  { to: '/disponibilidade', icon: Calendar, label: 'Disponibilidade' },
   { to: '/settings', icon: Settings, label: 'Configurações' },
 ];
 

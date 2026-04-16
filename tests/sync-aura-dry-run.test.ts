@@ -21,7 +21,7 @@ describe('sync aura dry run', () => {
             },
           },
           room_rates: {
-            'Apto Superior': {
+            Chale: {
               regular: {
                 season_name: 'Regular',
                 date_from: '2026-01-01',
@@ -36,16 +36,19 @@ describe('sync aura dry run', () => {
                 notes: '',
               },
             },
-          },
-          hospedin: {
-            enabled: true,
-            account_slug: 'delplata2026',
-            room_mappings: {
-              'Apto Superior': {
-                place_type_id: '123',
-                place_type_title: 'Apto Superior',
-                active: true,
-                notes: 'fixture',
+            'Apto Anexo': {
+              regular: {
+                season_name: 'Regular',
+                date_from: '2026-01-01',
+                date_to: '2026-12-31',
+                days_of_week: [0, 1, 2, 3, 4, 5, 6],
+                base_price: 100,
+                min_nights: 1,
+                priority: 100,
+                extra_adult_price: 0,
+                child_price_6_11: 0,
+                child_price_0_5: 0,
+                notes: '',
               },
             },
           },
@@ -73,7 +76,7 @@ describe('sync aura dry run', () => {
     const summary = JSON.parse(output);
     expect(summary.mode).toBe('dry-run');
     expect(summary.seedPath).toBe(seedPath);
-    expect(summary.hospedinRoomMappings).toBeGreaterThan(0);
-    expect(summary.hospedinSettings).toBeGreaterThanOrEqual(0);
+    expect(summary.assistantRules).toBeGreaterThan(0);
+    expect(summary.roomRates).toBeGreaterThan(0);
   });
 });

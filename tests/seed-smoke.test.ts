@@ -10,9 +10,5 @@ describe('operational seed smoke', () => {
 
     expect(seed).toHaveProperty('assistant_rules');
     expect(seed).toHaveProperty('room_rates');
-    expect(seed).toHaveProperty('hospedin');
-    expect(seed.hospedin).toHaveProperty('account_slug');
-    expect(seed.hospedin).toHaveProperty('room_mappings');
-    expect(Object.keys(seed.hospedin.room_mappings || {}).length).toBeGreaterThan(0);
   });
 });

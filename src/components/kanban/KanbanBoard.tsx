@@ -66,6 +66,7 @@ export type KanbanSyncState = 'connecting' | 'realtime' | 'polling' | 'error';
 
 interface KanbanBoardProps {
   onSyncChange?: (payload: { state: KanbanSyncState; message: string; lastUpdatedAt: string | null }) => void;
+  refreshSignal?: number;
 }
 
 interface DragState {
@@ -422,7 +423,7 @@ function DragOverlay({ card, position }: { card: KanbanCard; position: { x: numb
   );
 }
 
-export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
+export default function KanbanBoard({ onSyncChange, refreshSignal = 0 }: KanbanBoardProps) {
   const [cards, setCards] = useState<KanbanCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
@@ -574,6 +575,7 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
   }, [moveCard]);
 
   const syncStateRef = useRef<KanbanSyncState>('connecting');
+  const lastRefreshSignalRef = useRef(refreshSignal);
   const boardScrollRef = useRef<HTMLDivElement | null>(null);
   const dragStartXRef = useRef(0);
   const dragStartScrollLeftRef = useRef(0);
@@ -610,6 +612,34 @@ export default function KanbanBoard({ onSyncChange }: KanbanBoardProps) {
       supabase.removeChannel(channel);
     };
   }, [onSyncChange]);
+
+  useEffect(() => {
+    if (lastRefreshSignalRef.current === refreshSignal) {
+      return;
+    }
+
+    lastRefreshSignalRef.current = refreshSignal;
+
+    let mounted = true;
+    const updateSync = (state: KanbanSyncState, message: string, lastUpdatedAt: string | null = null) => {
+      syncStateRef.current = state;
+      onSyncChange?.({ state, message, lastUpdatedAt });
+    };
+
+    async function refresh() {
+      updateSync('polling', 'Recarregando Kanban...');
+      await fetchCards();
+      if (mounted) {
+        updateSync('realtime', 'Kanban sincronizado.');
+      }
+    }
+
+    void refresh();
+
+    return () => {
+      mounted = false;
+    };
+  }, [refreshSignal, fetchCards, onSyncChange]);
 
   useEffect(() => {
     if (!isDraggingBoard) {

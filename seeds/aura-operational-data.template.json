@@ -93,13 +93,40 @@
       "capacity_notes": [],
       "window_notes": []
     },
-    "Chale/Anexo": {
+    "Chale": {
+      "capacity_notes": [],
+      "location_notes": []
+    },
+    "Apto Anexo": {
       "capacity_notes": [],
       "location_notes": []
     }
   },
   "room_rates": {
-    "Chale/Anexo": {
+    "Chale": {
+      "nome_do_periodo": {
+        "season_name": "",
+        "date_from": "2026-01-01",
+        "date_to": "2026-12-31",
+        "days_of_week": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "base_price": 0,
+        "min_nights": 1,
+        "priority": 100,
+        "extra_adult_price": 0,
+        "child_price_6_11": 0,
+        "child_price_0_5": 0,
+        "notes": ""
+      }
+    },
+    "Apto Anexo": {
       "nome_do_periodo": {
         "season_name": "",
         "date_from": "2026-01-01",
@@ -167,34 +194,27 @@
         "child_price_0_5": 0,
         "notes": ""
       }
-    }
-  },
-  "hospedin": {
-    "enabled": false,
-    "api_base_url": "https://pms.hospedin.com/api/v2",
-    "account_slug": "",
-    "timeout_ms": 10000,
-    "availability_threshold": 3,
-    "cache_ttl_seconds": 900,
-    "fallback_message": "No momento nao consegui confirmar a disponibilidade em tempo real. Posso seguir com a cotacao e a equipe confirma manualmente.",
-    "room_mappings": {
-      "Chale/Anexo": {
-        "place_type_id": "",
-        "place_type_title": "",
-        "active": true,
-        "notes": "Preencher com o place_type_id real da Hospedin quando disponível."
-      },
-      "Apto Terreo": {
-        "place_type_id": "",
-        "place_type_title": "",
-        "active": true,
-        "notes": "Preencher com o place_type_id real da Hospedin quando disponível."
-      },
-      "Apto Superior": {
-        "place_type_id": "",
-        "place_type_title": "",
-        "active": true,
-        "notes": "Preencher com o place_type_id real da Hospedin quando disponível."
+      ,
+      "tiradentes_2026": {
+        "season_name": "Tiradentes 2026",
+        "date_from": "2026-04-21",
+        "date_to": "2026-04-23",
+        "days_of_week": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "base_price": 799,
+        "min_nights": 3,
+        "priority": 9,
+        "extra_adult_price": 100,
+        "child_price_6_11": 80,
+        "child_price_0_5": 0,
+        "notes": "Pacote de feriado com minimo de 3 diarias."
       }
     }
   }

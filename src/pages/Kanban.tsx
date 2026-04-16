@@ -11,6 +11,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function Kanban() {
+  const [refreshSignal, setRefreshSignal] = useState(0);
   const [sync, setSync] = useState<{
     state: KanbanSyncState;
     message: string;
@@ -37,6 +38,10 @@ export default function Kanban() {
 
   const SyncIcon =
     sync.state === 'realtime' ? Radio : sync.state === 'error' ? AlertTriangle : RefreshCw;
+
+  const handleRefreshKanban = () => {
+    setRefreshSignal((current) => current + 1);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -126,6 +131,15 @@ export default function Kanban() {
         </div>
         
         <div className="flex items-center gap-4">
+          <button
+            onClick={handleRefreshKanban}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-zinc-200 hover:bg-white/10 transition-all active:scale-[0.98]"
+            title="Recarregar cards do Kanban"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Recarregar Kanban
+          </button>
+
           <AuraModeControl
             assistantMode={assistantMode}
             assistantEnabled={assistantEnabled}
@@ -150,7 +164,7 @@ export default function Kanban() {
         </div>
       )}
       
-      <KanbanBoard onSyncChange={setSync} />
+      <KanbanBoard onSyncChange={setSync} refreshSignal={refreshSignal} />
     </div>
   );
 }

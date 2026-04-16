@@ -45,16 +45,24 @@ insert into public.room_rates (
   notes
 )
 values
-  ('Chale/Anexo', 'Tarifa regular - Domingo a Sexta', '2026-01-01', '2026-12-31', array[0,1,2,3,4,5], 349, 1, 100, 100, 80, 0, true, 'Base trazida do workflow legado.'),
+  ('Chale', 'Tarifa regular - Domingo a Sexta', '2026-01-01', '2026-12-31', array[0,1,2,3,4,5], 349, 1, 100, 100, 80, 0, true, 'Base trazida do workflow legado.'),
+  ('Apto Anexo', 'Tarifa regular - Domingo a Sexta', '2026-01-01', '2026-12-31', array[0,1,2,3,4,5], 349, 1, 100, 100, 80, 0, true, 'Base trazida do workflow legado.'),
   ('Apto Terreo', 'Tarifa regular - Domingo a Sexta', '2026-01-01', '2026-12-31', array[0,1,2,3,4,5], 359, 1, 100, 100, 80, 0, true, 'Base trazida do workflow legado.'),
   ('Apto Superior', 'Tarifa regular - Domingo a Sexta', '2026-01-01', '2026-12-31', array[0,1,2,3,4,5], 369, 1, 100, 100, 80, 0, true, 'Base trazida do workflow legado.'),
-  ('Chale/Anexo', 'Tarifa regular - Sabado', '2026-01-01', '2026-12-31', array[6], 379, 1, 90, 100, 80, 0, true, 'Base trazida do workflow legado.'),
+  ('Chale', 'Tarifa regular - Sabado', '2026-01-01', '2026-12-31', array[6], 379, 1, 90, 100, 80, 0, true, 'Base trazida do workflow legado.'),
+  ('Apto Anexo', 'Tarifa regular - Sabado', '2026-01-01', '2026-12-31', array[6], 379, 1, 90, 100, 80, 0, true, 'Base trazida do workflow legado.'),
   ('Apto Terreo', 'Tarifa regular - Sabado', '2026-01-01', '2026-12-31', array[6], 389, 1, 90, 100, 80, 0, true, 'Base trazida do workflow legado.'),
   ('Apto Superior', 'Tarifa regular - Sabado', '2026-01-01', '2026-12-31', array[6], 399, 1, 90, 100, 80, 0, true, 'Base trazida do workflow legado.'),
-  ('Chale/Anexo', 'Pascoa 2026', '2026-04-03', '2026-04-05', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
+  ('Chale', 'Pascoa 2026', '2026-04-03', '2026-04-05', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
+  ('Apto Anexo', 'Pascoa 2026', '2026-04-03', '2026-04-05', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
   ('Apto Terreo', 'Pascoa 2026', '2026-04-03', '2026-04-05', array[0,1,2,3,4,5,6], 699, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
   ('Apto Superior', 'Pascoa 2026', '2026-04-03', '2026-04-05', array[0,1,2,3,4,5,6], 799, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
-  ('Chale/Anexo', 'Corpus Christi 2026', '2026-06-04', '2026-06-07', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
+  ('Chale', 'Tiradentes 2026', '2026-04-21', '2026-04-23', array[0,1,2,3,4,5,6], 599, 3, 9, 100, 80, 0, true, 'Pacote de feriado com minimo de 3 diarias.'),
+  ('Apto Anexo', 'Tiradentes 2026', '2026-04-21', '2026-04-23', array[0,1,2,3,4,5,6], 599, 3, 9, 100, 80, 0, true, 'Pacote de feriado com minimo de 3 diarias.'),
+  ('Apto Terreo', 'Tiradentes 2026', '2026-04-21', '2026-04-23', array[0,1,2,3,4,5,6], 699, 3, 9, 100, 80, 0, true, 'Pacote de feriado com minimo de 3 diarias.'),
+  ('Apto Superior', 'Tiradentes 2026', '2026-04-21', '2026-04-23', array[0,1,2,3,4,5,6], 799, 3, 9, 100, 80, 0, true, 'Pacote de feriado com minimo de 3 diarias.'),
+  ('Chale', 'Corpus Christi 2026', '2026-06-04', '2026-06-07', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
+  ('Apto Anexo', 'Corpus Christi 2026', '2026-06-04', '2026-06-07', array[0,1,2,3,4,5,6], 599, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
   ('Apto Terreo', 'Corpus Christi 2026', '2026-06-04', '2026-06-07', array[0,1,2,3,4,5,6], 699, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.'),
   ('Apto Superior', 'Corpus Christi 2026', '2026-06-04', '2026-06-07', array[0,1,2,3,4,5,6], 799, 3, 10, 100, 80, 0, true, 'Minimo de diarias obrigatorio. Ajuste se necessario.')
 on conflict do nothing;
